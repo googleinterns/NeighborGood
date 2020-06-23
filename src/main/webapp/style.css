@@ -74,8 +74,11 @@ section {
 }
 .help-button {
     cursor: pointer;
+    font-weight: bold;
 }
-.task-category {
+.task-footer {
     font-style: italic;
     padding-top: 1em;
+    display: flex;
+    justify-content: space-between;
 }
