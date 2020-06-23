@@ -1,0 +1,81 @@
+body {
+	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    margin: auto;
+}
+#userpage-icon {
+    padding: 1em;
+}
+
+#title {
+    font-size: 4em;
+    text-align: center;
+    padding-bottom: 0.5em;
+}
+#control-bar {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 2em;
+}
+
+#categories {
+    display: flex;
+    border-bottom: solid;
+    border-top: solid;
+    border-left: solid;
+    width: 83%;
+}
+#category-all {
+    background-color: lightgray;
+}
+.categories {
+    border-right: solid;
+    cursor: pointer;
+    text-align: center;
+    width: 20%;
+    min-width: 0;
+    overflow: hidden;
+    line-height: 3em;
+}
+
+#add-task {
+    white-space: nowrap;
+    line-height: 3em;
+    margin-left: 1em;
+    border: solid;
+    cursor: pointer;
+    width: 15%;
+    min-width: 0;
+    overflow: hidden;
+    text-align: center;
+}
+
+section {
+    max-width: 55em;
+    margin: auto;
+    padding: 0 1em;
+}
+
+#tasks-list {
+    border-top: solid;
+    border-right: solid;
+    border-left: solid;
+}
+.task {
+    padding: 1em;
+    border-bottom: solid;
+}
+.task-header {
+    display: flex;
+    padding-bottom: 1em;
+    justify-content: space-between;
+}
+.username {
+    width: 70%;
+}
+.help-button {
+    cursor: pointer;
+}
+.task-category {
+    font-style: italic;
+    padding-top: 1em;
+}
