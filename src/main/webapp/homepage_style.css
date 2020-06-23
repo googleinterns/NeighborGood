@@ -2,21 +2,30 @@ body {
 	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
     margin: auto;
 }
+
+/* Header Styling */
 #userpage-icon {
     padding: 1em;
 }
-
 #title {
     font-size: 4em;
     text-align: center;
     padding-bottom: 0.5em;
 }
+
+/* Main Content Styling */
+section {
+    max-width: 55em;
+    margin: auto;
+    padding: 0 1em;
+}
+
+/* Styling for control bar (categories and add task) */
 #control-bar {
     display: flex;
     justify-content: center;
     padding-bottom: 2em;
 }
-
 #categories {
     display: flex;
     border-bottom: solid;
@@ -36,7 +45,6 @@ body {
     overflow: hidden;
     line-height: 3em;
 }
-
 #add-task {
     white-space: nowrap;
     line-height: 3em;
@@ -49,12 +57,7 @@ body {
     text-align: center;
 }
 
-section {
-    max-width: 55em;
-    margin: auto;
-    padding: 0 1em;
-}
-
+/* Tasks Styling */
 #tasks-list {
     border-top: solid;
     border-right: solid;

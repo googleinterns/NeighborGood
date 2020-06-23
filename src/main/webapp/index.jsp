@@ -9,6 +9,7 @@
     <script src="https://kit.fontawesome.com/71105f4105.js" crossorigin="anonymous"></script> 
   </head>
   <body>
+      <!--Site Header-->
       <header>
           <nav>
               <div id="userpage-icon">
@@ -19,7 +20,11 @@
               NeighborHelp
           </div>
       </header>
+
+      <!--Main Content of Site-->
       <section>
+
+          <!--Control Bar for choosing categories and adding tasks-->
           <div id="control-bar">
               <div id="categories">
                   <div class="categories" id="category-all" onclick="filterBy('all')">ALL</div>
@@ -32,8 +37,10 @@
                   ADD TASK
               </div>
           </div>
+
+          <!--Hard Coded List of Tasks-->
           <div id="tasks-list">
-              <!--Task-->
+              <!-- New Task Begins-->
               <div class="task garden">
                   <div class="task-header">
                       <div class="username">
@@ -55,7 +62,7 @@
                       </div>  
                   </div>
               </div>
-              <!--Task-->
+              <!-- New Task Begins-->
               <div class="task shopping">
                   <div class="task-header">
                       <div class="username">
@@ -77,7 +84,7 @@
                       </div>  
                   </div>
               </div>
-              <!--Task-->
+              <!-- New Task Begins-->
               <div class="task misc">
                   <div class="task-header">
                       <div class="username">
@@ -99,7 +106,7 @@
                       </div>  
                   </div>
               </div>
-              <!--Task-->
+              <!-- New Task Begins-->
               <div class="task shopping">
                   <div class="task-header">
                       <div class="username">
@@ -121,7 +128,7 @@
                       </div>  
                   </div>
               </div>
-              <!--Task-->
+              <!-- New Task Begins-->
               <div class="task pets">
                   <div class="task-header">
                       <div class="username">
@@ -143,7 +150,7 @@
                       </div>  
                   </div>
               </div>
-              <!--Task-->
+              <!-- New Task Begins-->
               <div class="task garden">
                   <div class="task-header">
                       <div class="username">
