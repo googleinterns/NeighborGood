@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="user_profile_script.js"></script>
   </head>
-  <body>
+  <body onload="showNeedHelp()">
     <div id="nav-bar">
         <p id="return-link"><a href="index.html">BACK TO HOME</a></p>
         <p id="log-out-link">Leonard Zhang |  <a href="logout.html">Log out</a></p>
@@ -21,9 +21,9 @@
     <hr/>
     <div id="button-container-wrap">
         <div id="container">
-            <button class="help-button">Need help</button>
-            <button class="help-button">Offer help</button>
-            <button id="create">+</button>
+            <button class="help-button" id="need-help-button" onclick="showNeedHelp()">Need help</button>
+            <button class="help-button" id="offer-help-button" onclick="showOfferHelp()">Offer help</button>
+            <button id="create" onclick="showModal()">+</button>
         </div>
     </div>
     <br/>
@@ -31,7 +31,7 @@
         <table id="need-help">
             <tr>
                 <th>Task Overview</th>
-                <th>Assignee</th>
+                <th>Helper</th>
                 <th>Status</th>
                 <th>Edit</th>
                 <th>Delete</th>
@@ -64,6 +64,54 @@
                 </button></td>
             </tr>
         </table>
+        <table id="offer-help">
+            <tr>
+                <th>Task Overview</th>
+                <th>Neighbor</th>
+                <th>Reward</th>
+                <th>Mark as complete</th>
+            </tr>
+            <tr>
+                <td>Collect the garbage on the drive</td>
+                <td>Leonard</td>
+                <td>100 pts</td>
+				<td><button class="complete-task" onclick="completeTask(this)">
+                    <i class="fa fa-check"></i>
+                </button></td>
+            </tr>
+            <tr>
+                <td>Mown the grass in the backyard</td>
+                <td>Jack</td>
+                <td>150 pts</td>
+                <td><button class="complete-task" onclick="completeTask(this)">
+                    <i class="fa fa-check"></i>
+                </button></td>
+            </tr>
+            <tr>
+                <td>Help me grab some bread and milk from supermarket</td>
+                <td>Jason</td>
+                <td>250 pts</td>
+                <td><button class="complete-task" onclick="completeTask(this)">
+                    <i class="fa fa-check"></i>
+                </button></td>
+            </tr>
+        </table>
+    </div>
+    <div id="createTaskModal">
+        <div id="modal">
+            <span id="close-button" onclick="closeModal()">&times;</span>
+            <form id="new-task-form" action="/tasks" method="POST">
+                <h1>CREATE A NEW TASK: </h1>
+                <br/>
+                <h2>Task Content:</h2>
+                <textarea name="task-content-input" placeholder="Task Content"></textarea>
+                <br/>
+                <h2>Rewarding Points:</h2>
+                <textarea name="reward-input" placeholder="Enter rewarding points for completing the task"></textarea>
+                <br/><br/>
+                <input type="submit" />
+            </form>
+        </div>
     </div>
   </body>
 </html>
