@@ -73,3 +73,20 @@ function removeTask(element) {
 function cancelHelpOut(element) {
 	element.parentNode.style.display = "none";
 }
+
+/** Leonard's implementation of the Add Task modal */
+function showModal() {
+    var modal = document.getElementById("createTaskModal");
+    modal.style.display = "block";
+}
+function closeModal() {
+    var modal = document.getElementById("createTaskModal");
+    modal.style.display = "none";
+}
+// If the user clicks outside of the modal, closes the modal directly
+window.onclick = function(event) {
+    var modal = document.getElementById("createTaskModal");
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
