@@ -7,6 +7,12 @@ body {
 #userpage-icon {
     padding: 1em;
 }
+i:hover{
+    color: grey;
+}
+i {
+    color: black;
+}
 #title {
     font-size: 4em;
     text-align: center;
@@ -23,21 +29,23 @@ section {
 /* Styling for control bar (categories and add task) */
 #control-bar {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     padding-bottom: 2em;
 }
 #categories {
     display: flex;
-    border-bottom: solid;
-    border-top: solid;
-    border-left: solid;
-    width: 83%;
+    border-bottom: solid black;
+    border-top: solid black;
+    border-left: solid black;;
+    width: 90%;
 }
 #category-all {
-    background-color: lightgray;
+    background-color:gray;
+    color: white;
+    font-weight: bold;
 }
 .categories {
-    border-right: solid;
+    border-right: solid black;
     cursor: pointer;
     text-align: center;
     width: 20%;
@@ -45,16 +53,17 @@ section {
     overflow: hidden;
     line-height: 3em;
 }
+.categories:hover {
+    background-color: lightgray;
+}
 #add-task {
-    white-space: nowrap;
-    line-height: 3em;
-    margin-left: 1em;
-    border: solid;
+    padding-left: 1em;
     cursor: pointer;
-    width: 15%;
     min-width: 0;
     overflow: hidden;
-    text-align: center;
+}
+#addtaskbutton {
+    font-size: 3.5em;
 }
 
 /* Tasks Styling */
@@ -64,8 +73,11 @@ section {
     border-left: solid;
 }
 .task {
-    padding: 1em;
     border-bottom: solid;
+    position: relative;
+}
+.task-container {
+    padding: 1em;
 }
 .task-header {
     display: flex;
@@ -79,9 +91,37 @@ section {
     cursor: pointer;
     font-weight: bold;
 }
+.help-button:hover{
+    color: gray;
+}
 .task-footer {
     font-style: italic;
     padding-top: 1em;
     display: flex;
     justify-content: space-between;
+}
+.confirm-overlay {
+    position: absolute;
+    z-index: 99;
+    display: none;
+    background: rgba(236, 236, 240, 0.85);
+    backdrop-filter: blur(4px);
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    line-height: 2em;
+    font-size: 2em;
+    font-weight: bold;
+    overflow: hidden;
+}
+.confirm-overlay a:hover {
+    color: gray;
+    cursor:pointer;
+}
+.exit-confirm {
+    font-size: 30px;
+    line-height: 0em;
+    text-align: right;
+    padding-right: 1em;
+    padding-top: 1em;
 }
