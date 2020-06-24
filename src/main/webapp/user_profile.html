@@ -40,7 +40,7 @@
                 <td>Collect the garbage on the drive</td>
                 <td>Leonard</td>
                 <td>OPEN</td>
-                <td><button class="edit-task"><i class="fa fa-edit"></i></button></td>
+                <td><button class="edit-task" onclick="showModal()"><i class="fa fa-edit"></i></button></td>
 				<td><button class="delete-task" onclick="deleteRow(this)">
                     <i class="fa fa-trash-o"></i>
                 </button></td>
@@ -49,7 +49,7 @@
                 <td>Mown the grass in the backyard</td>
                 <td>Jack</td>
                 <td>OPEN</td>
-                <td><button class="edit-task"><i class="fa fa-edit"></i></button></td>
+                <td><button class="edit-task" onclick="showModal()"><i class="fa fa-edit"></i></button></td>
                 <td><button class="delete-task" onclick="deleteRow(this)">
                     <i class="fa fa-trash-o"></i>
                 </button></td>
@@ -58,8 +58,8 @@
                 <td>Help me grab some bread and milk from supermarket</td>
                 <td>Jason</td>
                 <td>IN PROGRESS</td>
-                <td><button class="edit-task"><i class="fa fa-edit"></i></button></td>
-                <td><button class="delete-task" onclick="deleteRow(this)">
+                <td><button class="edit-task" onclick="editInProgress()"><i class="fa fa-edit"></i></button></td>
+                <td><button class="delete-task" onclick="deleteInProgress()">
                     <i class="fa fa-trash-o"></i>
                 </button></td>
             </tr>
@@ -70,6 +70,7 @@
                 <th>Neighbor</th>
                 <th>Reward</th>
                 <th>Mark as complete</th>
+                <th>Abandon</th>
             </tr>
             <tr>
                 <td>Collect the garbage on the drive</td>
@@ -77,6 +78,9 @@
                 <td>100 pts</td>
 				<td><button class="complete-task" onclick="completeTask(this)">
                     <i class="fa fa-check"></i>
+                </button></td>
+                <td><button class="abandon-task" onclick="completeTask(this)">
+                    <i class="fa fa-times"></i>
                 </button></td>
             </tr>
             <tr>
@@ -86,6 +90,9 @@
                 <td><button class="complete-task" onclick="completeTask(this)">
                     <i class="fa fa-check"></i>
                 </button></td>
+                <td><button class="abandon-task" onclick="completeTask(this)">
+                    <i class="fa fa-times"></i>
+                </button></td>
             </tr>
             <tr>
                 <td>Help me grab some bread and milk from supermarket</td>
@@ -93,6 +100,9 @@
                 <td>250 pts</td>
                 <td><button class="complete-task" onclick="completeTask(this)">
                     <i class="fa fa-check"></i>
+                </button></td>
+                <td><button class="abandon-task" onclick="completeTask(this)">
+                    <i class="fa fa-times"></i>
                 </button></td>
             </tr>
         </table>

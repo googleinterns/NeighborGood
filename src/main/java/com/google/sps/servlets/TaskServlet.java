@@ -1,0 +1,108 @@
+// Copyright 2019 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package com.google.sps.servlets;
+
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gson.Gson;
+import java.io.IOException;
+import java.util.List;
+import java.util.ArrayList;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/** Servlet that creates new task entity and fetch saved tasks. */
+@WebServlet("/tasks")
+public class TaskServlet extends HttpServlet {
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // Serve the GET request sent from home page to fetch all the tasks
+        return;
+    }
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // Get the rewarding points from the form
+        int rewardPts = getRewardingPoints(request);
+        if (rewardPts == -1) {
+            response.setContentType("text/html");
+            response.getWriter().println("Please enter a valid integer in the range of 0-200");
+            return;
+        }
+
+        // Get the task detail from the form input
+        String taskDetail = "";
+        String input = request.getParameter("task-content-input");
+        if (input != null) {
+            taskDetail = input;
+        }
+
+        // If the input is nonempty and valid, set the taskDetail value to the input value
+        if (!taskDetail.equals("")) {
+            long timestamp = System.currentTimeMillis();
+
+            // Create an Entity that stores the input comment
+            Entity taskEntity = new Entity("Task");
+            taskEntity.setProperty("detail", taskDetail);
+            taskEntity.setProperty("timestamp", timestamp);
+            taskEntity.setProperty("reward", rewardPts);
+            taskEntity.setProperty("status", "OPEN");
+            taskEntity.setProperty("Owner", "Leonard");
+            taskEntity.setProperty("Helper", "N/A");
+            taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
+
+            DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+            datastore.put(taskEntity);
+        }
+
+        // Redirect back to the user page.
+        response.sendRedirect("/user_profile.html");
+    }
+
+    /** Return the input rewarding points by the user, or -1 if the input was invalid */
+    private int getRewardingPoints(HttpServletRequest request) {
+        // Get the input from the form.
+        String rewardPtsString = request.getParameter("reward-input");
+
+        // Convert the input to an int.
+        int rewardPts;
+        try {
+            rewardPts = Integer.parseInt(rewardPtsString);
+        } catch (NumberFormatException e) {
+            System.err.println("Could not convert to int: " + rewardPtsString);
+            return -1;
+        }
+
+        // Check that the input is positive.
+        if (rewardPts < 0 || rewardPts > 200) {
+            System.err.println("User input is out of range: " + rewardPtsString);
+            return -1;
+        }
+
+        return rewardPts;
+    }
+}
