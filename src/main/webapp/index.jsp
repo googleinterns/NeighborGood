@@ -18,9 +18,9 @@
                   </a>
               </div>
           </nav>
-          <div id="title">
-              NeighborHelp
-          </div>
+          <h1 id="title">
+              NeighborGood
+          </h1>
       </header>
 
       <!--Main Content of Site-->
