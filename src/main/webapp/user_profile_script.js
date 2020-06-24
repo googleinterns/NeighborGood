@@ -30,12 +30,16 @@ function showNeedHelp() {
     document.getElementById("need-help").style.display = "table";
     document.getElementById("create").style.display = "block";
     document.getElementById("offer-help").style.display = "none";
+    document.getElementById("need-help-button").style.backgroundColor = "#3e8e41";
+    document.getElementById("offer-help-button").style.backgroundColor = "#4CAF50";
 }
 
 function showOfferHelp() {
     document.getElementById("need-help").style.display = "none";
     document.getElementById("create").style.display = "none";
     document.getElementById("offer-help").style.display = "table";
+    document.getElementById("need-help-button").style.backgroundColor = "#4CAF50";
+    document.getElementById("offer-help-button").style.backgroundColor = "#3e8e41";
 }
 
 function showModal() {

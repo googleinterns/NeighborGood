@@ -9,7 +9,7 @@
   </head>
   <body onload="showNeedHelp()">
     <div id="nav-bar">
-        <p id="return-link"><a href="index.html">BACK TO HOME</a></p>
+        <p id="return-link"><a href="index.jsp">BACK TO HOME</a></p>
         <p id="log-out-link">Leonard Zhang |  <a href="logout.html">Log out</a></p>
     </div>
     <div style="clear: both"></div>
@@ -23,7 +23,7 @@
         <div id="container">
             <button class="help-button" id="need-help-button" onclick="showNeedHelp()">Need help</button>
             <button class="help-button" id="offer-help-button" onclick="showOfferHelp()">Offer help</button>
-            <button id="create" onclick="showModal()">+</button>
+            <i class="fa fa-plus-circle fa-3x" id="create" onclick="showModal()"></i>
         </div>
     </div>
     <br/>
@@ -102,12 +102,14 @@
             <span id="close-button" onclick="closeModal()">&times;</span>
             <form id="new-task-form" action="/tasks" method="POST">
                 <h1>CREATE A NEW TASK: </h1>
+                <div>
+                    <label for="task-content-input">Task Detail:</label>
+                    <br/>
+                </div>
+                <textarea name="task-content-input" id="task-content-input" placeholder="Describe your task here:"></textarea>
                 <br/>
-                <h2>Task Content:</h2>
-                <textarea name="task-content-input" placeholder="Task Content"></textarea>
-                <br/>
-                <h2>Rewarding Points:</h2>
-                <textarea name="reward-input" placeholder="Enter rewarding points for completing the task"></textarea>
+                <label for="rewarding-point-input">Rewarding Points:</label>
+                <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50">
                 <br/><br/>
                 <input type="submit" />
             </form>
