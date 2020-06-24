@@ -36,7 +36,7 @@
                   <div class="categories" id="category-misc" onclick="filterBy('misc')">MISC</div>
               </div>
               <div id="add-task">
-                  <i class="fas fa-plus-circle" aria-hidden="true" id="addtaskbutton" title="Add Task"></i>
+                  <i class="fas fa-plus-circle" aria-hidden="true" id="addtaskbutton" title="Add Task" onclick="showModal()"></i>
               </div>
           </div>
 
@@ -212,5 +212,24 @@
               </div>
           </div>
       </section>
+      <!-- Add Task Modal Section Implemented by Leonard -->
+      <div id="createTaskModal">
+        <div id="modal">
+            <span id="close-button" onclick="closeModal()">&times;</span>
+            <form id="new-task-form" action="/tasks" method="POST">
+                <h1>CREATE A NEW TASK: </h1>
+                <div>
+                    <label for="task-content-input">Task Detail:</label>
+                    <br/>
+                </div>
+                <textarea name="task-content-input" id="task-content-input" placeholder="Describe your task here:"></textarea>
+                <br/>
+                <label for="rewarding-point-input">Rewarding Points:</label>
+                <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50">
+                <br/><br/>
+                <input type="submit" />
+            </form>
+        </div>
+    </div>
   </body>
 </html>
