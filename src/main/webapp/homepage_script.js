@@ -80,6 +80,8 @@ function logOut() {
     let loginMessage = document.getElementById("login-message");
     loginMessage.innerHTML = "<a onclick='logIn()'>Login to help a neighbor!</a>";
     document.getElementById("user-link").style.display = "none";
+    document.getElementById("categories").style.width = "100%";
+    document.getElementById("add-task").style.display = "none";
 }
 
 /** Temporary login function for prototype */
@@ -88,6 +90,8 @@ function logIn(){
     let loginMessage = document.getElementById("login-message");
     loginMessage.innerHTML = "User | <a onclick='logOut()'>Logout</a>";
     document.getElementById("user-link").style.display = "block";
+    document.getElementById("categories").style.width = "90%";
+    document.getElementById("add-task").style.display = "block";
 }
 
 /** Leonard's implementation of the Add Task modal */
