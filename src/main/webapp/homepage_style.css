@@ -4,8 +4,24 @@ body {
 }
 
 /* Header Styling */
+nav {
+    display: flex;
+    justify-content: space-between;
+}
 #userpage-icon {
     padding: 1em;
+}
+#login-logout {
+    padding: 0 1em;
+}
+#login-logout a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+}
+#login-logout a:hover {
+    color: gray;
 }
 i:hover{
     color: grey;

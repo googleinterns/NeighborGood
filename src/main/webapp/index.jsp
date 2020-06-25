@@ -17,6 +17,9 @@
                       <i class="fas fa-user-circle fa-3x" title="Go to User Page"></i>
                   </a>
               </div>
+              <div id="login-logout">
+          	      <p id="login-message">User | <a onclick="logOut()">Logout</a></p>
+              </div>
           </nav>
           <h1 id="title">
               NeighborGood

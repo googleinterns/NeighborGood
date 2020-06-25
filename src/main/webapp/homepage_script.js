@@ -74,6 +74,20 @@ function cancelHelpOut(element) {
 	element.parentNode.style.display = "none";
 }
 
+/** Temporary logout function for prototype */
+function logOut() {
+    alert("You have been logged out");
+    let loginMessage = document.getElementById("login-message");
+    loginMessage.innerHTML = "<a onclick='logIn()'>Login to help a neighbor!</a>";
+}
+
+/** Temporary login function for prototype */
+function logIn(){
+    alert("You are now logged in");
+    let loginMessage = document.getElementById("login-message");
+    loginMessage.innerHTML = "User | <a onclick='logOutMessage()'>Logout</a>";
+}
+
 /** Leonard's implementation of the Add Task modal */
 function showModal() {
     var modal = document.getElementById("createTaskModal");
