@@ -61,12 +61,12 @@
     width: 8%;
     border-radius: 2px;
     color: white; /* White text */
+    padding: 10px 24px; /* Some padding */
     cursor: pointer; /* Pointer/hand icon */
     float: left; /* Float the buttons side by side */
     font-family: “Lucida Bright”, Georgia, serif;
     font-weight: 650;
-    text-align: center;
-    font-size: calc(6px + 0.5vw);
+    font-size: 0.75vw;
 }
 
 #create {
@@ -149,11 +149,11 @@ th, td {
 	color: white;
 }
 
-.delete-task:hover, .abandon-task:hover {
+.delete-task:hover {
 	background-color: red;
 }
 
-.delete-task:hover i, .abandon-task:hover i {
+.delete-task:hover i {
 	color: white;
 }
 

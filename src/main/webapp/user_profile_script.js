@@ -68,7 +68,6 @@ function showNeedHelp() {
     document.getElementById("offer-help").style.display = "none";
     document.getElementById("need-help-button").style.backgroundColor = "#3e8e41";
     document.getElementById("offer-help-button").style.backgroundColor = "#4CAF50";
-    displayNeedHelpTasks();
 }
 
 function showOfferHelp() {
