@@ -13,7 +13,7 @@
       <header>
           <nav>
               <div id="userpage-icon">
-                  <a href="user_profile.html">
+                  <a href="user_profile.html" id="user-link">
                       <i class="fas fa-user-circle fa-3x" title="Go to User Page"></i>
                   </a>
               </div>
