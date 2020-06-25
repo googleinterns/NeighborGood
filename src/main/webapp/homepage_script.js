@@ -91,3 +91,12 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 }
+
+function adjustControlBar(userLogged){
+    console.log(userLogged);
+	if (userLogged === false) {
+        document.getElementById("categories").style.width = "100%";
+    } else {
+        document.getElementById("categories").style.width = "90%";
+    }
+}

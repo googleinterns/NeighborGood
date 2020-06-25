@@ -10,13 +10,16 @@
   </head>
   <%@ page import = "com.google.appengine.api.users.UserService" %>
   <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
-  <body>
+  <% UserService userService = UserServiceFactory.getUserService(); 
+  boolean userLogged = userService.isUserLoggedIn(); %>
+  <body onload="adjustControlBar(<%=userLogged%>)">
       <!--Site Header-->
       <header>
           <nav>
               <div id="userpage-icon">
-              <% UserService userService = UserServiceFactory.getUserService();
-              if (userService.isUserLoggedIn()) { %>
+              <%
+              if (userLogged) { 
+              %>
                   <a href="user_profile.html">
                       <i class="fas fa-user-circle fa-3x" title="Go to User Page"></i>
                   </a>
@@ -27,7 +30,7 @@
 
               <div id="login-logout">
           	      <%
-            	  if (userService.isUserLoggedIn()) {
+            	  if (userLogged) {
                       String urlToRedirectToAfterUserLogsOut = "/";
                       String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
                   %>
@@ -60,9 +63,15 @@
                   <div class="categories" id="category-pets" onclick="filterBy('pets')">PETS</div>
                   <div class="categories" id="category-misc" onclick="filterBy('misc')">MISC</div>
               </div>
+              <%
+              if (userLogged) {
+              %>
               <div id="add-task">
                   <i class="fas fa-plus-circle" aria-hidden="true" id="addtaskbutton" title="Add Task" onclick="showModal()"></i>
               </div>
+              <% 
+              }
+              %>
           </div>
 
           <!--Hard Coded List of Tasks-->
@@ -78,9 +87,15 @@
                             <div class="username">
                                 JOHN SMITH
                             </div>
+                            <%
+                            if (userLogged) {
+                            %>
                             <div class="help-button" onclick="helpOut(this)">
                                 HELP OUT
                             </div>
+                            <%
+                            }
+                            %>
                         </div>
                         <div class="task-content">
                             I need someone to help me mow my lawn.
@@ -106,9 +121,15 @@
                             <div class="username">
                                 CARMEN ROSA
                             </div>
+                            <%
+                            if (userLogged) {
+                            %>
                             <div class="help-button" onclick="helpOut(this)">
                                 HELP OUT
                             </div>
+                            <%
+                            }
+                            %>
                         </div>
                         <div class="task-content">
                             Could someone pick up my pharmacy prescription?
@@ -134,9 +155,15 @@
                             <div class="username">
                                 FRIENDLY NEIGHBOR
                             </div>
+                            <%
+                            if (userLogged) {
+                            %>
                             <div class="help-button" onclick="helpOut(this)">
                                 HELP OUT
                             </div>
+                            <%
+                            }
+                            %>
                         </div>
                         <div class="task-content">
                             Can someone help me unload some furniture?
@@ -162,9 +189,15 @@
                             <div class="username">
                                 SPONGE BOB
                             </div>
+                            <%
+                            if (userLogged) {
+                            %>
                             <div class="help-button" onclick="helpOut(this)">
                                 HELP OUT
                             </div>
+                            <%
+                            }
+                            %>
                         </div>
                         <div class="task-content">
                             I need someone to go to the grocery store for me.
@@ -190,9 +223,15 @@
                             <div class="username">
                                 BOB ROGERS
                             </div>
+                            <%
+                            if (userLogged) {
+                            %>
                             <div class="help-button" onclick="helpOut(this)">
                                 HELP OUT
                             </div>
+                            <%
+                            }
+                            %>
                         </div>
                         <div class="task-content">
                             Could someone walk Fluffy for me? I am in bedrest for a week.
@@ -218,9 +257,15 @@
                             <div class="username">
                                 GARDEN ENTHUSIAST
                             </div>
+                            <%
+                            if (userLogged) {
+                            %>
                             <div class="help-button" onclick="helpOut(this)">
                                 HELP OUT
                             </div>
+                            <%
+                            }
+                            %>
                         </div>
                         <div class="task-content">
                             Can someone water my garden next week? I'll be out of town.
