@@ -8,17 +8,39 @@
     <script src="homepage_script.js"></script>
     <script src="https://kit.fontawesome.com/71105f4105.js" crossorigin="anonymous"></script> 
   </head>
+  <%@ page import = "com.google.appengine.api.users.UserService" %>
+  <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
   <body>
       <!--Site Header-->
       <header>
           <nav>
               <div id="userpage-icon">
+              <% UserService userService = UserServiceFactory.getUserService();
+              if (userService.isUserLoggedIn()) { %>
                   <a href="user_profile.html">
                       <i class="fas fa-user-circle fa-3x" title="Go to User Page"></i>
                   </a>
+              <%
+              }
+              %>
               </div>
+
               <div id="login-logout">
-          	      <p id="login-message">User | <a onclick="logOut()">Logout</a></p>
+          	      <%
+            	  if (userService.isUserLoggedIn()) {
+                      String urlToRedirectToAfterUserLogsOut = "/";
+                      String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
+                  %>
+          	      <p class="login-messages"><%=userService.getCurrentUser().getEmail()%> | <a href="<%=logoutUrl%>">Logout</a></p>
+                  <%
+                  } else {
+                      String urlToRedirectToAfterUserLogsIn = "/";
+                      String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
+                  %>
+                  <p class="login-messages"><a href="<%=loginUrl%>">Login to help out a neighbor!</a></p>
+                  <%
+                    }
+                  %>
               </div>
           </nav>
           <h1 id="title">
