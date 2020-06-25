@@ -18,3 +18,44 @@ function deleteRow(row) {
         document.getElementById("need-help").deleteRow(rowIndex);
     }
 }
+
+function completeTask(row) {
+    if (confirm("Are you sure that you have already completed the task?")) {
+        var rowIndex = row.parentNode.parentNode.rowIndex;
+        document.getElementById("offer-help").deleteRow(rowIndex);
+    }
+}
+
+function showNeedHelp() {
+    document.getElementById("need-help").style.display = "table";
+    document.getElementById("create").style.display = "block";
+    document.getElementById("offer-help").style.display = "none";
+    document.getElementById("need-help-button").style.backgroundColor = "#3e8e41";
+    document.getElementById("offer-help-button").style.backgroundColor = "#4CAF50";
+}
+
+function showOfferHelp() {
+    document.getElementById("need-help").style.display = "none";
+    document.getElementById("create").style.display = "none";
+    document.getElementById("offer-help").style.display = "table";
+    document.getElementById("need-help-button").style.backgroundColor = "#4CAF50";
+    document.getElementById("offer-help-button").style.backgroundColor = "#3e8e41";
+}
+
+function showModal() {
+    var modal = document.getElementById("createTaskModal");
+    modal.style.display = "block";
+}
+
+function closeModal() {
+    var modal = document.getElementById("createTaskModal");
+    modal.style.display = "none";
+}
+
+// If the user clicks outside of the modal, closes the modal directly
+window.onclick = function(event) {
+    var modal = document.getElementById("createTaskModal");
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
