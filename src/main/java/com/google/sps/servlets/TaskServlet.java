@@ -47,7 +47,7 @@ public class TaskServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // Get the rewarding points from the form
-        int rewardPts = getRewardingPoints(request);
+        int rewardPts = getRewardingPoints(request, "reward-input");
         if (rewardPts == -1) {
             response.setContentType("text/html");
             response.getWriter().println("Please enter a valid integer in the range of 0-200");
@@ -84,9 +84,9 @@ public class TaskServlet extends HttpServlet {
     }
 
     /** Return the input rewarding points by the user, or -1 if the input was invalid */
-    private int getRewardingPoints(HttpServletRequest request) {
+    private int getRewardingPoints(HttpServletRequest request, String inputName) {
         // Get the input from the form.
-        String rewardPtsString = request.getParameter("reward-input");
+        String rewardPtsString = request.getParameter(inputName);
 
         // Convert the input to an int.
         int rewardPts;
@@ -104,5 +104,41 @@ public class TaskServlet extends HttpServlet {
         }
 
         return rewardPts;
+    }
+
+    @Override
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String keyString = request.getParameter("key");
+
+        Key taskKey = KeyFactory.stringToKey(keyString);
+
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        datastore.delete(taskKey);
+
+        // Redirect to the user profile page
+        response.sendRedirect("/user_profile.html");
+    }
+
+    @Override
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String keyString = request.getParameter("key");
+        int rewardPts = getRewardingPoints(request, "edit-input");
+        if (rewardPts == -1) {
+            response.setContentType("text/html");
+            response.getWriter().println("Please enter a valid integer in the range of 0-200");
+            return;
+        }
+
+        // Get the task detail from the form input
+        String taskDetail = "";
+        String input = request.getParameter("edit-content-input");
+        if (input != null) {
+            taskDetail = input;
+        }
+
+        // If the input is nonempty and valid, set the taskDetail value to the input value
+        if (!taskDetail.equals("")) {
+            
+        }
     }
 }

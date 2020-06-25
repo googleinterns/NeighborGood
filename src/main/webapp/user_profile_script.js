@@ -12,6 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+async function getInfo(keyString) {
+    const queryURL = "/tasks/info?key=" + keyString;
+    const request = new Request(queryURL, {method: "GET"});
+    const response = await fetch(request);
+    const info = await response.json();
+    console.log(info[0]);
+    return info[0];
+}
+
+async function deleteTask(keyString) {
+    const info = await getInfo(keyString);
+    if (info.status !== "OPEN") {
+        window.alert("You can only delete an 'OPEN' task.")
+    } else {
+        const queryURL = "/tasks?key=" + keyString;
+        const request = new Request(queryURL, {method: "DELETE"});
+        const response = await fetch(request);
+    }
+}
+
+async function editTask(keyString) {
+    const info = await getInfo(keyString);
+    console.log(info);
+    if (info.status !== "OPEN") {
+        window.alert("You can only edit an 'OPEN' task.")
+    } else {
+        document.getElementById("edit-content-input").value = info.detail;
+        document.getElementById("edit-point-input").value = info.reward.toString();
+        const id_input = document.getElementById("task-id-input");
+        id_input.value = info.keyString;
+        id_input.readOnly = true;
+        id_input.style.display = "none"
+        document.getElementById("editTaskModal").style.display = "block";
+    }
+}
+
 function deleteRow(row) {
     if (confirm("Are you sure that you want to delete this already published task?")) {
         var rowIndex = row.parentNode.parentNode.rowIndex;
@@ -61,11 +97,20 @@ function closeModal() {
     modal.style.display = "none";
 }
 
+function closeEditModal() {
+    var modal = document.getElementById("editTaskModal");
+    modal.style.display = "none";
+}
+
 // If the user clicks outside of the modal, closes the modal directly
 window.onclick = function(event) {
     var modal = document.getElementById("createTaskModal");
     if (event.target == modal) {
         modal.style.display = "none";
+    }
+    var editModal = document.getElementById("editTaskModal");
+    if (event.target == editModal) {
+        editModal.style.display = "none";
     }
 }
 
@@ -91,16 +136,17 @@ async function displayNeedHelpTasks() {
             td.appendChild(document.createTextNode(data[i]));
             tr.appendChild(td);
         }
+        const keyStringCopy = task.keyString.slice();
         var editTd = document.createElement("td");
         var editBtn = document.createElement("button");
         editBtn.className = "edit-task";
-        editBtn.addEventListener("click", showModal);
+        editBtn.addEventListener("click", function () { editTask(keyStringCopy) });
         editBtn.innerHTML = '<i class="fa fa-edit"></i>';
         editTd.appendChild(editBtn);
         var deleteTd = document.createElement("td");
         var deleteBtn = document.createElement("button");
         deleteBtn.className = "delete-task";
-        deleteBtn.addEventListener("click", deleteInProgress);
+        deleteBtn.addEventListener("click", function () { deleteTask(keyStringCopy) });
         deleteBtn.innerHTML = '<i class="fa fa-trash-o"></i>';
         deleteTd.appendChild(deleteBtn);
         tr.appendChild(editTd);

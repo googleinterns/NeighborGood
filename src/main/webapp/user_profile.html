@@ -28,42 +28,7 @@
     </div>
     <br/>
     <div id="task-list">
-        <table id="need-help">
-            <tr>
-                <th>Task Overview</th>
-                <th>Helper</th>
-                <th>Status</th>
-                <th>Edit</th>
-                <th>Delete</th>
-            </tr>
-            <tr>
-                <td>Collect the garbage on the drive</td>
-                <td>Leonard</td>
-                <td>OPEN</td>
-                <td><button class="edit-task" onclick="showModal()"><i class="fa fa-edit"></i></button></td>
-				<td><button class="delete-task" onclick="deleteRow(this)">
-                    <i class="fa fa-trash-o"></i>
-                </button></td>
-            </tr>
-            <tr>
-                <td>Mown the grass in the backyard</td>
-                <td>Jack</td>
-                <td>OPEN</td>
-                <td><button class="edit-task" onclick="showModal()"><i class="fa fa-edit"></i></button></td>
-                <td><button class="delete-task" onclick="deleteRow(this)">
-                    <i class="fa fa-trash-o"></i>
-                </button></td>
-            </tr>
-            <tr>
-                <td>Help me grab some bread and milk from supermarket</td>
-                <td>Jason</td>
-                <td>IN PROGRESS</td>
-                <td><button class="edit-task" onclick="editInProgress()"><i class="fa fa-edit"></i></button></td>
-                <td><button class="delete-task" onclick="deleteInProgress()">
-                    <i class="fa fa-trash-o"></i>
-                </button></td>
-            </tr>
-        </table>
+        <table id="need-help"></table>
         <table id="offer-help">
             <tr>
                 <th>Task Overview</th>
@@ -121,6 +86,26 @@
                 <label for="rewarding-point-input">Rewarding Points:</label>
                 <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50">
                 <br/><br/>
+                <input type="submit" />
+            </form>
+        </div>
+    </div>
+    <div id="editTaskModal">
+        <div id="editModal">
+            <span id="edit-close-button" onclick="closeEditModal()">&times;</span>
+            <form id="edit-task-form" action="/tasks" method="PUT">
+                <h1>EDIT THE CURRENT TASK: </h1>
+                <div>
+                    <label for="edit-content-input">Task Detail:</label>
+                    <br/>
+                </div>
+                <textarea name="edit-content-input" id="edit-content-input"></textarea>
+                <br/>
+                <label for="edit-point-input">Rewarding Points: </label>
+                <input type="number" id="edit-point-input" name="edit-input" min="0" max="200">
+                <textarea name="task-id" id="task-id-input"></textarea>
+                <br/>
+                <br/>
                 <input type="submit" />
             </form>
         </div>
