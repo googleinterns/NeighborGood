@@ -1,0 +1,92 @@
+* {
+	 margin: 0;
+	 padding: 0;
+	 box-sizing: border-box;
+}
+ html, body {
+	 height: 100%;
+}
+ body {
+	 font: 15px 'Open Sans', sans-serif;
+	 color: #777;
+}
+ a {
+	 cursor: pointer;
+}
+ ul {
+	 list-style: none;
+}
+ .wrapper {
+	 display: flex;
+	 min-height: 100%;
+}
+ nav {
+	 width: 200px;
+	 background: #404040;
+}
+ nav header {
+	 position: relative;
+	 height: 80px;
+	 padding: 20px 0 0 15px;
+	 font-size: 16px;
+	 color: #fff;
+	 background: #333;
+}
+ nav ul a {
+	 position: relative;
+	 display: block;
+	 padding: 15px 15px 17px 50px;
+	 color: #fff;
+	 border-bottom: 1px solid;
+	 background: #333;
+}
+ nav ul a:hover, nav ul a.active {
+	 background: #c0c0c0;
+}
+ main {
+	 flex: 1;
+	 padding: 25px;
+	 background: #f5f5f5;
+}
+ main h1 {
+	 height: 80px;
+	 margin: -25px -25px 25px -25px;
+	 padding: 0 25px;
+	 line-height: 76px;
+	 font-size: 24px;
+	 font-weight: 400;
+	 background: #ddd;
+     color: #333;
+}
+ .flex-grid {
+	 display: flex;
+}
+ .flex-grid > div {
+	 flex: 1;
+	 margin: 0 20px 20px 0;
+	 padding: 15px;
+	 border: 1px solid #ddd;
+	 background: #fff;
+}
+ .flex-grid h2 {
+	 padding: 12px 15px;
+	 font-size: 20px;
+	 font-weight: 400;
+	 border-bottom: 1px solid #ddd;
+     color: #333;
+}
+ .flex-grid li {
+	 margin: 0 0 10px;
+	 padding: 0 0 0 25px;
+}
+
+/** Media Queries **/
+ @media (max-width: 1000px) {
+	 .flex-grid {
+		 flex-direction: column;
+	}
+	 .flex-grid > div {
+		 margin-right: 0;
+	}
+}
+ 
