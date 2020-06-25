@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that creates new task entity and fetch saved tasks. */
+/** Servlet that fetch all saved tasks whose owner is the current user. */
 @WebServlet("/mytasks/needhelp")
 public class MyNeedHelpTaskServlet extends HttpServlet {
     @Override

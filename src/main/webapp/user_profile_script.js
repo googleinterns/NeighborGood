@@ -17,8 +17,8 @@ async function getInfo(keyString) {
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
     const info = await response.json();
-    console.log(info[0]);
-    return info[0];
+    console.log(info);
+    return info;
 }
 
 async function deleteTask(keyString) {
@@ -53,14 +53,6 @@ function deleteRow(row) {
         var rowIndex = row.parentNode.parentNode.rowIndex;
         document.getElementById("need-help").deleteRow(rowIndex);
     }
-}
-
-function deleteInProgress() {
-    window.alert("You cannot delete an 'IN PROGRESS' task.")
-}
-
-function editInProgress() {
-    window.alert("You cannot edit an 'IN PROGRESS' task.")
 }
 
 function completeTask(row) {
@@ -141,13 +133,13 @@ async function displayNeedHelpTasks() {
         var editBtn = document.createElement("button");
         editBtn.className = "edit-task";
         editBtn.addEventListener("click", function () { editTask(keyStringCopy) });
-        editBtn.innerHTML = '<i class="fa fa-edit"></i>';
+        editBtn.innerHTML = (task.status === "OPEN") ? '<i class="fa fa-edit"></i>':'<i class="fa fa-ban"></i>';
         editTd.appendChild(editBtn);
         var deleteTd = document.createElement("td");
         var deleteBtn = document.createElement("button");
         deleteBtn.className = "delete-task";
         deleteBtn.addEventListener("click", function () { deleteTask(keyStringCopy) });
-        deleteBtn.innerHTML = '<i class="fa fa-trash-o"></i>';
+        deleteBtn.innerHTML = (task.status === "OPEN") ? '<i class="fa fa-trash-o"></i>':'<i class="fa fa-ban"></i>';
         deleteTd.appendChild(deleteBtn);
         tr.appendChild(editTd);
         tr.appendChild(deleteTd);
