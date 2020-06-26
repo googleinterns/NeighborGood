@@ -26,9 +26,11 @@ async function deleteTask(keyString) {
     if (info.status !== "OPEN") {
         window.alert("You can only delete an 'OPEN' task.")
     } else {
-        const queryURL = "/tasks?key=" + keyString;
-        const request = new Request(queryURL, {method: "DELETE"});
-        const response = await fetch(request);
+        if (confirm("Are you sure that you want to delete the task?")) {
+            const queryURL = "/tasks?key=" + keyString;
+            const request = new Request(queryURL, {method: "DELETE"});
+            const response = await fetch(request);
+        }
     }
 }
 
@@ -48,17 +50,29 @@ async function editTask(keyString) {
     }
 }
 
-function deleteRow(row) {
-    if (confirm("Are you sure that you want to delete this already published task?")) {
-        var rowIndex = row.parentNode.parentNode.rowIndex;
-        document.getElementById("need-help").deleteRow(rowIndex);
+async function completeTask(keyString) {
+    const info = await getInfo(keyString);
+    if (info.status !== "IN PROGRESS") {
+        window.alert("You have already marked the task as complete.");
+    } else {
+        if (confirm("Are you sure that you have already completed the task?")) {
+            const queryURL = "/tasks/info?key=" + keyString + "&status=" + "COMPLETE: AWAIT VERIFICATION";
+            const request = new Request(queryURL, {method: "POST"});
+            const response = await fetch(request);
+        }
     }
 }
 
-function completeTask(row) {
-    if (confirm("Are you sure that you have already completed the task?")) {
-        var rowIndex = row.parentNode.parentNode.rowIndex;
-        document.getElementById("offer-help").deleteRow(rowIndex);
+async function abandonTask(keyString) {
+    const info = await getInfo(keyString);
+    if (info.status !== "IN PROGRESS") {
+        window.alert("You have already marked the task as complete.");
+    } else {
+        if (confirm("Are you sure that you want to abandon the task?")) {
+            const queryURL = "/tasks/info?key=" + keyString + "&status=" + "OPEN";
+            const request = new Request(queryURL, {method: "POST"});
+            const response = await fetch(request);
+        }
     }
 }
 
@@ -77,6 +91,7 @@ function showOfferHelp() {
     document.getElementById("offer-help").style.display = "table";
     document.getElementById("need-help-button").style.backgroundColor = "#4CAF50";
     document.getElementById("offer-help-button").style.backgroundColor = "#3e8e41";
+    displayOfferHelpTasks();
 }
 
 function showModal() {
@@ -107,7 +122,9 @@ window.onclick = function(event) {
 }
 
 async function displayNeedHelpTasks() {
-    const response = await fetch("/mytasks/needhelp");
+    const queryURL = "mytasks?keyword=Owner";
+    const request = new Request(queryURL, {method: "GET"});
+    const response = await fetch(request);
     const taskResponse = await response.json();
     const needHelpTable = document.getElementById("need-help");
     needHelpTable.innerHTML = "";
@@ -144,5 +161,48 @@ async function displayNeedHelpTasks() {
         tr.appendChild(editTd);
         tr.appendChild(deleteTd);
         needHelpTable.appendChild(tr);
+    }
+}
+
+async function displayOfferHelpTasks() {
+    const queryURL = "mytasks?keyword=Helper";
+    const request = new Request(queryURL, {method: "GET"});
+    const response = await fetch(request);
+    const taskResponse = await response.json();
+    const offerHelpTable = document.getElementById("offer-help");
+    offerHelpTable.innerHTML = "";
+    var headerRow = document.createElement("tr");
+    var headers = ["Task Overview", "Status", "Neighbor", "Reward", "Mark as complete", "Abandon"];
+    for (var index = 0; index < headers.length; index++) {
+        var th = document.createElement("th");
+        th.appendChild(document.createTextNode(headers[index]));
+        headerRow.appendChild(th);
+    }
+    offerHelpTable.appendChild(headerRow);
+    for (var index = 0; index < taskResponse.length; index++) {
+        var tr = document.createElement("tr");
+        var task = taskResponse[index];
+        var data = [task.detail, task.status, task.owner, task.reward.toString()];
+        for (var i = 0; i < data.length; i++) {
+            var td = document.createElement("td");
+            td.appendChild(document.createTextNode(data[i]));
+            tr.appendChild(td);
+        }
+        const keyStringCopy = task.keyString.slice();
+        var completeTd = document.createElement("td");
+        var completeBtn = document.createElement("button");
+        completeBtn.className = "complete-task";
+        completeBtn.addEventListener("click", function () { completeTask(keyStringCopy) });
+        completeBtn.innerHTML = (task.status === "IN PROGRESS") ? '<i class="fa fa-check"></i>':'<i class="fa fa-ban"></i>';
+        completeTd.appendChild(completeBtn);
+        var abandonTd = document.createElement("td");
+        var abandonBtn = document.createElement("button");
+        abandonBtn.className = "abandon-task";
+        abandonBtn.addEventListener("click", function () { abandonTask(keyStringCopy) });
+        abandonBtn.innerHTML = (task.status === "IN PROGRESS") ? '<i class="fa fa-times"></i>':'<i class="fa fa-ban"></i>';;
+        abandonTd.appendChild(abandonBtn);
+        tr.appendChild(completeTd);
+        tr.appendChild(abandonTd);
+        offerHelpTable.appendChild(tr);
     }
 }
