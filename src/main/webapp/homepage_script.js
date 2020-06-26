@@ -82,6 +82,10 @@ function logOut() {
     document.getElementById("user-link").style.display = "none";
     document.getElementById("categories").style.width = "100%";
     document.getElementById("add-task").style.display = "none";
+    const helpButtons = document.getElementsByClassName("help-button");
+    for (let i = 0; i < helpButtons.length; i++) {
+        helpButtons[i].style.display = "none";
+    }
 }
 
 /** Temporary login function for prototype */
@@ -92,6 +96,10 @@ function logIn(){
     document.getElementById("user-link").style.display = "block";
     document.getElementById("categories").style.width = "90%";
     document.getElementById("add-task").style.display = "block";
+    const helpButtons = document.getElementsByClassName("help-button");
+    for (let i = 0; i < helpButtons.length; i++) {
+        helpButtons[i].style.display = "block";
+    }
 }
 
 /** Leonard's implementation of the Add Task modal */
