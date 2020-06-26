@@ -1,3 +1,18 @@
+// Copyright 2019 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+const mapskey = config.MAPS_KEY
 
 /** Function that visually mimics the functionality of filtering tasks by category */
 function filterBy(category) {
@@ -93,10 +108,85 @@ window.onclick = function(event) {
 }
 
 function adjustControlBar(userLogged){
-    console.log(userLogged);
 	if (userLogged === false) {
         document.getElementById("categories").style.width = "100%";
     } else {
         document.getElementById("categories").style.width = "90%";
     }
 }
+
+/* Event listener to get user's neighborhood*/
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', getUserNeighborhood);
+} else {
+    getUserNeighborhood();
+}
+
+/* Function dynamically adds Maps API and
+begins the processes of retrieving the user's neighborhood*/
+function getUserNeighborhood() {
+    const script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src =  "https://maps.googleapis.com/maps/api/js?key=" + mapskey + "&callback=initialize";
+    script.defer = true;
+    script.async = true;
+    document.head.appendChild(script);
+	
+	window.initialize = function () {
+        getUserLocation().then(location => toNeighborhood(location))
+        	.then(neighborhood => {
+                // For now this just prints the neighborhood to the console
+                // but the neighborhood will be used when implementing
+                // the list tasks feature
+            	console.log(neighborhood);
+        	}).catch(() => {
+                console.error("User location and/or neighborhood could not be retrieved");
+            });
+	}
+}
+
+/* Function that returns a promise to get and return the user's location */
+ function getUserLocation() {
+    return new Promise((resolve, reject) => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var location = {lat: position.coords.latitude, lng: position.coords.longitude};
+                resolve(location);
+            }, function() {
+                reject("User location failed");
+            });
+        } else {
+            reject("User location is not supported by this browser");
+        }
+    });
+}
+
+/* Function that returns a promise to return a neighborhood
+array that includes the postal code and country */
+function toNeighborhood(latlng) {
+	return new Promise((resolve, reject) => {
+        const geocoder = new google.maps.Geocoder;
+        geocoder.geocode({"location": latlng}, function(results, status) {
+            if (status == "OK") {
+                if (results[0]) {
+                    const result = results[0]
+                    let zipCode = "";
+                    let country ="";
+                    for (let i = result.address_components.length - 1; i >= 0; i--) {
+                        let component = result.address_components[i];
+                        if ((zipCode == "") && (component.types.indexOf("postal_code") >= 0 )) {
+                            zipCode = component.long_name;
+                        }
+                        if ((country == "") && (component.types.indexOf("country") >= 0 )) {
+                            country = component.long_name;
+                        }
+                        if (zipCode != "" && country != "") break;
+                    }
+                    resolve([zipCode, country]);
+                } else reject("Couldn't get neighborhood");
+            } else reject("Couldn't get neighborhood");
+        });
+    });
+}
+
+
