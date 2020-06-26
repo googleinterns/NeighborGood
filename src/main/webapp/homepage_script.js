@@ -136,7 +136,7 @@ function getUserNeighborhood() {
 	
     // Once the Maps API script has dynamically loaded it gets the user location,
     // waits until it gets an answer and then calls toNeighborhood passing the location
-    // toNeighborhood consequently returns the user's neighborhood
+    // as an argument. toNeighborhood consequently returns the user's neighborhood
 	window.initialize = function () {
         getUserLocation().then(location => toNeighborhood(location))
         	.then(neighborhood => {
