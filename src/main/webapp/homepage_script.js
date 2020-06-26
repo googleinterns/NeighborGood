@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const mapskey = config.MAPS_KEY
+const MAPSKEY = config.MAPS_KEY
 
 /** Function that visually mimics the functionality of filtering tasks by category */
 function filterBy(category) {
@@ -117,8 +117,10 @@ function adjustControlBar(userLogged){
 
 /* Event listener to get user's neighborhood*/
 if (document.readyState === 'loading') {
+    // adds on load event listener if document hasn't yet loaded
 	document.addEventListener('DOMContentLoaded', getUserNeighborhood);
 } else {
+    // if DOMContentLoaded has already fired, it simply calls the function
     getUserNeighborhood();
 }
 
@@ -127,11 +129,14 @@ begins the processes of retrieving the user's neighborhood*/
 function getUserNeighborhood() {
     const script = document.createElement("script");
     script.type = "text/javascript";
-    script.src =  "https://maps.googleapis.com/maps/api/js?key=" + mapskey + "&callback=initialize";
+    script.src =  "https://maps.googleapis.com/maps/api/js?key=" + MAPSKEY + "&callback=initialize";
     script.defer = true;
     script.async = true;
     document.head.appendChild(script);
 	
+    // Once the Maps API script has dynamically loaded it gets the user location,
+    // waits until it gets an answer and then calls toNeighborhood passing the location
+    // toNeighborhood consequently returns the user's neighborhood
 	window.initialize = function () {
         getUserLocation().then(location => toNeighborhood(location))
         	.then(neighborhood => {
