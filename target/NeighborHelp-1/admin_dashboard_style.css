@@ -105,10 +105,15 @@ main h1 {
     border-radius: inherit;
 }
 
-#card-div {
+#card-container {
 	max-height: 600px;
 	max-width: 500px;
-	overflow: auto;
+    min-width: 500px;
+}
+
+#card-div {
+    max-height: 545px;
+    overflow: auto;
 }
 
 #card-div ul {
@@ -154,14 +159,20 @@ main h1 {
 	margin: 0;
 }
 
+#chart-container { 
+  max-height: 600px;
+  min-height: 600px;
+}
+
+#chart-div {
+    height: 545px; 
+}
+
+
 /** Media Queries **/
 @media (max-width: 1000px) {
 	.notification-grid, .flex-grid {
 		flex-direction: column;
-	}
-	.flex-grid > div {
-		margin-right: 0;
-        margin-left: 0;
 	}
 
     .notification-grid > div {
@@ -169,4 +180,13 @@ main h1 {
         margin-top: 10px;
         margin-bottom: 10px;
 	}
+
+	.flex-grid > div {
+		margin-right: 0;
+        margin-left: 0;
+	}
+
+
+    
+
 }
