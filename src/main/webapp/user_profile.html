@@ -44,8 +44,8 @@
 				<td><button class="complete-task" onclick="completeTask(this)">
                     <i class="fa fa-check"></i>
                 </button></td>
-                <td><button class="abandon-task" onclick="completeTask(this)">
-                    <i class="fa fa-times"></i>
+                <td><button class="abandon-task" onclick="completeTask(this)">	
+                    <i class="fa fa-times"></i>	
                 </button></td>
             </tr>
             <tr>
@@ -55,8 +55,8 @@
                 <td><button class="complete-task" onclick="completeTask(this)">
                     <i class="fa fa-check"></i>
                 </button></td>
-                <td><button class="abandon-task" onclick="completeTask(this)">
-                    <i class="fa fa-times"></i>
+                <td><button class="abandon-task" onclick="completeTask(this)">	
+                    <i class="fa fa-times"></i>	
                 </button></td>
             </tr>
             <tr>
@@ -66,8 +66,8 @@
                 <td><button class="complete-task" onclick="completeTask(this)">
                     <i class="fa fa-check"></i>
                 </button></td>
-                <td><button class="abandon-task" onclick="completeTask(this)">
-                    <i class="fa fa-times"></i>
+                <td><button class="abandon-task" onclick="completeTask(this)">	
+                    <i class="fa fa-times"></i>	
                 </button></td>
             </tr>
         </table>
@@ -93,7 +93,7 @@
     <div id="editTaskModal">
         <div id="editModal">
             <span id="edit-close-button" onclick="closeEditModal()">&times;</span>
-            <form id="edit-task-form" action="/tasks" method="PUT">
+            <form id="edit-task-form" action="/tasks/edit" method="POST">
                 <h1>EDIT THE CURRENT TASK: </h1>
                 <div>
                     <label for="edit-content-input">Task Detail:</label>

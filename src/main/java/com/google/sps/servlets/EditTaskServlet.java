@@ -36,19 +36,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that creates new task entity and fetch saved tasks. */
-@WebServlet("/tasks")
-public class TaskServlet extends HttpServlet {
-    @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // Serve the GET request sent from home page to fetch all the tasks
-        return;
-    }
-
+/** Servlet that handles the request for editing the details and rewards for a certain task. */
+@WebServlet("/tasks/edit")
+public class EditTaskServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // Get the rewarding points from the form
-        int rewardPts = getRewardingPoints(request, "reward-input");
+        System.out.println("Modify");
+        String keyString = request.getParameter("task-id");
+        int rewardPts = getRewardingPoints(request, "edit-input");
         if (rewardPts == -1) {
             response.setContentType("text/html");
             response.getWriter().println("Please enter a valid integer in the range of 0-200");
@@ -57,33 +52,34 @@ public class TaskServlet extends HttpServlet {
 
         // Get the task detail from the form input
         String taskDetail = "";
-        String input = request.getParameter("task-content-input");
+        String input = request.getParameter("edit-content-input");
         if (input != null) {
             taskDetail = input;
         }
 
         // If the input is nonempty and valid, set the taskDetail value to the input value
         if (!taskDetail.equals("")) {
-            long timestamp = System.currentTimeMillis();
-
-            // Create an Entity that stores the input comment
-            Entity taskEntity = new Entity("Task");
-            taskEntity.setProperty("detail", taskDetail);
-            taskEntity.setProperty("timestamp", timestamp);
-            taskEntity.setProperty("reward", rewardPts);
-            taskEntity.setProperty("status", "OPEN");
-            taskEntity.setProperty("Owner", "Leonard");
-            taskEntity.setProperty("Helper", "N/A");
-            taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
-
+            Key taskKey = KeyFactory.stringToKey(keyString);
             DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-            datastore.put(taskEntity);
-        }
+            Entity task;
+            try {
+                task = datastore.get(taskKey);
+            } catch (EntityNotFoundException e) {
+                System.err.println("Unable to find the entity based on the input key");
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "The entity is not found in the database");
+                return;
+            }
 
-        // Redirect back to the user page.
+            // Set the details and rewards to the newly input value
+            task.setProperty("detail", taskDetail);
+            task.setProperty("reward", rewardPts);
+            datastore.put(task);
+        }
         response.sendRedirect("/user_profile.html");
     }
 
+    // Both TaskServlet and EditTaskServlet use this method. I will fix this by putting the function in a separate
+    // class in the next PR.
     /** Return the input rewarding points by the user, or -1 if the input was invalid */
     private int getRewardingPoints(HttpServletRequest request, String inputName) {
         // Get the input from the form.
@@ -105,18 +101,5 @@ public class TaskServlet extends HttpServlet {
         }
 
         return rewardPts;
-    }
-
-    @Override
-    public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String keyString = request.getParameter("key");
-
-        Key taskKey = KeyFactory.stringToKey(keyString);
-
-        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-        datastore.delete(taskKey);
-
-        // Redirect to the user profile page
-        response.sendRedirect("/user_profile.html");
     }
 }

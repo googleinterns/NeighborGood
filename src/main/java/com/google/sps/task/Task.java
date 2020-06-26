@@ -15,23 +15,31 @@
 package com.google.sps.task;
 
 public final class Task {
-    private final String detail;
-    private final String keyString;
-    private final long timestamp;
-    private final String status;
-    private final long reward;
-    private final String owner;
-    private final String helper;
-    private final String address;
+  private final String detail;
+  private final String keyString;
+  private final long timestamp;
+  private final String status;
+  private final long reward;
+  private final String owner;
+  private final String helper;
+  private final String address;
 
-    public Task(String keyString, String detail, long timestamp, String status, long reward, String owner, String helper, String address) {
-        this.keyString = keyString;
-        this.detail = detail;
-        this.timestamp = timestamp;
-        this.status = status;
-        this.reward = reward;
-        this.owner = owner;
-        this.helper = helper;
-        this.address = address;
-    }
+  public Task(
+      String keyString,
+      String detail,
+      long timestamp,
+      String status,
+      long reward,
+      String owner,
+      String helper,
+      String address) {
+    this.keyString = keyString;
+    this.detail = detail;
+    this.timestamp = timestamp;
+    this.status = status;
+    this.reward = reward;
+    this.owner = owner;
+    this.helper = helper;
+    this.address = address;
+  }
 }

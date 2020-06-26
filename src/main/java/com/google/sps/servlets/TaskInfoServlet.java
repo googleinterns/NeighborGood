@@ -38,7 +38,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that creates new task entity and fetch saved tasks. */
+/** 
+ * Servlet that returns all the information about a specific task whose corresponding entity key matches
+ * the given input keyString .
+ */
 @WebServlet("/tasks/info")
 public class TaskInfoServlet extends HttpServlet {
     @Override
@@ -67,11 +70,9 @@ public class TaskInfoServlet extends HttpServlet {
 
         Task taskEntry = new Task(keyString, detail, timestamp, status, reward, owner, helper, address);
         System.out.println(status.equals("OPEN"));
-        List<Task> result = new ArrayList<>();
-        result.add(taskEntry);
 
         Gson gson = new Gson();
-        String json = gson.toJson(result);
+        String json = gson.toJson(taskEntry);
         response.setContentType("application/json;");
         response.getWriter().println(json);
     }
