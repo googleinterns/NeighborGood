@@ -46,21 +46,11 @@ public class TaskInfoServlet extends HttpServlet {
       entity = datastore.get(taskKey);
     } catch (EntityNotFoundException e) {
       System.err.println("Unable to find the entity based on the input key");
-      response.sendError(
-          HttpServletResponse.SC_NOT_FOUND, "The entity is not found in the database");
+      response.sendError(HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
       return;
     }
 
-    String detail = (String) entity.getProperty("detail");
-    long timestamp = (long) entity.getProperty("timestamp");
-    long reward = (long) entity.getProperty("reward");
-    String status = (String) entity.getProperty("status");
-    String owner = (String) entity.getProperty("Owner");
-    String helper = (String) entity.getProperty("Helper");
-    String address = (String) entity.getProperty("Address");
-
-    Task taskEntry = new Task(keyString, detail, timestamp, status, reward, owner, helper, address);
-    System.out.println(status.equals("OPEN"));
+    Task taskEntry = new Task(entity);
 
     Gson gson = new Gson();
     String json = gson.toJson(taskEntry);
@@ -81,8 +71,7 @@ public class TaskInfoServlet extends HttpServlet {
       entity = datastore.get(taskKey);
     } catch (EntityNotFoundException e) {
       System.err.println("Unable to find the entity based on the input key");
-      response.sendError(
-          HttpServletResponse.SC_NOT_FOUND, "The entity is not found in the database");
+      response.sendError(HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
       return;
     }
 

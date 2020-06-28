@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-async function getInfo(keyString) {
+
+
+async function getTaskInfo(keyString) {
     const queryURL = "/tasks/info?key=" + keyString;
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
     const info = await response.json();
-    console.log(info);
     return info;
 }
 
 async function deleteTask(keyString) {
-    const info = await getInfo(keyString);
+    const info = await getTaskInfo(keyString);
     if (info.status !== "OPEN") {
         window.alert("You can only delete an 'OPEN' task.")
     } else {
@@ -30,41 +31,50 @@ async function deleteTask(keyString) {
             const queryURL = "/tasks?key=" + keyString;
             const request = new Request(queryURL, {method: "DELETE"});
             const response = await fetch(request);
+            showNeedHelp();
         }
     }
 }
 
 async function editTask(keyString) {
-    const info = await getInfo(keyString);
-    console.log(info);
+    const info = await getTaskInfo(keyString);
     if (info.status !== "OPEN") {
         window.alert("You can only edit an 'OPEN' task.")
     } else {
-        document.getElementById("edit-content-input").value = info.detail;
+        document.getElementById("edit-detail-input").value = info.detail;
         document.getElementById("edit-point-input").value = info.reward.toString();
         const id_input = document.getElementById("task-id-input");
         id_input.value = info.keyString;
-        id_input.readOnly = true;
-        id_input.style.display = "none"
-        document.getElementById("editTaskModal").style.display = "block";
+        document.getElementById("editTaskModalWrapper").style.display = "block";
+        showNeedHelp()
     }
 }
 
 async function completeTask(keyString) {
-    const info = await getInfo(keyString);
+    const info = await getTaskInfo(keyString);
     if (info.status !== "IN PROGRESS") {
         window.alert("You have already marked the task as complete.");
+    } else if (info.owner === info.helper) {
+        window.alert("You cannot complete a task published by yourself! The task will now be removed from the system!");
+        var queryURL = "/tasks/info?key=" + keyString + "&status=" + "OPEN";
+        var request = new Request(queryURL, {method: "POST"});
+        var response = await fetch(request);
+        queryURL = "/tasks?key=" + keyString;
+        request = new Request(queryURL, {method: "DELETE"});
+        response = await fetch(request);
+        showOfferHelp()
     } else {
         if (confirm("Are you sure that you have already completed the task?")) {
             const queryURL = "/tasks/info?key=" + keyString + "&status=" + "COMPLETE: AWAIT VERIFICATION";
             const request = new Request(queryURL, {method: "POST"});
             const response = await fetch(request);
+            showOfferHelp();
         }
     }
 }
 
 async function abandonTask(keyString) {
-    const info = await getInfo(keyString);
+    const info = await getTaskInfo(keyString);
     if (info.status !== "IN PROGRESS") {
         window.alert("You have already marked the task as complete.");
     } else {
@@ -72,6 +82,7 @@ async function abandonTask(keyString) {
             const queryURL = "/tasks/info?key=" + keyString + "&status=" + "OPEN";
             const request = new Request(queryURL, {method: "POST"});
             const response = await fetch(request);
+            showOfferHelp();
         }
     }
 }
@@ -95,34 +106,34 @@ function showOfferHelp() {
 }
 
 function showModal() {
-    var modal = document.getElementById("createTaskModal");
+    var modal = document.getElementById("createTaskModalWrapper");
     modal.style.display = "block";
 }
 
 function closeModal() {
-    var modal = document.getElementById("createTaskModal");
+    var modal = document.getElementById("createTaskModalWrapper");
     modal.style.display = "none";
 }
 
 function closeEditModal() {
-    var modal = document.getElementById("editTaskModal");
+    var modal = document.getElementById("editTaskModalWrapper");
     modal.style.display = "none";
 }
 
 // If the user clicks outside of the modal, closes the modal directly
 window.onclick = function(event) {
-    var modal = document.getElementById("createTaskModal");
+    var modal = document.getElementById("createTaskModalWrapper");
     if (event.target == modal) {
         modal.style.display = "none";
     }
-    var editModal = document.getElementById("editTaskModal");
+    var editModal = document.getElementById("editTaskModalWrapper");
     if (event.target == editModal) {
         editModal.style.display = "none";
     }
 }
 
 async function displayNeedHelpTasks() {
-    const queryURL = "mytasks?keyword=Owner";
+    const queryURL = "/mytasks?keyword=Owner";
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
     const taskResponse = await response.json();
@@ -165,7 +176,7 @@ async function displayNeedHelpTasks() {
 }
 
 async function displayOfferHelpTasks() {
-    const queryURL = "mytasks?keyword=Helper";
+    const queryURL = "/mytasks?keyword=Helper";
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
     const taskResponse = await response.json();
