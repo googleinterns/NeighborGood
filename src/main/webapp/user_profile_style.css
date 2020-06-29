@@ -1,3 +1,8 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: auto;
+}
+
 #nav-bar {
 	margin-left: 2%;
 	width: 96%;
@@ -35,8 +40,8 @@
 }
 
 #title {
-	font-size: 40px;
-	font-family: “Book Antiqua”, Palatino, “Palatino Linotype”, “Palatino LT STD”, Georgia, serif;
+	font-size: 3em;
+	font-family: Roboto, sans-serif;
 	float: left;
 }
 
@@ -81,7 +86,7 @@
 }
 
 #create:hover {
-	color: red;
+	color: grey;
 }
 
 #task-list {
