@@ -138,15 +138,7 @@ async function displayNeedHelpTasks() {
     const response = await fetch(request);
     const taskResponse = await response.json();
     const needHelpTable = document.getElementById("need-help");
-    needHelpTable.innerHTML = "";
-    var headerRow = document.createElement("tr");
-    var headers = ["Task Overview", "Helper", "Status", "Edit", "Delete"];
-    for (var index = 0; index < headers.length; index++) {
-        var th = document.createElement("th");
-        th.appendChild(document.createTextNode(headers[index]));
-        headerRow.appendChild(th);
-    }
-    needHelpTable.appendChild(headerRow);
+    needHelpTable.innerHTML = needHelpTable.rows[0].innerHTML;
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
@@ -181,15 +173,7 @@ async function displayOfferHelpTasks() {
     const response = await fetch(request);
     const taskResponse = await response.json();
     const offerHelpTable = document.getElementById("offer-help");
-    offerHelpTable.innerHTML = "";
-    var headerRow = document.createElement("tr");
-    var headers = ["Task Overview", "Status", "Neighbor", "Reward", "Mark as complete", "Abandon"];
-    for (var index = 0; index < headers.length; index++) {
-        var th = document.createElement("th");
-        th.appendChild(document.createTextNode(headers[index]));
-        headerRow.appendChild(th);
-    }
-    offerHelpTable.appendChild(headerRow);
+    offerHelpTable.innerHTML = offerHelpTable.rows[0].innerHTML;
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
