@@ -67,7 +67,7 @@ public class EditTaskServlet extends HttpServlet {
     } else {
       System.err.println("The input task detail is empty");
       response.sendError(
-          HttpServletResponse.SC_FORBIDDEN, "The task detail field cannot be empty.");
+          HttpServletResponse.SC_BAD_REQUEST, "The task detail field cannot be empty.");
       return;
     }
 

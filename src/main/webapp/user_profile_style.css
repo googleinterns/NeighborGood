@@ -14,7 +14,7 @@ body {
 #return-link a {
 	font-family: Poppins, sans-serif;
 	font-weight: 700;
-	color: #000;
+	color: #222;
 }
 
 #log-out-link {
@@ -79,7 +79,7 @@ body {
 	width: 50px;
 	height: 50px;
 	border: none;
-    color: black; /* White text */
+    color: #222; /* White text */
     cursor: pointer; /* Pointer/hand icon */
     float: right; /* Float the buttons side by side */
 	margin-right: 2%;
@@ -90,7 +90,7 @@ body {
 }
 
 #task-list {
-	border: 2px solid black;
+	border: 2px solid #222;
 }
 
 /* Clear floats (clearfix hack) */
@@ -118,7 +118,7 @@ table {
     width: 100%;
 }
 table, th, td {
-    border: 1px solid black;
+    border: 1px solid #222;
     border-collapse: collapse;
 }
 
@@ -136,7 +136,7 @@ th, td {
 }
 
 .task-table th {
-    background-color: black;
+    background-color: #222;
     color: white;
 }
 
