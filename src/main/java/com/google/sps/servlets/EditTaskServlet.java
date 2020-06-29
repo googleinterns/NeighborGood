@@ -42,34 +42,34 @@ public class EditTaskServlet extends HttpServlet {
     // Get the task detail from the form input
     String taskDetail = "";
     String input = request.getParameter("task-detail-input");
+    // If the input is valid, set the taskDetail value to the input value
     if (input != null) {
       taskDetail = input;
     }
 
-    // If the input is nonempty and valid, set the taskDetail value to the input value
-    if (!taskDetail.equals("")) {
-      Key taskKey = KeyFactory.stringToKey(keyString);
-      DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-      Entity task;
-      try {
-        task = datastore.get(taskKey);
-      } catch (EntityNotFoundException e) {
-        System.err.println("Unable to find the entity based on the input key");
-        response.sendError(
-            HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
-        return;
-      }
-
-      // Set the details and rewards to the newly input value
-      task.setProperty("detail", taskDetail);
-      task.setProperty("reward", rewardPts);
-      datastore.put(task);
-    } else {
+    // If input task detail is empty, reject the request to edit and send a 400 error.
+    if (taskDetail.equals("")) {
       System.err.println("The input task detail is empty");
       response.sendError(
           HttpServletResponse.SC_BAD_REQUEST, "The task detail field cannot be empty.");
       return;
     }
+
+    Key taskKey = KeyFactory.stringToKey(keyString);
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Entity task;
+    try {
+      task = datastore.get(taskKey);
+    } catch (EntityNotFoundException e) {
+      System.err.println("Unable to find the entity based on the input key");
+      response.sendError(HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
+      return;
+    }
+
+    // Set the details and rewards to the newly input value
+    task.setProperty("detail", taskDetail);
+    task.setProperty("reward", rewardPts);
+    datastore.put(task);
 
     response.sendRedirect("/user_profile.html");
   }
