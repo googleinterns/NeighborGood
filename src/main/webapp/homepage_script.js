@@ -14,11 +14,15 @@
 
 const MAPSKEY = config.MAPS_KEY
 
-/* Calls addOnCliks once page has loaded */
+/* Calls addOnClicks and getUserNeighborhood once page has loaded */
 if (document.readyState === 'loading') {
+    // adds on load event listeners if document hasn't yet loaded
     document.addEventListener('DOMContentLoaded', addOnClicks)
+    document.addEventListener('DOMContentLoaded', getUserNeighborhood);
 } else {
+    // if DOMContentLoaded has already fired, it simply calls the functions
     addOnClicks();
+    getUserNeighborhood();
 }
 
 /* Function adds all the necessary 'click' event listeners*/
@@ -150,15 +154,6 @@ window.onclick = function(event) {
     }
 }
 
-/* Event listener to get user's neighborhood*/
-if (document.readyState === 'loading') {
-    // adds on load event listener if document hasn't yet loaded
-	document.addEventListener('DOMContentLoaded', getUserNeighborhood);
-} else {
-    // if DOMContentLoaded has already fired, it simply calls the function
-    getUserNeighborhood();
-}
-
 /* Function dynamically adds Maps API and
 begins the processes of retrieving the user's neighborhood*/
 function getUserNeighborhood() {
@@ -178,7 +173,6 @@ function getUserNeighborhood() {
                 // For now this just prints the neighborhood to the console
                 // but the neighborhood will be used when implementing
                 // the list tasks feature
-            	console.log(neighborhood);
         	}).catch(() => {
                 console.error("User location and/or neighborhood could not be retrieved");
             });
