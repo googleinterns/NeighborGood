@@ -1,6 +1,7 @@
 google.charts.load('current', {'packages':['line']});
 google.charts.setOnLoadCallback(drawChart);
 
+document.getElementsByTagName("body").addEventListener("onresize", drawChart);
 function _init_(){
 }
 
