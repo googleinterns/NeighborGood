@@ -28,60 +28,36 @@
     </div>
     <br/>
     <div id="task-list">
-        <table id="need-help"></table>
-        <table id="offer-help">
+        <table class="task-table" id="need-help">
             <tr>
                 <th>Task Overview</th>
+                <th>Helper</th>
+                <th>Status</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </table>
+        <table class="task-table" id="offer-help">
+            <tr>
+                <th>Task Overview</th>
+                <th>Status</th>
                 <th>Neighbor</th>
                 <th>Reward</th>
                 <th>Mark as complete</th>
                 <th>Abandon</th>
             </tr>
-            <tr>
-                <td>Collect the garbage on the drive</td>
-                <td>Leonard</td>
-                <td>100 pts</td>
-				<td><button class="complete-task" onclick="completeTask(this)">
-                    <i class="fa fa-check"></i>
-                </button></td>
-                <td><button class="abandon-task" onclick="completeTask(this)">	
-                    <i class="fa fa-times"></i>	
-                </button></td>
-            </tr>
-            <tr>
-                <td>Mown the grass in the backyard</td>
-                <td>Jack</td>
-                <td>150 pts</td>
-                <td><button class="complete-task" onclick="completeTask(this)">
-                    <i class="fa fa-check"></i>
-                </button></td>
-                <td><button class="abandon-task" onclick="completeTask(this)">	
-                    <i class="fa fa-times"></i>	
-                </button></td>
-            </tr>
-            <tr>
-                <td>Help me grab some bread and milk from supermarket</td>
-                <td>Jason</td>
-                <td>250 pts</td>
-                <td><button class="complete-task" onclick="completeTask(this)">
-                    <i class="fa fa-check"></i>
-                </button></td>
-                <td><button class="abandon-task" onclick="completeTask(this)">	
-                    <i class="fa fa-times"></i>	
-                </button></td>
-            </tr>
         </table>
     </div>
-    <div id="createTaskModal">
-        <div id="modal">
-            <span id="close-button" onclick="closeModal()">&times;</span>
+    <div class="modalWrapper" id="createTaskModalWrapper">
+        <div class="modal" id="createTaskModal">
+            <span class="close-button" id="close-button" onclick="closeModal()">&times;</span>
             <form id="new-task-form" action="/tasks" method="POST">
                 <h1>CREATE A NEW TASK: </h1>
                 <div>
-                    <label for="task-content-input">Task Detail:</label>
+                    <label for="task-detail-input">Task Detail:</label>
                     <br/>
                 </div>
-                <textarea name="task-content-input" id="task-content-input" placeholder="Describe your task here:"></textarea>
+                <textarea name="task-detail-input" id="task-detail-input" placeholder="Describe your task here:"></textarea>
                 <br/>
                 <label for="rewarding-point-input">Rewarding Points:</label>
                 <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50">
@@ -90,20 +66,20 @@
             </form>
         </div>
     </div>
-    <div id="editTaskModal">
-        <div id="editModal">
-            <span id="edit-close-button" onclick="closeEditModal()">&times;</span>
+    <div class="modalWrapper" id="editTaskModalWrapper">
+        <div class="modal" id="editTaskModal">
+            <span class="close-button" id="edit-close-button" onclick="closeEditModal()">&times;</span>
             <form id="edit-task-form" action="/tasks/edit" method="POST">
                 <h1>EDIT THE CURRENT TASK: </h1>
                 <div>
-                    <label for="edit-content-input">Task Detail:</label>
+                    <label for="edit-detail-input">Task Detail:</label>
                     <br/>
                 </div>
-                <textarea name="edit-content-input" id="edit-content-input"></textarea>
+                <textarea name="task-detail-input" id="edit-detail-input"></textarea>
                 <br/>
                 <label for="edit-point-input">Rewarding Points: </label>
-                <input type="number" id="edit-point-input" name="edit-input" min="0" max="200">
-                <textarea name="task-id" id="task-id-input"></textarea>
+                <input type="number" id="edit-point-input" name="reward-input" min="0" max="200">
+                <input type="hidden" name="task-id" id="task-id-input">
                 <br/>
                 <br/>
                 <input type="submit" />
