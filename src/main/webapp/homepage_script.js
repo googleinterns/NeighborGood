@@ -14,11 +14,55 @@
 
 const MAPSKEY = config.MAPS_KEY
 
-/** Function that visually mimics the functionality of filtering tasks by category */
+/* Calls addOnCliks once page has loaded */
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', addOnClicks)
+} else {
+    addOnClicks();
+}
+
+/* Function adds all the necessary 'click' event listeners*/
+function addOnClicks() {
+    
+    // adds showModal and closeModal click events for the add task button
+    document.getElementById("addtaskbutton").addEventListener("click", showModal);
+    document.getElementById("close-button").addEventListener("click", closeModal);
+
+	// adds filterBy click event listener to category buttons
+	const categoryButtons = document.getElementsByClassName("categories");
+    for (let i = 0; i < categoryButtons.length; i++) {
+        categoryButtons[i].addEventListener("click", function(e) {
+            filterBy(e.target.id);
+        });
+    }
+    // adds removeTask click event listener to remove task buttons
+    const removeTaskButtons = document.getElementsByClassName("removetask");
+    for (let i = 0; i < removeTaskButtons.length; i++){
+        removeTaskButtons[i].addEventListener("click", function(e) {
+            removeTask(e.target);
+        });
+    }
+    // adds cancelHelpOut click event listener to exit confirm buttons
+    const exitConfirmButtons = document.getElementsByClassName("exit-confirm");
+    for (let i = 0; i < exitConfirmButtons.length; i++) {
+        exitConfirmButtons[i].addEventListener("click", function(e) {
+            cancelHelpOut(e.target);
+        });
+    }
+    // adds helpOut click event listener to help out buttons
+    const helpOutButtons = document.getElementsByClassName("help-button");
+    for (let i = 0; i < helpOutButtons.length; i++) {
+        helpOutButtons[i].addEventListener("click", function(e) {
+            helpOut(e.target);
+        });
+    }
+}
+
+/* Function that visually mimics the functionality of filtering tasks by category */
 function filterBy(category) {
     const categoryButtons = document.getElementsByClassName("categories");
     const tasks = document.getElementsByClassName("task");
-    const idName = "category-" + category;
+    const idName = category;
 
 	// Unhighlights and resets styling for all category buttons
     for (let i = 0; i < categoryButtons.length; i++){
@@ -73,24 +117,23 @@ function filterBy(category) {
     }
 }
 
-/** Function that display the help out confirmation overlay */
+/* Function that display the help out confirmation overlay */
 function helpOut(element) {
     const overlay = element.parentNode.parentNode.parentNode.getElementsByClassName("confirm-overlay");
     overlay[0].style.display = "block";
 }
 
-/** Function that hides the task after user confirms they want to help out */
+/* Function that hides the task after user confirms they want to help out */
 function removeTask(element) {
     element.parentNode.parentNode.style.display = "none";
 }
 
-/** Function that hides the help out confirmation overlay */
+/* Function that hides the help out confirmation overlay */
 function cancelHelpOut(element) {
-	element.parentNode.style.display = "none";
+	element.parentNode.parentNode.style.display = "none";
 }
 
-
-/** Leonard's implementation of the Add Task modal */
+/* Leonard's implementation of the Add Task modal */
 function showModal() {
     var modal = document.getElementById("createTaskModal");
     modal.style.display = "block";
@@ -104,14 +147,6 @@ window.onclick = function(event) {
     var modal = document.getElementById("createTaskModal");
     if (event.target == modal) {
         modal.style.display = "none";
-    }
-}
-
-function adjustControlBar(userLogged){
-	if (userLogged === false) {
-        document.getElementById("categories").style.width = "100%";
-    } else {
-        document.getElementById("categories").style.width = "90%";
     }
 }
 
@@ -193,5 +228,3 @@ function toNeighborhood(latlng) {
         });
     });
 }
-
-
