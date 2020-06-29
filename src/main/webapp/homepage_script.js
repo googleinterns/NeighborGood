@@ -170,10 +170,8 @@ function getUserNeighborhood() {
 	window.initialize = function () {
         getUserLocation().then(location => toNeighborhood(location))
         	.then(neighborhood => {
-                // For now this just prints the neighborhood to the console
-                // but the neighborhood will be used when implementing
-                // the list tasks feature
-                console.log(neighborhood);
+                const url = "/tasks?zipcode=" + neighborhood[0] + "&country=" + neighborhood[1];
+                fetch(url);
         	}).catch(() => {
                 console.error("User location and/or neighborhood could not be retrieved");
             });
