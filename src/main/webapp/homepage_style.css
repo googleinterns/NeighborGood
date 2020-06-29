@@ -54,9 +54,14 @@ section {
     border-bottom: solid black;
     border-top: solid black;
     border-left: solid black;;
+}
+.notFullWidth {
     width: 90%;
 }
-#category-all {
+.fullWidth {
+    width: 100%;
+}
+#all {
     background-color:gray;
     color: white;
     font-weight: bold;
