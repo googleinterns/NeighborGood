@@ -122,42 +122,38 @@ th, td {
     text-align: center;
 }
 
-#need-help tr:nth-child(even), #offer-help tr:nth-child(even) {
+.task-table tr:nth-child(even) {
     background-color: #eee;
 }
 
-#need-help tr:nth-child(odd), #offer-help tr:nth-child(odd) {
+.task-table tr:nth-child(odd) {
     background-color: #fff;
 }
 
-#need-help th, #offer-help th {
+.task-table th {
     background-color: black;
     color: white;
 }
 
-.delete-task, .edit-task, .complete-task {
-	background-color: white;
+table button {
+    background-color: white;
 	width: 40px;
 	height: 40px;
+}
+
+table button:hover i {
+    color: white;
 }
 
 .edit-task:hover, .complete-task:hover {
 	background-color: #4CAF50;
 }
 
-.edit-task:hover i, .complete-task:hover i {
-	color: white;
-}
-
 .delete-task:hover, .abandon-task:hover {
 	background-color: red;
 }
 
-.delete-task:hover i, .abandon-task:hover i {
-	color: white;
-}
-
-#createTaskModal, #editTaskModal {
+.modalWrapper {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
@@ -171,7 +167,7 @@ th, td {
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
-#modal, #editModal {
+.modal {
     background-color: #fefefe;
     margin: auto;
     padding: 20px;
@@ -179,7 +175,7 @@ th, td {
     width: 50%;
 }
 
-#modal textarea, #editModal textarea {
+.modal textarea {
     width: 50%;
     box-sizing: border-box;
     border: 4px solid rgb(97, 245, 195);
@@ -191,29 +187,27 @@ th, td {
     transition: width 0.5s ease-in-out;
 }
 
-#modal textarea:focus, #editModal textarea:focus {
+.modal textarea:focus {
     width: 100%;
     border: 4px solid lightcyan;
 }
 
-#modal label, #editModal label {
+.modal label {
     font-size: 24px;
     font-weight: bold;
     font-family: Georgia, 'Times New Roman', Times, serif
 }
 
-#close-button, #edit-close-button {
+.close-button {
   color: #aaaaaa;
   float: right;
   font-size: 28px;
   font-weight: bold;
 }
 
-#close-button:hover,
-#close-button:focus,
-#edit-close-button:hover,
-#edit-close-button:focus {
-  color: #000;
+.close-button:hover,
+.close-button:focus {
+  color: red;
   text-decoration: none;
   cursor: pointer;
 }

@@ -14,10 +14,13 @@
 
 package com.google.sps.task;
 
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.KeyFactory;
+
 public final class Task {
   private final String detail;
   private final String keyString;
-  private final long timestamp;
+  private final long creationTime;
   private final String status;
   private final long reward;
   private final String owner;
@@ -27,7 +30,7 @@ public final class Task {
   public Task(
       String keyString,
       String detail,
-      long timestamp,
+      long creationTime,
       String status,
       long reward,
       String owner,
@@ -35,11 +38,22 @@ public final class Task {
       String address) {
     this.keyString = keyString;
     this.detail = detail;
-    this.timestamp = timestamp;
+    this.creationTime = creationTime;
     this.status = status;
     this.reward = reward;
     this.owner = owner;
     this.helper = helper;
     this.address = address;
+  }
+
+  public Task(Entity entity) {
+    this.keyString = KeyFactory.keyToString(entity.getKey());
+    this.detail = (String) entity.getProperty("detail");
+    this.creationTime = (long) entity.getProperty("timestamp");
+    this.reward = (long) entity.getProperty("reward");
+    this.status = (String) entity.getProperty("status");
+    this.owner = (String) entity.getProperty("Owner");
+    this.helper = (String) entity.getProperty("Helper");
+    this.address = (String) entity.getProperty("Address");
   }
 }
