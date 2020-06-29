@@ -10,7 +10,7 @@ function filterBy(category) {
         let button = categoryButtons[i];
         if (document.getElementById(idName) != categoryButtons[i]) {
             button.style.backgroundColor = "transparent";
-    		button.style.color = "black";
+    		button.style.color = "#222";
         	button.style.fontWeight = "normal";
         	button.addEventListener("mouseover", function() {
                 button.style.backgroundColor = "lightgray";
@@ -19,14 +19,14 @@ function filterBy(category) {
                 button.style.backgroundColor = "transparent"
             });
         } else {
-            button.style.backgroundColor = "gray";
+            button.style.backgroundColor = "#222";
         	button.style.color = "white";
         	button.style.fontWeight = "bold";
             button.addEventListener("mouseover", function() {
-                button.style.backgroundColor = "gray";
+                button.style.backgroundColor = "#222";
             });
             button.addEventListener("mouseout", function() {
-                button.style.backgroundColor = "gray"
+                button.style.backgroundColor = "#222"
             });
         }
     }
