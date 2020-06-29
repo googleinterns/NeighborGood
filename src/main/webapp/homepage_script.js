@@ -173,6 +173,7 @@ function getUserNeighborhood() {
                 // For now this just prints the neighborhood to the console
                 // but the neighborhood will be used when implementing
                 // the list tasks feature
+                console.log(neighborhood);
         	}).catch(() => {
                 console.error("User location and/or neighborhood could not be retrieved");
             });
