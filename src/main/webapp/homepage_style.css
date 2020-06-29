@@ -1,6 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
 body {
 	font-family: 'Roboto', sans-serif;;
     margin: auto;
+    color: #222;
 }
 
 /* Header Styling */
@@ -17,7 +20,7 @@ nav {
 }
 #login-logout a {
     text-decoration: none;
-    color: black;
+    color: #222;
     font-weight: bold;
     cursor: pointer;
 }
@@ -28,7 +31,7 @@ i:hover{
     color: grey;
 }
 i {
-    color: black;
+    color: #222;
 }
 #title {
     font-size: 4em;
@@ -51,18 +54,18 @@ section {
 }
 #categories {
     display: flex;
-    border-bottom: solid black;
-    border-top: solid black;
-    border-left: solid black;;
+    border-bottom: solid #222;
+    border-top: solid #222;
+    border-left: solid #222;;
     width: 90%;
 }
 #category-all {
-    background-color:gray;
+    background-color:#222;
     color: white;
     font-weight: bold;
 }
 .categories {
-    border-right: solid black;
+    border-right: solid #222;
     cursor: pointer;
     text-align: center;
     width: 20%;
