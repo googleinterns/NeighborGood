@@ -13,10 +13,7 @@
   <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
   <% UserService userService = UserServiceFactory.getUserService(); 
   boolean userLoggedIn = userService.isUserLoggedIn();
-  String categoriesClass = new String();
-  if (userLoggedIn) {
-      categoriesClass = "notFullWidth";
-  } else categoriesClass = "fullWidth";
+  String categoriesClass = userLoggedIn ? "notFullWidth" : "fullWidth";
   %>
   <body>
       <!--Site Header-->
@@ -93,10 +90,16 @@
           <div id="tasks-list">
               <!-- New Task Begins-->
               <div class="task garden">
-                  <div class="confirm-overlay" id="overlay-task-1">
+                  <%
+                  if (userLoggedIn) {
+                  %>
+                  <div class="confirm-overlay">
                       <div class="exit-confirm"><a>&times</a></div>
                       <a class="removetask">CONFIRM</a>
                   </div>
+                  <%
+                  }
+                  %>
                   <div class="task-container">
                         <div class="task-header">
                             <div class="username">
@@ -127,10 +130,16 @@
               </div>
               <!-- New Task Begins-->
               <div class="task shopping">
-                  <div class="confirm-overlay"  id="overlay-task-2">
+                  <%
+                  if (userLoggedIn) {
+                  %>
+                  <div class="confirm-overlay">
                       <div class="exit-confirm"><a>&times</a></div>
                       <a class="removetask">CONFIRM</a>
                   </div>
+                  <%
+                  }
+                  %>
                   <div class="task-container">
                         <div class="task-header">
                             <div class="username">
@@ -161,10 +170,16 @@
               </div>
               <!-- New Task Begins-->
               <div class="task misc">
-                  <div class="confirm-overlay" id="overlay-task-3">
+                  <%
+                  if (userLoggedIn) {
+                  %>
+                  <div class="confirm-overlay">
                       <div class="exit-confirm"><a>&times</a></div>
                       <a class="removetask">CONFIRM</a>
                   </div>
+                  <%
+                  }
+                  %>
                   <div class="task-container">
                         <div class="task-header">
                             <div class="username">
@@ -195,10 +210,16 @@
               </div>
               <!-- New Task Begins-->
               <div class="task shopping">
-                  <div class="confirm-overlay" id="overlay-task-4">
+                  <%
+                  if (userLoggedIn) {
+                  %>
+                  <div class="confirm-overlay">
                       <div class="exit-confirm"><a>&times</a></div>
                       <a class="removetask">CONFIRM</a>
                   </div>
+                  <%
+                  }
+                  %>
                   <div class="task-container">
                         <div class="task-header">
                             <div class="username">
@@ -229,10 +250,16 @@
               </div>
               <!-- New Task Begins-->
               <div class="task pets">
-                  <div class="confirm-overlay" id="overlay-task-5">
+                  <%
+                  if (userLoggedIn) {
+                  %>
+                  <div class="confirm-overlay">
                       <div class="exit-confirm"><a>&times</a></div>
                       <a class="removetask">CONFIRM</a>
                   </div>
+                  <%
+                  }
+                  %>
                   <div class="task-container">
                         <div class="task-header">
                             <div class="username">
@@ -263,10 +290,16 @@
               </div>
               <!-- New Task Begins-->
               <div class="task garden">
-                  <div class="confirm-overlay" id="overlay-task-6">
+                  <%
+                  if (userLoggedIn) {
+                  %>
+                  <div class="confirm-overlay">
                       <div class="exit-confirm"><a>&times</a></div>
                       <a class="removetask">CONFIRM</a>
                   </div>
+                  <%
+                  }
+                  %>
                   <div class="task-container">
                         <div class="task-header">
                             <div class="username">
