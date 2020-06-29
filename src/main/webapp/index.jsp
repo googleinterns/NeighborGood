@@ -23,10 +23,19 @@
           <nav>
               <div id="userpage-icon">
               <%
-              if (userLoggedIn) { 
+              if (userLoggedIn && !userService.isUserAdmin()) { 
               %>
                   <a href="user_profile.html">
                       <i class="fas fa-user-circle fa-3x" title="Go to User Page"></i>
+                  </a>
+              <%
+              }
+              %>
+              <%
+              if (userLoggedIn && userService.isUserAdmin()) { 
+              %>
+                  <a href="admin_dashboard.html">
+                      <i class="fas fa-user-cog fa-3x" title="Go to Admin Dashboard"></i>
                   </a>
               <%
               }
