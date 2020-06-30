@@ -47,32 +47,33 @@ public class TaskServlet extends HttpServlet {
     // Get the task detail from the form input
     String taskDetail = "";
     String input = request.getParameter("task-detail-input");
+    // If the input is valid, set the taskDetail value to the input value
     if (input != null) {
       taskDetail = input;
     }
 
-    // If the input is nonempty and valid, set the taskDetail value to the input value
-    if (!taskDetail.equals("")) {
-      long creationTime = System.currentTimeMillis();
-
-      // Create an Entity that stores the input comment
-      Entity taskEntity = new Entity("Task");
-      taskEntity.setProperty("detail", taskDetail);
-      taskEntity.setProperty("timestamp", creationTime);
-      taskEntity.setProperty("reward", rewardPts);
-      taskEntity.setProperty("status", "OPEN");
-      taskEntity.setProperty("Owner", "Leonard");
-      taskEntity.setProperty("Helper", "N/A");
-      taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
-
-      DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-      datastore.put(taskEntity);
-    } else {
+    // If input task detail is empty, reject the request to add a new task and send a 400 error.
+    if (taskDetail.equals("")) {
       System.err.println("The input task detail is empty");
       response.sendError(
-          HttpServletResponse.SC_FORBIDDEN, "The task detail field cannot be empty.");
+          HttpServletResponse.SC_BAD_REQUEST, "The task detail field cannot be empty.");
       return;
     }
+
+    long creationTime = System.currentTimeMillis();
+
+    // Create an Entity that stores the input comment
+    Entity taskEntity = new Entity("Task");
+    taskEntity.setProperty("detail", taskDetail);
+    taskEntity.setProperty("timestamp", creationTime);
+    taskEntity.setProperty("reward", rewardPts);
+    taskEntity.setProperty("status", "OPEN");
+    taskEntity.setProperty("Owner", "Leonard");
+    taskEntity.setProperty("Helper", "N/A");
+    taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    datastore.put(taskEntity);
 
     // Redirect back to the user page.
     response.sendRedirect("/user_profile.html");
@@ -108,6 +109,7 @@ public class TaskServlet extends HttpServlet {
 
     Key taskKey = KeyFactory.stringToKey(keyString);
 
+    // TODO: Handle the exceptional case where the user attempts to delete a non-existent task.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.delete(taskKey);
 

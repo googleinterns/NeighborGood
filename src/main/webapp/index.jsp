@@ -120,10 +120,7 @@
                         <div class="task-footer">
                             <div class="task-category">
                                 #garden
-                            </div>
-                            <div class="task-points">
-                                50 PTS
-                            </div>  
+                            </div> 
                         </div>
                   </div>
               </div>
@@ -161,9 +158,6 @@
                             <div class="task-category">
                                 #shopping
                             </div>
-                            <div class="task-points">
-                                25 PTS
-                            </div>  
                         </div>
                   </div>
               </div>
@@ -201,9 +195,6 @@
                             <div class="task-category">
                                 #misc
                             </div>
-                            <div class="task-points">
-                                75 PTS
-                            </div>  
                         </div>
                   </div>
               </div>
@@ -241,9 +232,6 @@
                             <div class="task-category">
                                 #shopping
                             </div>
-                            <div class="task-points">
-                                50 PTS
-                            </div>  
                         </div>
                   </div>
               </div>
@@ -280,10 +268,7 @@
                         <div class="task-footer">
                             <div class="task-category">
                                 #pets
-                            </div>
-                            <div class="task-points">
-                                75 PTS
-                            </div>  
+                            </div> 
                         </div>
                   </div>
               </div>
@@ -321,9 +306,6 @@
                             <div class="task-category">
                                 #garden
                             </div>
-                            <div class="task-points">
-                                150 PTS
-                            </div>  
                         </div>
                   </div>
               </div>

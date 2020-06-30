@@ -14,7 +14,7 @@
   <body onload="showNeedHelp()">
     <div id="nav-bar">
         <p id="return-link"><a href="index.jsp">BACK TO HOME</a></p>
-        <p id="log-out-link">Leonard Zhang |  <a href="logout.html">Log out</a></p>
+        <p id="log-out-link">Leonard Zhang |  <a href="logout.html">Logout</a></p>
     </div>
     <div style="clear: both"></div>
     <div id="header">
@@ -33,23 +33,29 @@
     <br/>
     <div id="task-list">
         <table class="task-table" id="need-help">
-            <tr>
-                <th>Task Overview</th>
-                <th>Helper</th>
-                <th>Status</th>
-                <th>Edit</th>
-                <th>Delete</th>
-            </tr>
+            <thead>
+                <tr>
+                    <th>Task Overview</th>
+                    <th>Helper</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="need-help-body"></tbody>
         </table>
         <table class="task-table" id="offer-help">
-            <tr>
-                <th>Task Overview</th>
-                <th>Status</th>
-                <th>Neighbor</th>
-                <th>Reward</th>
-                <th>Mark as complete</th>
-                <th>Abandon</th>
-            </tr>
+            <thead>
+                <tr>
+                    <th>Task Overview</th>
+                    <th>Status</th>
+                    <th>Neighbor</th>
+                    <th>Reward</th>
+                    <th>Mark as complete</th>
+                    <th>Abandon</th>
+                </tr>
+            </thead>
+            <tbody id="offer-help-body"></tbody>
         </table>
     </div>
     <div class="modalWrapper" id="createTaskModalWrapper">
