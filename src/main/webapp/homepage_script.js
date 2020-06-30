@@ -1,9 +1,60 @@
+/* Calls addClickHandlers once page has loaded */
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', addClickHandlers)
+} else {
+    addClickHandlers();
+}
 
-/** Function that visually mimics the functionality of filtering tasks by category */
-function filterBy(category) {
+/* Function adds all the necessary 'click' event listeners*/
+function addClickHandlers() {
+    
+    // adds showModal and closeModal click events for the add task button
+    if (document.body.contains(document.getElementById("addtaskbutton"))) {
+        document.getElementById("addtaskbutton").addEventListener("click", showModal);
+    	document.getElementById("close-button").addEventListener("click", closeModal);
+    }
+
+	// adds filterTasksBy click event listener to category buttons
+	const categoryButtons = document.getElementsByClassName("categories");
+    for (let i = 0; i < categoryButtons.length; i++) {
+        categoryButtons[i].addEventListener("click", function(e) {
+            filterTasksBy(e.target.id);
+        });
+    }
+    // adds removeTask click event listener to remove task buttons
+    const removeTaskButtons = document.getElementsByClassName("removetask");
+    for (let i = 0; i < removeTaskButtons.length; i++){
+        if (document.body.contains(removeTaskButtons[i])){
+            removeTaskButtons[i].addEventListener("click", function(e) {
+            	removeTask(e.target);
+        	});
+        }
+    }
+    // adds cancelHelpOut click event listener to exit confirm buttons
+    const exitConfirmButtons = document.getElementsByClassName("exit-confirm");
+    for (let i = 0; i < exitConfirmButtons.length; i++) {
+        if (document.body.contains(exitConfirmButtons[i])){
+            exitConfirmButtons[i].addEventListener("click", function(e) {
+                cancelHelpOut(e.target);
+            });
+        }
+    }
+    // adds helpOut click event listener to help out buttons
+    const helpOutButtons = document.getElementsByClassName("help-button");
+        for (let i = 0; i < helpOutButtons.length; i++) {
+            if (document.body.contains(helpOutButtons[i])){
+                helpOutButtons[i].addEventListener("click", function(e) {
+                    helpOut(e.target);
+                });
+            }
+        }
+}
+
+/* Function that visually mimics the functionality of filtering tasks by category */
+function filterTasksBy(category) {
     const categoryButtons = document.getElementsByClassName("categories");
     const tasks = document.getElementsByClassName("task");
-    const idName = "category-" + category;
+    const idName = category;
 
 	// Unhighlights and resets styling for all category buttons
     for (let i = 0; i < categoryButtons.length; i++){
@@ -38,7 +89,7 @@ function filterBy(category) {
 
             // removes any help with task overlays
             let overlay = tasks[i].getElementsByClassName("confirm-overlay");
-            overlay[0].style.display = "none";
+            if (overlay.length > 0) overlay[0].style.display = "none";
         }
     }
     
@@ -53,56 +104,29 @@ function filterBy(category) {
             }
             // removes any help with task overlays
             let overlay = tasks[i].getElementsByClassName("confirm-overlay");
-            overlay[0].style.display = "none";
+            if (overlay.length > 0) overlay[0].style.display = "none";
         }
     }
 }
 
-/** Function that display the help out confirmation overlay */
+/* Function that display the help out confirmation overlay */
 function helpOut(element) {
-    const overlay = element.parentNode.parentNode.parentNode.getElementsByClassName("confirm-overlay");
+    const task = element.closest(".task");
+    const overlay = task.getElementsByClassName("confirm-overlay");
     overlay[0].style.display = "block";
 }
 
-/** Function that hides the task after user confirms they want to help out */
+/* Function that hides the task after user confirms they want to help out */
 function removeTask(element) {
-    element.parentNode.parentNode.style.display = "none";
+    element.closest(".task").style.display = "none";
 }
 
-/** Function that hides the help out confirmation overlay */
+/* Function that hides the help out confirmation overlay */
 function cancelHelpOut(element) {
-	element.parentNode.style.display = "none";
+	element.closest(".confirm-overlay").style.display = "none";
 }
 
-/** Temporary logout function for prototype */
-function logOut() {
-    alert("You have been logged out");
-    let loginMessage = document.getElementById("login-message");
-    loginMessage.innerHTML = "<a onclick='logIn()'>Login to help a neighbor!</a>";
-    document.getElementById("user-link").style.display = "none";
-    document.getElementById("categories").style.width = "100%";
-    document.getElementById("add-task").style.display = "none";
-    const helpButtons = document.getElementsByClassName("help-button");
-    for (let i = 0; i < helpButtons.length; i++) {
-        helpButtons[i].style.display = "none";
-    }
-}
-
-/** Temporary login function for prototype */
-function logIn(){
-    alert("You are now logged in");
-    let loginMessage = document.getElementById("login-message");
-    loginMessage.innerHTML = "User | <a onclick='logOut()'>Logout</a>";
-    document.getElementById("user-link").style.display = "block";
-    document.getElementById("categories").style.width = "90%";
-    document.getElementById("add-task").style.display = "block";
-    const helpButtons = document.getElementsByClassName("help-button");
-    for (let i = 0; i < helpButtons.length; i++) {
-        helpButtons[i].style.display = "block";
-    }
-}
-
-/** Leonard's implementation of the Add Task modal */
+/* Leonard's implementation of the Add Task modal */
 function showModal() {
     var modal = document.getElementById("createTaskModal");
     modal.style.display = "block";
