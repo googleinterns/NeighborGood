@@ -24,7 +24,7 @@
               <%
               if (userLoggedIn && !userService.isUserAdmin()) { 
               %>
-                  <a href="user_profile.html">
+                  <a href="user_profile.jsp">
                       <i class="fas fa-user-circle fa-3x" title="Go to User Page"></i>
                   </a>
               <%

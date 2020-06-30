@@ -55,14 +55,7 @@ async function completeTask(keyString) {
     if (info.status !== "IN PROGRESS") {
         window.alert("You have already marked the task as complete.");
     } else if (info.owner === info.helper) {
-        window.alert("You cannot complete a task published by yourself! The task will now be removed from the system!");
-        var queryURL = "/tasks/info?key=" + keyString + "&status=" + "OPEN";
-        var request = new Request(queryURL, {method: "POST"});
-        var response = await fetch(request);
-        queryURL = "/tasks?key=" + keyString;
-        request = new Request(queryURL, {method: "DELETE"});
-        response = await fetch(request);
-        showOfferHelp()
+        window.alert("You cannot complete a task published by yourself!");
     } else {
         if (confirm("Are you sure that you have already completed the task?")) {
             const queryURL = "/tasks/info?key=" + keyString + "&status=" + "COMPLETE: AWAIT VERIFICATION";
@@ -137,8 +130,8 @@ async function displayNeedHelpTasks() {
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
     const taskResponse = await response.json();
-    const needHelpTable = document.getElementById("need-help");
-    needHelpTable.innerHTML = needHelpTable.rows[0].innerHTML;
+    const needHelpBody = document.getElementById("need-help-body");
+    needHelpBody.innerHTML = "";
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
@@ -163,7 +156,7 @@ async function displayNeedHelpTasks() {
         deleteTd.appendChild(deleteBtn);
         tr.appendChild(editTd);
         tr.appendChild(deleteTd);
-        needHelpTable.appendChild(tr);
+        needHelpBody.appendChild(tr);
     }
 }
 
@@ -172,8 +165,8 @@ async function displayOfferHelpTasks() {
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
     const taskResponse = await response.json();
-    const offerHelpTable = document.getElementById("offer-help");
-    offerHelpTable.innerHTML = offerHelpTable.rows[0].innerHTML;
+    const offerHelpBody = document.getElementById("offer-help-body");
+    offerHelpBody.innerHTML = "";
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
@@ -198,6 +191,6 @@ async function displayOfferHelpTasks() {
         abandonTd.appendChild(abandonBtn);
         tr.appendChild(completeTd);
         tr.appendChild(abandonTd);
-        offerHelpTable.appendChild(tr);
+        offerHelpBody.appendChild(tr);
     }
 }

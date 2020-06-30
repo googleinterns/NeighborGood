@@ -7,10 +7,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="user_profile_script.js"></script>
   </head>
+  <%@ page import = "com.google.appengine.api.users.UserService" %>
+  <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
+  <% UserService userService = UserServiceFactory.getUserService();
+  if (userService.isUserLoggedIn()) { %>
   <body onload="showNeedHelp()">
     <div id="nav-bar">
         <p id="return-link"><a href="index.jsp">BACK TO HOME</a></p>
-        <p id="log-out-link">Leonard Zhang |  <a href="logout.html">Log out</a></p>
+        <p id="log-out-link">Leonard Zhang |  <a href="logout.html">Logout</a></p>
     </div>
     <div style="clear: both"></div>
     <div id="header">
@@ -29,23 +33,29 @@
     <br/>
     <div id="task-list">
         <table class="task-table" id="need-help">
-            <tr>
-                <th>Task Overview</th>
-                <th>Helper</th>
-                <th>Status</th>
-                <th>Edit</th>
-                <th>Delete</th>
-            </tr>
+            <thead>
+                <tr>
+                    <th>Task Overview</th>
+                    <th>Helper</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="need-help-body"></tbody>
         </table>
         <table class="task-table" id="offer-help">
-            <tr>
-                <th>Task Overview</th>
-                <th>Status</th>
-                <th>Neighbor</th>
-                <th>Reward</th>
-                <th>Mark as complete</th>
-                <th>Abandon</th>
-            </tr>
+            <thead>
+                <tr>
+                    <th>Task Overview</th>
+                    <th>Status</th>
+                    <th>Neighbor</th>
+                    <th>Reward</th>
+                    <th>Mark as complete</th>
+                    <th>Abandon</th>
+                </tr>
+            </thead>
+            <tbody id="offer-help-body"></tbody>
         </table>
     </div>
     <div class="modalWrapper" id="createTaskModalWrapper">
@@ -87,4 +97,9 @@
         </div>
     </div>
   </body>
+  <%
+  } else {
+      response.sendRedirect(userService.createLoginURL("/"));
+  }
+  %>
 </html>
