@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.google.sps</groupId>
-  <artifactId>NeighborHelp</artifactId>
+  <artifactId>NeighborGood</artifactId>
   <version>1</version>
   <packaging>war</packaging>
 
@@ -46,8 +46,7 @@
         <artifactId>appengine-maven-plugin</artifactId>
         <version>2.2.0</version>
         <configuration>
-        <!-- REPLACE PROJECT ID -->
-          <deploy.projectId>{capstone-project-id}</deploy.projectId>
+          <deploy.projectId>neighborgood-step</deploy.projectId>
           <deploy.version>1</deploy.version>
         </configuration>
       </plugin>

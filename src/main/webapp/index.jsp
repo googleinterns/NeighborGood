@@ -13,7 +13,7 @@
       <header>
           <nav>
               <div id="userpage-icon">
-                  <a href="user_profile.html">
+                  <a href="user_profile.html" id="user-link">
                       <i class="fas fa-user-circle fa-3x" title="Go to User Page"></i>
                   </a>
               </div>
@@ -66,10 +66,7 @@
                         <div class="task-footer">
                             <div class="task-category">
                                 #garden
-                            </div>
-                            <div class="task-points">
-                                50 PTS
-                            </div>  
+                            </div> 
                         </div>
                   </div>
               </div>
@@ -95,9 +92,6 @@
                             <div class="task-category">
                                 #shopping
                             </div>
-                            <div class="task-points">
-                                25 PTS
-                            </div>  
                         </div>
                   </div>
               </div>
@@ -123,9 +117,6 @@
                             <div class="task-category">
                                 #misc
                             </div>
-                            <div class="task-points">
-                                75 PTS
-                            </div>  
                         </div>
                   </div>
               </div>
@@ -151,9 +142,6 @@
                             <div class="task-category">
                                 #shopping
                             </div>
-                            <div class="task-points">
-                                50 PTS
-                            </div>  
                         </div>
                   </div>
               </div>
@@ -178,10 +166,7 @@
                         <div class="task-footer">
                             <div class="task-category">
                                 #pets
-                            </div>
-                            <div class="task-points">
-                                75 PTS
-                            </div>  
+                            </div> 
                         </div>
                   </div>
               </div>
@@ -207,9 +192,6 @@
                             <div class="task-category">
                                 #garden
                             </div>
-                            <div class="task-points">
-                                150 PTS
-                            </div>  
                         </div>
                   </div>
               </div>
