@@ -68,7 +68,6 @@ body {
     color: white; /* White text */
     cursor: pointer; /* Pointer/hand icon */
     float: left; /* Float the buttons side by side */
-    font-family: “Lucida Bright”, Georgia, serif;
     font-weight: 650;
     text-align: center;
     font-size: calc(6px + 0.5vw);
@@ -186,8 +185,6 @@ table button:hover i {
     border: 4px solid rgb(97, 245, 195);
     border-radius: 4px;
     font-size: 16px;
-    font-family: 'Times New Roman', Times, serif;
-    font-weight: bold;
     padding: 10px 20px 10px 20px;
     transition: width 0.5s ease-in-out;
 }
@@ -200,7 +197,6 @@ table button:hover i {
 .modal label {
     font-size: 24px;
     font-weight: bold;
-    font-family: Georgia, 'Times New Roman', Times, serif
 }
 
 .close-button {
