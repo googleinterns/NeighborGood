@@ -178,10 +178,14 @@ function getUserNeighborhood() {
     // as an argument. toNeighborhood consequently returns the user's neighborhood
 	window.initialize = function () {
         getUserLocation().then(location => toNeighborhood(location))
-        	.then(neighborhood => {
-                const url = "/tasks?zipcode=" + neighborhood[0] + "&country=" + neighborhood[1];
-                fetch(url);
-        	}).catch(() => {
+        	.then(neighborhood => fetch("/tasks?zipcode="+neighborhood[0]+"&country="+neighborhood[1]))
+            .then((response) => response.json()).then(html => {
+                if (html){
+                    document.getElementById("tasks-list").innerHTML = html;
+                    addClickHandlers();
+                }
+            })
+            .catch(() => {
                 console.error("User location and/or neighborhood could not be retrieved");
             });
 	}

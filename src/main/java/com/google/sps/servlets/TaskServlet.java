@@ -17,9 +17,17 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gson.Gson;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -30,8 +38,56 @@ import javax.servlet.http.HttpServletResponse;
 public class TaskServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // Serve the GET request sent from home page to fetch all the tasks
-    return;
+    UserService userService = UserServiceFactory.getUserService();
+    boolean userLoggedIn = userService.isUserLoggedIn();
+
+    String zipcode = request.getParameter("zipcode");
+    String country = request.getParameter("country");
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    Query query = new Query("Task").addSort("timestamp", SortDirection.DESCENDING);
+
+    Query.CompositeFilter queryFilter =
+        new Query.CompositeFilter(
+            Query.CompositeFilterOperator.AND,
+            Arrays.asList(
+                new Query.FilterPredicate("zipcode", Query.FilterOperator.EQUAL, zipcode),
+                new Query.FilterPredicate("country", Query.FilterOperator.EQUAL, country)));
+
+    query.setFilter(queryFilter);
+
+    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(20));
+
+    StringBuilder out = new StringBuilder();
+    for (Entity entity : results) {
+      out.append("<div class='task'>");
+      if (userLoggedIn) {
+        out.append("<div class='confirm-overlay'>");
+        out.append("<div class='exit-confirm'><a>&times</a></div>");
+        out.append("<a class='removetask'>CONFIRM</a>");
+        out.append("</div>");
+      }
+      out.append("<div class='task-container'>");
+      out.append("<div class='task-header'>");
+      out.append("<div class='username'>")
+          .append((String) entity.getProperty("Owner"))
+          .append("</div>");
+      if (userLoggedIn) {
+        out.append("<div class='help-button'>HELP OUT</div>");
+      }
+      out.append("</div>");
+      out.append("<div class='task-content'>")
+          .append((String) entity.getProperty("detail"))
+          .append("</div>");
+      out.append("<div class='task-footer'><div class='task-category'>#garden</div></div>");
+      out.append("</div></div>");
+    }
+
+    Gson gson = new Gson();
+    String json = gson.toJson(out.toString());
+    response.setContentType("application/json;");
+    response.getWriter().println(json);
   }
 
   @Override
@@ -55,8 +111,12 @@ public class TaskServlet extends HttpServlet {
     if (!taskDetail.equals("")) {
       long creationTime = System.currentTimeMillis();
 
+      UserService userService = UserServiceFactory.getUserService();
+      String userId = userService.getCurrentUser().getUserId();
+
       // Create an Entity that stores the input comment
       Entity taskEntity = new Entity("Task");
+      taskEntity.setProperty("userId", userId);
       taskEntity.setProperty("detail", taskDetail);
       taskEntity.setProperty("timestamp", creationTime);
       taskEntity.setProperty("reward", rewardPts);
@@ -64,6 +124,8 @@ public class TaskServlet extends HttpServlet {
       taskEntity.setProperty("Owner", "Leonard");
       taskEntity.setProperty("Helper", "N/A");
       taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
+      taskEntity.setProperty("zipcode", "59715");
+      taskEntity.setProperty("country", "United States");
 
       DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
       datastore.put(taskEntity);

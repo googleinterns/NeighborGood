@@ -15,6 +15,7 @@
   boolean userLoggedIn = userService.isUserLoggedIn();
   String categoriesClass = userLoggedIn ? "notFullWidth" : "fullWidth";
   %>
+
   <body>
       <!--Site Header-->
       <header>
