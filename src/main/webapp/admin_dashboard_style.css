@@ -158,7 +158,7 @@ main h1 {
 
 
 /** Media Queries **/
-@media (max-width: 1200px) {
+@media (max-width: 1300px) {
 	.notification-grid, .flex-grid {
 		flex-direction: column;
 	}
@@ -173,6 +173,12 @@ main h1 {
 		margin-right: 0;
 		margin-left: 0;
 	}
+
+    #card-container {
+        max-width: none;
+        width: calc(100vw - 200px);
+        min-width: 500px;
+    }
 
 	#chart-container { 
 		max-height: 600px;
