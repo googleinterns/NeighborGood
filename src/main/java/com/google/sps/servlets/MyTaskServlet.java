@@ -19,6 +19,8 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
@@ -42,6 +44,21 @@ public class MyTaskServlet extends HttpServlet {
     // keyword is either "Owner" or "Helper". Depending on the keyword, the filter will filter
     // on different fields accordingly.
     Filter filter = new FilterPredicate(keyword, FilterOperator.EQUAL, "Leonard");
+
+    // Depending on the input complete parameter, the status filter will be different.
+    String complete = request.getParameter("complete");
+    if (complete.equals("True")) {
+      Filter openFilter = new FilterPredicate("status", FilterOperator.NOT_EQUAL, "OPEN");
+      Filter inProgressFilter =
+          new FilterPredicate("status", FilterOperator.NOT_EQUAL, "IN PROGRESS");
+      CompositeFilter statusFilter = CompositeFilterOperator.and(openFilter, inProgressFilter);
+      filter = CompositeFilterOperator.and(filter, statusFilter);
+    } else {
+      Filter openFilter = new FilterPredicate("status", FilterOperator.EQUAL, "OPEN");
+      Filter inProgressFilter = new FilterPredicate("status", FilterOperator.EQUAL, "IN PROGRESS");
+      CompositeFilter statusFilter = CompositeFilterOperator.or(openFilter, inProgressFilter);
+      filter = CompositeFilterOperator.and(filter, statusFilter);
+    }
 
     Query query = new Query("Task").setFilter(filter);
 
