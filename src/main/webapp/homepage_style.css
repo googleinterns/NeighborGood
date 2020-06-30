@@ -1,6 +1,7 @@
 body {
 	font-family: 'Roboto', sans-serif;;
     margin: auto;
+    padding-bottom: 3em;
 }
 
 /* Header Styling */
@@ -89,7 +90,12 @@ section {
 }
 
 /* Tasks Styling */
+#no-tasks-message {
+    display: none;
+    text-align: center;
+}
 #tasks-list {
+    display: none;
     border-top: solid;
     border-right: solid;
     border-left: solid;
@@ -115,6 +121,9 @@ section {
 }
 .help-button:hover{
     color: gray;
+}
+.disable-help:hover{
+    cursor:not-allowed;
 }
 .task-footer {
     font-style: italic;

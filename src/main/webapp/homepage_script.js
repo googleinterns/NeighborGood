@@ -13,21 +13,20 @@
 // limitations under the License.
 
 const MAPSKEY = config.MAPS_KEY
+let neighborhood = null;
 
 /* Calls addOnClicks and getUserNeighborhood once page has loaded */
 if (document.readyState === 'loading') {
     // adds on load event listeners if document hasn't yet loaded
-    document.addEventListener('DOMContentLoaded', addClickHandlers)
+    document.addEventListener('DOMContentLoaded', addUIClickHandlers)
     document.addEventListener('DOMContentLoaded', getUserNeighborhood);
 } else {
     // if DOMContentLoaded has already fired, it simply calls the functions
-    addClickHandlers();
+    addUIClickHandlers();
     getUserNeighborhood();
 }
 
-/* Function adds all the necessary 'click' event listeners*/
-function addClickHandlers() {
-    
+function addUIClickHandlers() {
     // adds showModal and closeModal click events for the add task button
     if (document.body.contains(document.getElementById("addtaskbutton"))) {
         document.getElementById("addtaskbutton").addEventListener("click", showModal);
@@ -41,6 +40,11 @@ function addClickHandlers() {
             filterTasksBy(e.target.id);
         });
     }
+}
+
+/* Function adds all the necessary 'click' event listeners*/
+function addTasksClickHandlers() {
+
     // adds removeTask click event listener to remove task buttons
     const removeTaskButtons = document.getElementsByClassName("removetask");
     for (let i = 0; i < removeTaskButtons.length; i++){
@@ -63,23 +67,24 @@ function addClickHandlers() {
     const helpOutButtons = document.getElementsByClassName("help-button");
         for (let i = 0; i < helpOutButtons.length; i++) {
             if (document.body.contains(helpOutButtons[i])){
-                helpOutButtons[i].addEventListener("click", function(e) {
-                    helpOut(e.target);
-                });
+                if (!helpOutButtons[i].classList.contains("disable-help")) {
+                    helpOutButtons[i].addEventListener("click", function(e) {
+                        helpOut(e.target);
+                    });
+                }
             }
         }
 }
 
-/* Function that visually mimics the functionality of filtering tasks by category */
+/* Function filters tasks by categories and styles selected categories */
 function filterTasksBy(category) {
-    const categoryButtons = document.getElementsByClassName("categories");
-    const tasks = document.getElementsByClassName("task");
-    const idName = category;
+    fetchTasks(category).then(response => displayTasks(response));
 
 	// Unhighlights and resets styling for all category buttons
+    const categoryButtons = document.getElementsByClassName("categories");
     for (let i = 0; i < categoryButtons.length; i++){
         let button = categoryButtons[i];
-        if (document.getElementById(idName) != categoryButtons[i]) {
+        if (document.getElementById(category) != button) {
             button.style.backgroundColor = "transparent";
     		button.style.color = "black";
         	button.style.fontWeight = "normal";
@@ -99,32 +104,6 @@ function filterTasksBy(category) {
             button.addEventListener("mouseout", function() {
                 button.style.backgroundColor = "gray"
             });
-        }
-    }
-
-    // Shows all tasks and highlights the 'ALL' button
-	if (category == "all") {
-        for (let i = 0; i < tasks.length; i++) {
-            tasks[i].style.display = "block";
-
-            // removes any help with task overlays
-            let overlay = tasks[i].getElementsByClassName("confirm-overlay");
-            if (overlay.length > 0) overlay[0].style.display = "none";
-        }
-    }
-    
-    // Hides all tasks that don't match the category, shows all
-    // of those that do and highlights appropriate category button
-	else {
-        for (let i = 0; i < tasks.length; i++) {
-            if (tasks[i].classList.contains(category)) {
-                tasks[i].style.display = "block";
-            } else {
-                tasks[i].style.display = "none";
-            }
-            // removes any help with task overlays
-            let overlay = tasks[i].getElementsByClassName("confirm-overlay");
-            if (overlay.length > 0) overlay[0].style.display = "none";
         }
     }
 }
@@ -178,13 +157,8 @@ function getUserNeighborhood() {
     // as an argument. toNeighborhood consequently returns the user's neighborhood
 	window.initialize = function () {
         getUserLocation().then(location => toNeighborhood(location))
-        	.then(neighborhood => fetch("/tasks?zipcode="+neighborhood[0]+"&country="+neighborhood[1]))
-            .then((response) => response.json()).then(html => {
-                if (html){
-                    document.getElementById("tasks-list").innerHTML = html;
-                    addClickHandlers();
-                }
-            })
+        	.then(() => fetchTasks())
+            .then((response) => displayTasks(response))
             .catch(() => {
                 console.error("User location and/or neighborhood could not be retrieved");
             });
@@ -228,9 +202,34 @@ function toNeighborhood(latlng) {
                         }
                         if (zipCode != "" && country != "") break;
                     }
+                    neighborhood = [zipCode, country];
                     resolve([zipCode, country]);
                 } else reject("Couldn't get neighborhood");
             } else reject("Couldn't get neighborhood");
         });
+    });
+}
+
+/* Fetches tasks from servlet by neighborhood and category */
+function fetchTasks(category) {
+    let url = "/tasks?zipcode=" + neighborhood[0]+ "&country=" + neighborhood[1];
+    if (category !== undefined && category != "all") {
+        url += "&category=" + category;
+    }
+    return fetch(url);
+}
+
+/* Displays the tasks received from the server response */
+function displayTasks(response) {
+    response.json().then(html => {
+        if (html){
+            document.getElementById("no-tasks-message").style.display = "none";
+            document.getElementById("tasks-list").innerHTML = html;
+            document.getElementById("tasks-list").style.display = "block";
+            addTasksClickHandlers();
+        } else {
+            document.getElementById("no-tasks-message").style.display = "block";
+            document.getElementById("tasks-list").style.display = "none";
+        }
     });
 }

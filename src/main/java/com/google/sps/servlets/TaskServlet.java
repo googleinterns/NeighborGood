@@ -26,7 +26,7 @@ import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -37,9 +37,11 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/tasks")
 public class TaskServlet extends HttpServlet {
   @Override
+  // doGet method retrieves tasks from datastore and responds with the HTML for each task fetched
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     UserService userService = UserServiceFactory.getUserService();
     boolean userLoggedIn = userService.isUserLoggedIn();
+    String userId = userLoggedIn ? userService.getCurrentUser().getUserId() : "null";
 
     String zipcode = request.getParameter("zipcode");
     String country = request.getParameter("country");
@@ -48,18 +50,26 @@ public class TaskServlet extends HttpServlet {
 
     Query query = new Query("Task").addSort("timestamp", SortDirection.DESCENDING);
 
-    Query.CompositeFilter queryFilter =
-        new Query.CompositeFilter(
-            Query.CompositeFilterOperator.AND,
-            Arrays.asList(
-                new Query.FilterPredicate("zipcode", Query.FilterOperator.EQUAL, zipcode),
-                new Query.FilterPredicate("country", Query.FilterOperator.EQUAL, country)));
+    // Creates list of filters
+    List<Query.Filter> filters = new ArrayList<Query.Filter>();
+    filters.add(new Query.FilterPredicate("zipcode", Query.FilterOperator.EQUAL, zipcode));
+    filters.add(new Query.FilterPredicate("country", Query.FilterOperator.EQUAL, country));
 
-    query.setFilter(queryFilter);
+    // Applies a category filter, if any
+    if (request.getParameterMap().containsKey("category")) {
+      String category = request.getParameter("category");
+      filters.add(new Query.FilterPredicate("category", Query.FilterOperator.EQUAL, category));
+    }
 
+    // Applies filters to query
+    query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, filters));
+
+    // limits results to the 20 most recent tasks
     List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(20));
 
     StringBuilder out = new StringBuilder();
+
+    // Builds and stores HTML for each task
     for (Entity entity : results) {
       out.append("<div class='task'>");
       if (userLoggedIn) {
@@ -74,13 +84,21 @@ public class TaskServlet extends HttpServlet {
           .append((String) entity.getProperty("Owner"))
           .append("</div>");
       if (userLoggedIn) {
-        out.append("<div class='help-button'>HELP OUT</div>");
+        // changes the Help Button div if the current user is the owner of the task
+        if (!userId.equals((String) entity.getProperty("userId"))) {
+          out.append("<div class='help-button'>HELP OUT</div>");
+        } else {
+          out.append(
+              "<div class='help-button disable-help' title='This is your own task'>HELP OUT</div>");
+        }
       }
       out.append("</div>");
       out.append("<div class='task-content'>")
           .append((String) entity.getProperty("detail"))
           .append("</div>");
-      out.append("<div class='task-footer'><div class='task-category'>#garden</div></div>");
+      out.append("<div class='task-footer'><div class='task-category'>#")
+          .append((String) entity.getProperty("category"))
+          .append("</div></div>");
       out.append("</div></div>");
     }
 
@@ -126,6 +144,7 @@ public class TaskServlet extends HttpServlet {
       taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
       taskEntity.setProperty("zipcode", "59715");
       taskEntity.setProperty("country", "United States");
+      taskEntity.setProperty("category", "misc");
 
       DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
       datastore.put(taskEntity);

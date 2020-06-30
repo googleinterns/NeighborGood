@@ -29,6 +29,7 @@ public final class Task {
   private final String userId;
   private final String zipcode;
   private final String country;
+  private final String category;
 
   public Task(
       String keyString,
@@ -41,7 +42,8 @@ public final class Task {
       String address,
       String userId,
       String zipcode,
-      String country) {
+      String country,
+      String category) {
     this.keyString = keyString;
     this.detail = detail;
     this.creationTime = creationTime;
@@ -53,6 +55,7 @@ public final class Task {
     this.userId = userId;
     this.zipcode = zipcode;
     this.country = country;
+    this.category = category;
   }
 
   public Task(Entity entity) {
@@ -67,13 +70,6 @@ public final class Task {
     this.userId = (String) entity.getProperty("userId");
     this.zipcode = (String) entity.getProperty("zipcode");
     this.country = (String) entity.getProperty("country");
-  }
-
-  public String getDetail() {
-    return this.detail;
-  }
-
-  public String getOwner() {
-    return this.owner;
+    this.category = (String) entity.getProperty("category");
   }
 }
