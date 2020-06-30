@@ -148,15 +148,17 @@ main h1 {
 #chart-container { 
 	max-height: 600px;
 	min-height: 600px;
+	width: calc(100vw - 900px);
 }
 
 #chart-div {
-	height: 545px; 
+	height: 545px;
+	width: initial;
 }
 
 
 /** Media Queries **/
-@media (max-width: 1000px) {
+@media (max-width: 1200px) {
 	.notification-grid, .flex-grid {
 		flex-direction: column;
 	}
@@ -172,7 +174,11 @@ main h1 {
 		margin-left: 0;
 	}
 
-
-
+	#chart-container { 
+		max-height: 600px;
+		min-height: 600px;
+		width: calc(100vw - 200px);
+		min-width: 500px;
+	}
 
 }
