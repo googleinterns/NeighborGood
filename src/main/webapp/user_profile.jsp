@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="user_profile_script.js"></script>
   </head>
+  <%@ page import = "com.google.appengine.api.users.UserService" %>
+  <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
+  <% UserService userService = UserServiceFactory.getUserService();
+  if (userService.isUserLoggedIn()) { %>
   <body onload="showNeedHelp()">
     <div id="nav-bar">
         <p id="return-link"><a href="index.jsp">BACK TO HOME</a></p>
@@ -116,4 +120,9 @@
         </div>
     </div>
   </body>
+  <%
+  } else {
+      response.sendRedirect(userService.createLoginURL("/"));
+  }
+  %>
 </html>

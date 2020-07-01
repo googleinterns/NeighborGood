@@ -57,9 +57,14 @@ section {
     border-bottom: solid #222;
     border-top: solid #222;
     border-left: solid #222;;
+}
+.notFullWidth {
     width: 90%;
 }
-#category-all {
+.fullWidth {
+    width: 100%;
+}
+#all {
     background-color:#222;
     color: white;
     font-weight: bold;
