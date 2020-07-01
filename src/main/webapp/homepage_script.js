@@ -15,7 +15,7 @@
 const MAPSKEY = config.MAPS_KEY
 let neighborhood = null;
 
-/* Calls addOnClicks and getUserNeighborhood once page has loaded */
+/* Calls addUIClickHandlers and getUserNeighborhood once page has loaded */
 if (document.readyState === 'loading') {
     // adds on load event listeners if document hasn't yet loaded
     document.addEventListener('DOMContentLoaded', addUIClickHandlers)
@@ -26,6 +26,7 @@ if (document.readyState === 'loading') {
     getUserNeighborhood();
 }
 
+/* Function adds all the necessary UI 'click' event listeners*/
 function addUIClickHandlers() {
     // adds showModal and closeModal click events for the add task button
     if (document.body.contains(document.getElementById("addtaskbutton"))) {
@@ -42,7 +43,7 @@ function addUIClickHandlers() {
     }
 }
 
-/* Function adds all the necessary 'click' event listeners*/
+/* Function adds all the necessary tasks 'click' event listeners*/
 function addTasksClickHandlers() {
 
     // adds removeTask click event listener to remove task buttons
@@ -154,7 +155,8 @@ function getUserNeighborhood() {
 	
     // Once the Maps API script has dynamically loaded it gets the user location,
     // waits until it gets an answer and then calls toNeighborhood passing the location
-    // as an argument. toNeighborhood consequently returns the user's neighborhood
+    // as an argument, updates the global neighborhood variable and then calls
+    // fetchTasks and displayTasks
 	window.initialize = function () {
         getUserLocation().then(location => toNeighborhood(location))
         	.then(() => fetchTasks())
