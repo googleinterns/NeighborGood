@@ -312,16 +312,16 @@
               </div>
           </div>
       </section>
-      <div id="createTaskModal">
-        <div id="modal">
-            <span id="close-button">&times;</span>
+      <div class="modalWrapper" id="createTaskModalWrapper">
+        <div class="modal" id="createTaskModal">
+            <span class="close-button" id="close-button">&times;</span>
             <form id="new-task-form" action="/tasks" method="POST">
                 <h1>CREATE A NEW TASK: </h1>
                 <div>
-                    <label for="task-content-input">Task Detail:</label>
+                    <label for="task-detail-input">Task Detail:</label>
                     <br/>
                 </div>
-                <textarea name="task-content-input" id="task-content-input" placeholder="Describe your task here:"></textarea>
+                <textarea name="task-detail-input" id="task-detail-input" placeholder="Describe your task here:"></textarea>
                 <br/>
                 <label for="rewarding-point-input">Rewarding Points:</label>
                 <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50">

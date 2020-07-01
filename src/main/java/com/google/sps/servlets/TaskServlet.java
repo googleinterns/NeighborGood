@@ -76,7 +76,7 @@ public class TaskServlet extends HttpServlet {
     datastore.put(taskEntity);
 
     // Redirect back to the user page.
-    response.sendRedirect("/user_profile.html");
+    response.sendRedirect("/user_profile.jsp");
   }
 
   /** Return the input rewarding points by the user, or -1 if the input was invalid */
@@ -114,6 +114,6 @@ public class TaskServlet extends HttpServlet {
     datastore.delete(taskKey);
 
     // Redirect to the user profile page
-    response.sendRedirect("/user_profile.html");
+    response.sendRedirect("/user_profile.jsp");
   }
 }
