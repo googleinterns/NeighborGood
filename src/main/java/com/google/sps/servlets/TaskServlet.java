@@ -17,9 +17,17 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gson.Gson;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,9 +37,84 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/tasks")
 public class TaskServlet extends HttpServlet {
   @Override
+  // doGet method retrieves tasks from datastore and responds with the HTML for each task fetched
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // Serve the GET request sent from home page to fetch all the tasks
-    return;
+    UserService userService = UserServiceFactory.getUserService();
+    boolean userLoggedIn = userService.isUserLoggedIn();
+    String userId = userLoggedIn ? userService.getCurrentUser().getUserId() : "null";
+    String zipcode = "";
+    String country = "";
+
+    if (request.getParameterMap().containsKey("zipcode")
+        && request.getParameterMap().containsKey("country")) {
+      zipcode = request.getParameter("zipcode");
+      country = request.getParameter("country");
+    } else {
+      System.err.println("Zipcode and Country details are missing");
+      response.sendError(
+          HttpServletResponse.SC_BAD_REQUEST, "Zipcode and Country details are missing");
+    }
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    Query query = new Query("Task").addSort("timestamp", SortDirection.DESCENDING);
+
+    // Creates list of filters
+    List<Query.Filter> filters = new ArrayList<Query.Filter>();
+    filters.add(new Query.FilterPredicate("zipcode", Query.FilterOperator.EQUAL, zipcode));
+    filters.add(new Query.FilterPredicate("country", Query.FilterOperator.EQUAL, country));
+
+    // Applies a category filter, if any
+    if (request.getParameterMap().containsKey("category")) {
+      String category = request.getParameter("category");
+      filters.add(new Query.FilterPredicate("category", Query.FilterOperator.EQUAL, category));
+    }
+
+    // Applies filters to query
+    query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, filters));
+
+    // limits results to the 20 most recent tasks
+    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(20));
+
+    StringBuilder out = new StringBuilder();
+
+    // Builds and stores HTML for each task
+    for (Entity entity : results) {
+      out.append("<div class='task'>");
+      if (userLoggedIn) {
+        out.append("<div class='confirm-overlay'>");
+        out.append("<div class='exit-confirm'><a>&times</a></div>");
+        out.append("<a class='removetask'>CONFIRM</a>");
+        out.append("</div>");
+      }
+      out.append("<div class='task-container'>");
+      out.append("<div class='task-header'>");
+      out.append("<div class='username'>")
+          .append((String) entity.getProperty("Owner"))
+          .append("</div>");
+      if (userLoggedIn) {
+        // changes the Help Button div if the current user is the owner of the task
+        if (!userId.equals((String) entity.getProperty("userId"))) {
+          out.append("<div class='help-button'>HELP OUT</div>");
+        } else {
+          out.append(
+              "<div class='help-button disable-help' title='This is your own task'>HELP OUT</div>");
+        }
+      }
+      out.append("</div>");
+      out.append("<div class='task-content'>")
+          .append((String) entity.getProperty("detail"))
+          .append("</div>");
+      out.append("<div class='task-footer'><div class='task-category'>#")
+          .append((String) entity.getProperty("category"))
+          .append("</div></div>");
+      out.append("</div></div>");
+    }
+
+    Gson gson = new Gson();
+    String json = gson.toJson(out.toString());
+    response.setContentType("application/json;");
+    response.getWriter().println(json);
   }
 
   @Override
@@ -62,8 +145,12 @@ public class TaskServlet extends HttpServlet {
 
     long creationTime = System.currentTimeMillis();
 
+    UserService userService = UserServiceFactory.getUserService();
+    String userId = userService.getCurrentUser().getUserId();
+
     // Create an Entity that stores the input comment
     Entity taskEntity = new Entity("Task");
+    taskEntity.setProperty("userId", userId);
     taskEntity.setProperty("detail", taskDetail);
     taskEntity.setProperty("timestamp", creationTime);
     taskEntity.setProperty("reward", rewardPts);
@@ -71,6 +158,9 @@ public class TaskServlet extends HttpServlet {
     taskEntity.setProperty("Owner", "Leonard");
     taskEntity.setProperty("Helper", "N/A");
     taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
+    taskEntity.setProperty("zipcode", "59715");
+    taskEntity.setProperty("country", "United States");
+    taskEntity.setProperty("category", "misc");
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(taskEntity);
