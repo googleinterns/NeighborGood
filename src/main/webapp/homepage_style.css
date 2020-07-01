@@ -162,7 +162,7 @@ section {
 }
 
 /* Add task modal styling */
-#createTaskModal {
+.modalWrapper {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
@@ -175,47 +175,45 @@ section {
     background-color: rgb(0,0,0); /* Fallback color */
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
-#modal {
+
+.modal {
     background-color: #fefefe;
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
     width: 50%;
 }
-#modal textarea {
+
+.modal textarea {
     width: 50%;
     box-sizing: border-box;
     border: 4px solid rgb(97, 245, 195);
     border-radius: 4px;
     font-size: 16px;
-    font-family:  'Roboto', sans-serif;
     padding: 10px 20px 10px 20px;
     transition: width 0.5s ease-in-out;
-    margin-bottom: 1em;
-}
-#new-task-form {
-    margin-bottom: 1em;
-    margin-left: 1em;
-    margin-right: 1em;
 }
 
-#modal textarea:focus {
+.modal textarea:focus {
     width: 100%;
     border: 4px solid lightcyan;
 }
-#modal label {
+
+.modal label {
     font-size: 24px;
     font-weight: bold;
 }
-#close-button {
+
+.close-button {
   color: #aaaaaa;
   float: right;
   font-size: 28px;
   font-weight: bold;
 }
-#close-button:hover,
-#close-button:focus {
-  color: #000;
+
+.close-button:hover,
+.close-button:focus {
+  color: red;
   text-decoration: none;
   cursor: pointer;
 }
