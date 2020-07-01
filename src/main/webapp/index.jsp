@@ -86,7 +86,13 @@
               }
               %>
           </div>
-          <div id="no-tasks-message">
+          <div id="location-missing-message" class="results-message">
+              We could not retrieve your location to display your neighborhood tasks.
+          </div>
+          <div id="tasks-message" class="results-message">
+              These are the 20 (or less) most recent tasks in your neighborhood:
+          </div>
+          <div id="no-tasks-message" class="results-message">
               Sorry, there are currently no tasks within your neighborhood for you to help with.
           </div>
           <!--Listed Tasks Container-->

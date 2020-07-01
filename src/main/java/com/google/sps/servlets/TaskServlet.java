@@ -42,9 +42,18 @@ public class TaskServlet extends HttpServlet {
     UserService userService = UserServiceFactory.getUserService();
     boolean userLoggedIn = userService.isUserLoggedIn();
     String userId = userLoggedIn ? userService.getCurrentUser().getUserId() : "null";
+    String zipcode = "";
+    String country = "";
 
-    String zipcode = request.getParameter("zipcode");
-    String country = request.getParameter("country");
+    if (request.getParameterMap().containsKey("zipcode")
+        && request.getParameterMap().containsKey("country")) {
+      zipcode = request.getParameter("zipcode");
+      country = request.getParameter("country");
+    } else {
+      System.err.println("Zipcode and Country details are missing");
+      response.sendError(
+          HttpServletResponse.SC_BAD_REQUEST, "Zipcode and Country details are missing");
+    }
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
@@ -157,7 +166,7 @@ public class TaskServlet extends HttpServlet {
     datastore.put(taskEntity);
 
     // Redirect back to the user page.
-    response.sendRedirect("/user_profile.html");
+    response.sendRedirect("/user_profile.jsp");
   }
 
   /** Return the input rewarding points by the user, or -1 if the input was invalid */
@@ -195,6 +204,6 @@ public class TaskServlet extends HttpServlet {
     datastore.delete(taskKey);
 
     // Redirect to the user profile page
-    response.sendRedirect("/user_profile.html");
+    response.sendRedirect("/user_profile.jsp");
   }
 }

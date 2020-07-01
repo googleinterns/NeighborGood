@@ -51,7 +51,7 @@ section {
 #control-bar {
     display: flex;
     justify-content: space-between;
-    padding-bottom: 2em;
+    padding-bottom: 1.5em;
 }
 #categories {
     display: flex;
@@ -93,9 +93,10 @@ section {
 }
 
 /* Tasks Styling */
-#no-tasks-message {
+.results-message {
     display: none;
     text-align: center;
+    padding-bottom: 0.5em;
 }
 #tasks-list {
     display: none;

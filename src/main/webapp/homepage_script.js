@@ -13,7 +13,7 @@
 // limitations under the License.
 
 const MAPSKEY = config.MAPS_KEY
-let neighborhood = null;
+let neighborhood = [null , null];
 
 /* Calls addUIClickHandlers and getUserNeighborhood once page has loaded */
 if (document.readyState === 'loading') {
@@ -79,8 +79,12 @@ function addTasksClickHandlers() {
 
 /* Function filters tasks by categories and styles selected categories */
 function filterTasksBy(category) {
-    fetchTasks(category).then(response => displayTasks(response));
 
+// only fetches tasks if user's neighborhood has been retrieved
+if (JSON.stringify(neighborhood) != JSON.stringify([null, null])) {
+    fetchTasks(category)
+        .then(response => displayTasks(response));
+}
 	// Unhighlights and resets styling for all category buttons
     const categoryButtons = document.getElementsByClassName("categories");
     for (let i = 0; i < categoryButtons.length; i++){
@@ -163,6 +167,7 @@ function getUserNeighborhood() {
             .then((response) => displayTasks(response))
             .catch(() => {
                 console.error("User location and/or neighborhood could not be retrieved");
+                document.getElementById("location-missing-message").style.display = "block";
             });
 	}
 }
@@ -226,11 +231,15 @@ function displayTasks(response) {
     response.json().then(html => {
         if (html){
             document.getElementById("no-tasks-message").style.display = "none";
+            document.getElementById("location-missing-message").style.display = "none";
+            document.getElementById("tasks-message").style.display = "block";
             document.getElementById("tasks-list").innerHTML = html;
             document.getElementById("tasks-list").style.display = "block";
             addTasksClickHandlers();
         } else {
             document.getElementById("no-tasks-message").style.display = "block";
+            document.getElementById("tasks-message").style.display = "none";
+            document.getElementById("location-missing-message").style.display = "none";
             document.getElementById("tasks-list").style.display = "none";
         }
     });
