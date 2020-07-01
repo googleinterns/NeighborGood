@@ -49,7 +49,7 @@
           	      <p class="login-messages"><%=userService.getCurrentUser().getEmail()%> | <a href="<%=logoutUrl%>">Logout</a></p>
                   <%
                   } else {
-                      String urlToRedirectToAfterUserLogsIn = "/";
+                      String urlToRedirectToAfterUserLogsIn = "/account.jsp";
                       String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
                   %>
                   <p class="login-messages"><a href="<%=loginUrl%>">Login to help out a neighbor!</a></p>

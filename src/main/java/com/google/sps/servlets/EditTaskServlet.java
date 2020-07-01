@@ -50,8 +50,7 @@ public class EditTaskServlet extends HttpServlet {
     // If input task detail is empty, reject the request to edit and send a 400 error.
     if (taskDetail.equals("")) {
       System.err.println("The input task detail is empty");
-      response.sendError(
-          HttpServletResponse.SC_BAD_REQUEST, "The task detail field cannot be empty.");
+      response.sendRedirect("/400.html");
       return;
     }
 

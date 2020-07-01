@@ -9,12 +9,24 @@
   </head>
   <%@ page import = "com.google.appengine.api.users.UserService" %>
   <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
+  <%@ page import = "com.google.sps.helper.RetrieveInfo" %>
+  <%@ page import = "java.util.List" %>
   <% UserService userService = UserServiceFactory.getUserService();
-  if (userService.isUserLoggedIn()) { %>
+  if (!userService.isUserLoggedIn()) { 
+      response.sendRedirect(userService.createLoginURL("/account.jsp"));
+  } else {
+    List<String> userInfo = RetrieveInfo.getInfo(userService);
+    if (userInfo == null) {
+        response.sendRedirect("/account.jsp");
+        return;
+    } else {
+        String urlToRedirectAfterUserLogsOut = "/index.jsp";
+        String logoutURL = userService.createLogoutURL(urlToRedirectAfterUserLogsOut);
+        String nickname = userInfo.get(0); %>
   <body onload="showNeedHelp()">
     <div id="nav-bar">
         <p id="return-link"><a href="index.jsp">BACK TO HOME</a></p>
-        <p id="log-out-link">Leonard Zhang |  <a href="logout.html">Logout</a></p>
+        <p id="log-out-link"><%=nickname%> |  <a href="<%=logoutURL%>">Logout</a></p>
     </div>
     <div style="clear: both"></div>
     <div id="header">
@@ -121,8 +133,7 @@
     </div>
   </body>
   <%
-  } else {
-      response.sendRedirect(userService.createLoginURL("/"));
+    }
   }
   %>
 </html>
