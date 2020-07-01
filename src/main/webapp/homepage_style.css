@@ -205,15 +205,15 @@ section {
 }
 
 .close-button {
-  color: #aaaaaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
 }
 
 .close-button:hover,
 .close-button:focus {
-  color: red;
-  text-decoration: none;
-  cursor: pointer;
+    color: red;
+    text-decoration: none;
+    cursor: pointer;
 }
