@@ -48,10 +48,10 @@ public class MyTaskServlet extends HttpServlet {
     // Depending on the input complete parameter, the status filter will be different.
     String complete = request.getParameter("complete");
     if (complete.equals("True")) {
-      Filter openFilter = new FilterPredicate("status", FilterOperator.NOT_EQUAL, "OPEN");
+      Filter openFilter = new FilterPredicate("status", FilterOperator.EQUAL, "COMPLETE");
       Filter inProgressFilter =
-          new FilterPredicate("status", FilterOperator.NOT_EQUAL, "IN PROGRESS");
-      CompositeFilter statusFilter = CompositeFilterOperator.and(openFilter, inProgressFilter);
+          new FilterPredicate("status", FilterOperator.EQUAL, "COMPLETE: AWAIT VERIFICATION");
+      CompositeFilter statusFilter = CompositeFilterOperator.or(openFilter, inProgressFilter);
       filter = CompositeFilterOperator.and(filter, statusFilter);
     } else {
       Filter openFilter = new FilterPredicate("status", FilterOperator.EQUAL, "OPEN");

@@ -115,7 +115,7 @@ function showNeedHelp() {
     document.getElementById("need-help-button").style.backgroundColor = "#3e8e41";
     document.getElementById("offer-help-button").style.backgroundColor = "#4CAF50";
     displayNeedHelpTasks();
-    displayAwaitVerificationList();
+    displayNeedHelpCompleteTasks();
 }
 
 function showOfferHelp() {
@@ -127,7 +127,7 @@ function showOfferHelp() {
     document.getElementById("need-help-button").style.backgroundColor = "#4CAF50";
     document.getElementById("offer-help-button").style.backgroundColor = "#3e8e41";
     displayOfferHelpTasks();
-    displayCompleteTasks();
+    displayOfferHelpCompleteTasks();
 }
 
 function showModal() {
@@ -192,13 +192,13 @@ async function displayNeedHelpTasks() {
     }
 }
 
-async function displayAwaitVerificationList() {
+async function displayNeedHelpCompleteTasks() {
     const queryURL = "/mytasks?keyword=Owner&complete=True";
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
     const taskResponse = await response.json();
-    const awaitVerifBody = document.getElementById("await-verif-body");
-    awaitVerifBody.innerHTML = "";
+    const completeTaskBody = document.getElementById("await-verif-body");
+    completeTaskBody.innerHTML = "";
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
@@ -223,7 +223,7 @@ async function displayAwaitVerificationList() {
         disapproveTd.appendChild(disapproveBtn);
         tr.appendChild(verifyTd);
         tr.appendChild(disapproveTd);
-        awaitVerifBody.appendChild(tr);
+        completeTaskBody.appendChild(tr);
     }
 }
 
@@ -262,7 +262,7 @@ async function displayOfferHelpTasks() {
     }
 }
 
-async function displayCompleteTasks() {
+async function displayOfferHelpCompleteTasks() {
     const queryURL = "/mytasks?keyword=Helper&complete=True";
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
