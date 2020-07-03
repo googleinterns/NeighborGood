@@ -81,7 +81,7 @@ public class TaskServlet extends HttpServlet {
     // Builds and stores HTML for each task
     for (Entity entity : results) {
 
-      out.append("<div class='task' data-task-id='")
+      out.append("<div class='task' data-key='")
           .append(KeyFactory.keyToString(entity.getKey()))
           .append("'>");
       if (userLoggedIn) {

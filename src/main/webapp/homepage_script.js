@@ -14,6 +14,7 @@
 
 const MAPSKEY = config.MAPS_KEY
 let neighborhood = [null , null];
+let currentCategory = "all";
 
 /* Calls addUIClickHandlers and getUserNeighborhood once page has loaded */
 if (document.readyState === 'loading') {
@@ -45,12 +46,13 @@ function addUIClickHandlers() {
 
 /* Function filters tasks by categories and styles selected categories */
 function filterTasksBy(category) {
+    currentCategory = category;
 
-// only fetches tasks if user's neighborhood has been retrieved
-if (JSON.stringify(neighborhood) != JSON.stringify([null, null])) {
-    fetchTasks(category)
-        .then(response => displayTasks(response));
-}
+    // only fetches tasks if user's neighborhood has been retrieved
+    if (JSON.stringify(neighborhood) != JSON.stringify([null, null])) {
+        fetchTasks(category)
+            .then(response => displayTasks(response));
+    }
 	// Unhighlights and resets styling for all category buttons
     const categoryButtons = document.getElementsByClassName("categories");
     for (let i = 0; i < categoryButtons.length; i++){
@@ -88,7 +90,13 @@ function helpOut(element) {
 
 /* Function that hides the task after user confirms they want to help out */
 function confirmHelp(element) {
-    element.closest(".task").style.display = "none";
+    const url = "tasks/edit?key=" + element.dataset.key;
+    const request = new Request(url, {method: "POST"});
+    fetch(request).then(() => {
+        if (JSON.stringify(neighborhood) != JSON.stringify([null, null])) {
+            fetchTasks(currentCategory).then(response => displayTasks(response));
+        }
+    });
 }
 
 /* Function that hides the help out overlay */
