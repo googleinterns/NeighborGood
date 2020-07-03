@@ -43,40 +43,6 @@ function addUIClickHandlers() {
     }
 }
 
-/* Function adds all the necessary tasks 'click' event listeners*/
-function addTasksClickHandlers() {
-
-    // adds removeTask click event listener to remove task buttons
-    const removeTaskButtons = document.getElementsByClassName("removetask");
-    for (let i = 0; i < removeTaskButtons.length; i++){
-        if (document.body.contains(removeTaskButtons[i])){
-            removeTaskButtons[i].addEventListener("click", function(e) {
-            	removeTask(e.target);
-        	});
-        }
-    }
-    // adds cancelHelpOut click event listener to exit confirm buttons
-    const exitConfirmButtons = document.getElementsByClassName("exit-confirm");
-    for (let i = 0; i < exitConfirmButtons.length; i++) {
-        if (document.body.contains(exitConfirmButtons[i])){
-            exitConfirmButtons[i].addEventListener("click", function(e) {
-                cancelHelpOut(e.target);
-            });
-        }
-    }
-    // adds helpOut click event listener to help out buttons
-    const helpOutButtons = document.getElementsByClassName("help-button");
-        for (let i = 0; i < helpOutButtons.length; i++) {
-            if (document.body.contains(helpOutButtons[i])){
-                if (!helpOutButtons[i].classList.contains("disable-help")) {
-                    helpOutButtons[i].addEventListener("click", function(e) {
-                        helpOut(e.target);
-                    });
-                }
-            }
-        }
-}
-
 /* Function filters tasks by categories and styles selected categories */
 function filterTasksBy(category) {
 
@@ -113,21 +79,21 @@ if (JSON.stringify(neighborhood) != JSON.stringify([null, null])) {
     }
 }
 
-/* Function that display the help out confirmation overlay */
+/* Function that display the help out overlay */
 function helpOut(element) {
     const task = element.closest(".task");
-    const overlay = task.getElementsByClassName("confirm-overlay");
+    const overlay = task.getElementsByClassName("help-overlay");
     overlay[0].style.display = "block";
 }
 
 /* Function that hides the task after user confirms they want to help out */
-function removeTask(element) {
+function confirmHelp(element) {
     element.closest(".task").style.display = "none";
 }
 
-/* Function that hides the help out confirmation overlay */
-function cancelHelpOut(element) {
-	element.closest(".confirm-overlay").style.display = "none";
+/* Function that hides the help out overlay */
+function exitHelp(element) {
+	element.closest(".help-overlay").style.display = "none";
 }
 
 /* Leonard's implementation of the Add Task modal */
@@ -231,7 +197,6 @@ function displayTasks(response) {
     response.json().then(html => {
         if (html){
             document.getElementById("no-tasks-message").style.display = "none";
-            document.getElementById("location-missing-message").style.display = "none";
             document.getElementById("tasks-message").style.display = "block";
             document.getElementById("tasks-list").innerHTML = html;
             document.getElementById("tasks-list").style.display = "block";
@@ -239,8 +204,36 @@ function displayTasks(response) {
         } else {
             document.getElementById("no-tasks-message").style.display = "block";
             document.getElementById("tasks-message").style.display = "none";
-            document.getElementById("location-missing-message").style.display = "none";
             document.getElementById("tasks-list").style.display = "none";
         }
     });
+}
+
+/* Function adds all the necessary tasks 'click' event listeners*/
+function addTasksClickHandlers() {
+
+    // adds confirmHelp click event listener to confirm help buttons
+    const confirmHelpButtons = document.getElementsByClassName("confirm-help");
+    for (let i = 0; i < confirmHelpButtons.length; i++){
+        confirmHelpButtons[i].addEventListener("click", function(e) {
+            confirmHelp(e.target);
+        });
+        
+    }
+    // adds exitHelp click event listener to exit help buttons
+    const exitHelpButtons = document.getElementsByClassName("exit-help");
+    for (let i = 0; i < exitConfirmButtons.length; i++) {
+        exitHelpButtons[i].addEventListener("click", function(e) {
+            exitHelp(e.target);
+        });
+    }
+    // adds helpOut click event listener to help out buttons
+    const helpOutButtons = document.getElementsByClassName("help-out");
+        for (let i = 0; i < helpOutButtons.length; i++) {
+            if (!helpOutButtons[i].classList.contains("disable-help")) {
+                helpOutButtons[i].addEventListener("click", function(e) {
+                    helpOut(e.target);
+                });
+            }
+        }
 }

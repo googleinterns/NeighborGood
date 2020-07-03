@@ -80,11 +80,14 @@ public class TaskServlet extends HttpServlet {
 
     // Builds and stores HTML for each task
     for (Entity entity : results) {
-      out.append("<div class='task'>");
+
+      out.append("<div class='task' data-task-id='")
+          .append(KeyFactory.keyToString(entity.getKey()))
+          .append("'>");
       if (userLoggedIn) {
-        out.append("<div class='confirm-overlay'>");
-        out.append("<div class='exit-confirm'><a>&times</a></div>");
-        out.append("<a class='removetask'>CONFIRM</a>");
+        out.append("<div class='help-overlay'>");
+        out.append("<div class='exit-help'><a>&times</a></div>");
+        out.append("<a class='confirm-help'>CONFIRM</a>");
         out.append("</div>");
       }
       out.append("<div class='task-container'>");

@@ -119,11 +119,11 @@ section {
 .username {
     width: 70%;
 }
-.help-button {
+.help-out {
     cursor: pointer;
     font-weight: bold;
 }
-.help-button:hover{
+.help-out:hover{
     color: gray;
 }
 .disable-help:hover{
@@ -135,7 +135,7 @@ section {
     display: flex;
     justify-content: space-between;
 }
-.confirm-overlay {
+.help-overlay {
     position: absolute;
     z-index: 99;
     display: none;
@@ -149,11 +149,11 @@ section {
     font-weight: bold;
     overflow: hidden;
 }
-.confirm-overlay a:hover {
+.help-overlay a:hover {
     color: gray;
     cursor:pointer;
 }
-.exit-confirm {
+.exit-help {
     font-size: 30px;
     line-height: 0em;
     text-align: right;
