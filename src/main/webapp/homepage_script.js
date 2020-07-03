@@ -88,7 +88,9 @@ function helpOut(element) {
     overlay[0].style.display = "block";
 }
 
-/* Function that hides the task after user confirms they want to help out */
+/* Function sends a fetch request to the edit task servlet when the user
+offers to help out, edits the task's status and helper properties and
+then reloads the task list */
 function confirmHelp(element) {
     const url = "tasks/edit?key=" + element.dataset.key;
     const request = new Request(url, {method: "POST"});
