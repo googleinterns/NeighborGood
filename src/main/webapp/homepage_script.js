@@ -102,6 +102,7 @@ function confirmHelp(element) {
                 ("We're sorry, but the task you're trying to help with has already been claimed by another user.");
             window.location.href = '/';
         }
+        // fetches tasks again if user's current neighborhood was successfully retrieved and stored
         else if (JSON.stringify(neighborhood) != JSON.stringify([null, null])) {
             fetchTasks(currentCategory).then(response => displayTasks(response));
         }
