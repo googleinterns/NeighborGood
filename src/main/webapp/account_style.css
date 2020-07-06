@@ -70,7 +70,7 @@ label {
   cursor: pointer;
 }
 
-#submit-button:hover, 
+#submit-button:hover,
 #submit-button:focus {
   background: #169674;
 }
