@@ -9,8 +9,6 @@ google.charts.setOnLoadCallback(drawChart);
 window.addEventListener("resize", drawChart);
 
 window.addEventListener('load', drawMap);
-
-
 //window.onload(drawMap());
 
 function drawChart() {
@@ -140,4 +138,15 @@ function load(file){
 	src.setAttribute("type", "text/javascript");
 	src.setAttribute("src", file);
 	document.getElementsByTagName("head")[0].appendChild(src);
+}
+
+function initUserTasks(){
+    fetch('/user-tasks').then(response => response.json()).then((tasks) => {
+    console.log(tasks);
+    //     let taskSection = document.getElementById('tasks-container');
+        
+    //     for(userTask of tasks){
+    //         commentSection.innerHTML += addComment(userComment);
+    //     }
+     });
 }
