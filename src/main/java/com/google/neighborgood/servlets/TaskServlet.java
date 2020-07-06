@@ -63,6 +63,7 @@ public class TaskServlet extends HttpServlet {
     List<Query.Filter> filters = new ArrayList<Query.Filter>();
     filters.add(new Query.FilterPredicate("zipcode", Query.FilterOperator.EQUAL, zipcode));
     filters.add(new Query.FilterPredicate("country", Query.FilterOperator.EQUAL, country));
+    filters.add(new Query.FilterPredicate("status", Query.FilterOperator.EQUAL, "OPEN"));
 
     // Applies a category filter, if any
     if (request.getParameterMap().containsKey("category")) {
@@ -98,10 +99,10 @@ public class TaskServlet extends HttpServlet {
       if (userLoggedIn) {
         // changes the Help Button div if the current user is the owner of the task
         if (!userId.equals((String) entity.getProperty("userId"))) {
-          out.append("<div class='help-button'>HELP OUT</div>");
+          out.append("<div class='help-out'>HELP OUT</div>");
         } else {
           out.append(
-              "<div class='help-button disable-help' title='This is your own task'>HELP OUT</div>");
+              "<div class='help-out disable-help' title='This is your own task'>HELP OUT</div>");
         }
       }
       out.append("</div>");

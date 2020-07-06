@@ -20,44 +20,25 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that handles the request for editing the details and rewards for a certain task. */
+/** Servlet that handles the request for editing tasks. */
 @WebServlet("/tasks/edit")
 public class EditTaskServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
     String keyString = request.getParameter("task-id");
-    int rewardPts = getRewardingPoints(request, "reward-input");
-    if (rewardPts == -1) {
-      response.setContentType("text/html");
-      response.getWriter().println("Please enter a valid integer in the range of 0-200");
-      return;
-    }
-
-    // Get the task detail from the form input
-    String taskDetail = "";
-    String input = request.getParameter("task-detail-input");
-    // If the input is valid, set the taskDetail value to the input value
-    if (input != null) {
-      taskDetail = input;
-    }
-
-    // If input task detail is empty, reject the request to edit and send a 400 error.
-    if (taskDetail.equals("")) {
-      System.err.println("The input task detail is empty");
-      response.sendError(
-          HttpServletResponse.SC_BAD_REQUEST, "The task detail field cannot be empty.");
-      return;
-    }
-
     Key taskKey = KeyFactory.stringToKey(keyString);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity task;
+
     try {
       task = datastore.get(taskKey);
     } catch (EntityNotFoundException e) {
@@ -66,12 +47,57 @@ public class EditTaskServlet extends HttpServlet {
       return;
     }
 
-    // Set the details and rewards to the newly input value
-    task.setProperty("detail", taskDetail);
-    task.setProperty("reward", rewardPts);
-    datastore.put(task);
+    // Edits tasks that have been claimed by setting the "helper" property to the userId
+    // of the helper and changing the task's status to "IN PROGRESS"
+    if (request.getParameter("action").equals("helpout")) {
+      UserService userService = UserServiceFactory.getUserService();
+      if (!userService.isUserLoggedIn()) {
+        System.err.println("User must be logged in to help out with a task");
+        response.sendError(
+            HttpServletResponse.SC_UNAUTHORIZED, "You must be logged in to help out with a task");
+      }
+      String userId = userService.getCurrentUser().getUserId();
+      task.setProperty("Helper", userId);
+      task.setProperty("status", "IN PROGRESS");
+      datastore.put(task);
 
-    response.sendRedirect("/user_profile.html");
+      response.setContentType("text/html;");
+      response.getWriter().println();
+
+      // Edits task's details and reward points
+    } else {
+
+      int rewardPts = getRewardingPoints(request, "reward-input");
+      if (rewardPts == -1) {
+        response.setContentType("text/html");
+        response.getWriter().println("Please enter a valid integer in the range of 0-200");
+        return;
+      }
+
+      // Get the task detail from the form input
+      String taskDetail = "";
+      String input = request.getParameter("task-detail-input");
+      // If the input is valid, set the taskDetail value to the input value
+      if (input != null) {
+        taskDetail = input;
+      }
+
+      // If input task detail is empty, reject the request to edit and send a 400 error.
+      if (taskDetail.equals("")) {
+        System.err.println("The input task detail is empty");
+        response.sendError(
+            HttpServletResponse.SC_BAD_REQUEST, "The task detail field cannot be empty.");
+        return;
+      }
+
+      // Set the details and rewards to the newly input value
+      task.setProperty("detail", taskDetail);
+      task.setProperty("reward", rewardPts);
+
+      datastore.put(task);
+
+      response.sendRedirect("/user_profile.html");
+    }
   }
 
   // Both TaskServlet and EditTaskServlet use this method. I will fix this by putting the function

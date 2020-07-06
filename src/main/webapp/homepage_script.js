@@ -89,10 +89,11 @@ function helpOut(element) {
 }
 
 /* Function sends a fetch request to the edit task servlet when the user
-offers to help out, edits the task's status and helper properties and
+offers to help out, edits the task's status and helper properties, and
 then reloads the task list */
 function confirmHelp(element) {
-    const url = "tasks/edit?key=" + element.dataset.key;
+    const task = element.closest(".task");
+    const url = "tasks/edit?task-id=" + task.dataset.key + "&action=helpout";
     const request = new Request(url, {method: "POST"});
     fetch(request).then(() => {
         if (JSON.stringify(neighborhood) != JSON.stringify([null, null])) {
@@ -232,7 +233,7 @@ function addTasksClickHandlers() {
     }
     // adds exitHelp click event listener to exit help buttons
     const exitHelpButtons = document.getElementsByClassName("exit-help");
-    for (let i = 0; i < exitConfirmButtons.length; i++) {
+    for (let i = 0; i < exitHelpButtons.length; i++) {
         exitHelpButtons[i].addEventListener("click", function(e) {
             exitHelp(e.target);
         });
