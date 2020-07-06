@@ -20,31 +20,29 @@
       <!--Site Header-->
       <header>
           <nav>
+              <div id="user-icon">
               <%
               if (userLoggedIn && !userService.isUserAdmin()) { 
               %>
-              <div class="userpage-icon">
                   <a href="user_profile.jsp">
                       <i class="fas fa-user-circle fa-3x" title="Go to User Page"></i>
                   </a>
-              </div>
               <%
               }
               %>
               <%
               if (userLoggedIn && userService.isUserAdmin()) { 
               %>
-              <div class="userpage-icon" id="admin-icon">
-                  <a href="user_profile.jsp">
+                  <a href="user_profile.jsp" class="user-icon">
                       <i class="fas fa-user-circle fa-3x" title="Go to User Page"></i>
                   </a>
-                  <a href="admin_dashboard.html">
+                  <a href="admin_dashboard.html" class="user-icon">
                       <i class="fas fa-user-cog fa-3x" title="Go to Admin Dashboard"></i>
                   </a>
-              </div>    
               <%
               }
               %>
+              </div>
 
               <div id="login-logout">
           	      <%
