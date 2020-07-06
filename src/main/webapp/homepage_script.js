@@ -157,7 +157,7 @@ function getUserNeighborhood() {
 }
 
 /* Function that returns a promise to get and return the user's location */
- function getUserLocation() {
+function getUserLocation() {
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {

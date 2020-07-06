@@ -47,16 +47,17 @@ public class EditTaskServlet extends HttpServlet {
       return;
     }
 
+    UserService userService = UserServiceFactory.getUserService();
+    if (!userService.isUserLoggedIn()) {
+      System.err.println("User must be logged in to edit a task");
+      response.sendError(
+          HttpServletResponse.SC_UNAUTHORIZED,
+          "You must be logged in to perform this action on a task");
+    }
+
     // Edits tasks that have been claimed by setting the "helper" property to the userId
     // of the helper and changing the task's status to "IN PROGRESS"
     if (request.getParameter("action").equals("helpout")) {
-
-      UserService userService = UserServiceFactory.getUserService();
-      if (!userService.isUserLoggedIn()) {
-        System.err.println("User must be logged in to help out with a task");
-        response.sendError(
-            HttpServletResponse.SC_UNAUTHORIZED, "You must be logged in to help out with a task");
-      }
 
       if (!task.getProperty("status").equals("OPEN")) {
         System.err.println("Task must be open to be claimed by a helper");
@@ -69,12 +70,10 @@ public class EditTaskServlet extends HttpServlet {
       task.setProperty("status", "IN PROGRESS");
       datastore.put(task);
 
-      response.setContentType("text/html;");
-      response.getWriter().println();
+      return;
 
       // Edits task's details and reward points
     } else {
-
       int rewardPts = getRewardingPoints(request, "reward-input");
       if (rewardPts == -1) {
         response.setContentType("text/html");
