@@ -244,37 +244,36 @@ section {
 }
 
 @media only screen and (max-width: 600px) {
-
   #title {
-      font-size: 2.5em;
+    font-size: 2.5em;
   }
 
   #control-bar {
-      display: block;
+    display: block;
   }
 
   #categories {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
   }
 
   .categories {
-      min-width: 31%;
-      line-height: 2em;
+    min-width: 31%;
+    line-height: 2em;
   }
 
   #add-task {
-      text-align: right;
-      padding-right: 0.5em;
+    text-align: right;
+    padding-right: 0.5em;
   }
 
   #addtaskbutton {
-      font-size: 2.5em;
+    font-size: 2.5em;
   }
 
   .fa-3x {
-      font-size: 2.5em;
+    font-size: 2.5em;
   }
 }
