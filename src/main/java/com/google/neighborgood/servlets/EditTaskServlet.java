@@ -105,6 +105,7 @@ public class EditTaskServlet extends HttpServlet {
 
       response.sendRedirect("/user_profile.html");
     }
+
   }
 
   // Both TaskServlet and EditTaskServlet use this method. I will fix this by putting the function
