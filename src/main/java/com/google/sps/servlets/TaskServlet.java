@@ -152,7 +152,6 @@ public class TaskServlet extends HttpServlet {
 
     long creationTime = System.currentTimeMillis();
 
-    UserService userService = UserServiceFactory.getUserService();
     String userId = userService.getCurrentUser().getUserId();
 
     // Create an Entity that stores the input comment
@@ -162,7 +161,7 @@ public class TaskServlet extends HttpServlet {
     taskEntity.setProperty("timestamp", creationTime);
     taskEntity.setProperty("reward", rewardPts);
     taskEntity.setProperty("status", "OPEN");
-    taskEntity.setProperty("Owner", userService.getCurrentUser().getUserId());
+    taskEntity.setProperty("Owner", userId);
     taskEntity.setProperty("Helper", "N/A");
     taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
     taskEntity.setProperty("zipcode", "59715");
