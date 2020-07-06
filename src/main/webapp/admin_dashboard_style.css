@@ -145,17 +145,25 @@ main h1 {
 	margin: 0;
 }
 
-#chart-container { 
+#chart-container, #map-container { 
 	max-height: 600px;
 	min-height: 600px;
 	width: calc(100vw - 900px);
 }
 
-#chart-div {
+#chart-div{
 	height: 545px;
-	width: initial;
+	width: 100%;
 }
 
+#map-container {
+	position: relative;
+	overflow: hidden;
+}
+#map-div {
+	height: 100%;
+	width: 100%;
+}
 
 /** Media Queries **/
 @media (max-width: 1300px) {
@@ -174,17 +182,23 @@ main h1 {
 		margin-left: 0;
 	}
 
-    #card-container {
-        max-width: none;
-        width: calc(100vw - 200px);
-        min-width: 500px;
-    }
+	#card-container {
+		max-width: none;
+		width: calc(100vw - 200px);
+		min-width: 500px;
+	}
 
-	#chart-container { 
+	#chart-container, #map-container { 
 		max-height: 600px;
 		min-height: 600px;
 		width: calc(100vw - 200px);
 		min-width: 500px;
+	}
+
+	#map-div {
+		max-height: 545px;
+		min-height: 545px;
+		width: initial;
 	}
 
 }
