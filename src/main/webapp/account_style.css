@@ -5,6 +5,10 @@ body {
     background: #222;
 }
 
+.empty {
+    clear: both;
+}
+
 #header {
 	margin-top: 2px;
 	margin-left: 2%;

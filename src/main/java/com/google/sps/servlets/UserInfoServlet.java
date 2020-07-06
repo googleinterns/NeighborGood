@@ -34,10 +34,11 @@ public class UserInfoServlet extends HttpServlet {
     String addressInput = request.getParameter("address-input");
     String phoneInput = request.getParameter("phone-input");
     String email = userService.getCurrentUser().getEmail();
+    String userId = userService.getCurrentUser().getUserId();
 
-    if (nicknameInput != null) nickname = nicknameInput;
-    if (addressInput != null) address = addressInput;
-    if (phoneInput != null) phone = phoneInput;
+    if (nicknameInput != null) nickname = nicknameInput.trim();
+    if (addressInput != null) address = addressInput.trim();
+    if (phoneInput != null) phone = phoneInput.trim();
 
     if (nickname.equals("") || address.equals("") || phone.equals("")) {
       System.err.println("At least one input field is empty");
@@ -47,7 +48,8 @@ public class UserInfoServlet extends HttpServlet {
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Query query =
-        new Query("UserInfo").setFilter(new FilterPredicate("email", FilterOperator.EQUAL, email));
+        new Query("UserInfo")
+            .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, userId));
     PreparedQuery results = datastore.prepare(query);
     Entity entity = results.asSingleEntity();
     if (entity == null) {
@@ -56,6 +58,7 @@ public class UserInfoServlet extends HttpServlet {
       entity.setProperty("address", address);
       entity.setProperty("phone", phone);
       entity.setProperty("email", email);
+      entity.setProperty("userId", userId);
     } else {
       entity.setProperty("nickname", nickname);
       entity.setProperty("address", address);

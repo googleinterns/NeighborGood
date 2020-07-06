@@ -25,11 +25,12 @@ import com.google.appengine.api.users.UserService;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class RetrieveInfo {
-  public static List<String> getInfoFromEmail(String email) {
+public final class RetrieveUserInfo {
+  public static List<String> getInfoFromId(String userId) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Query query =
-        new Query("UserInfo").setFilter(new FilterPredicate("email", FilterOperator.EQUAL, email));
+        new Query("UserInfo")
+            .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, userId));
     PreparedQuery results = datastore.prepare(query);
 
     Entity entity = results.asSingleEntity();
@@ -45,6 +46,6 @@ public final class RetrieveInfo {
   }
 
   public static List<String> getInfo(UserService userService) {
-    return getInfoFromEmail(userService.getCurrentUser().getEmail());
+    return getInfoFromId(userService.getCurrentUser().getUserId());
   }
 }

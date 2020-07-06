@@ -3,6 +3,10 @@ body {
     margin: auto;
 }
 
+.empty {
+    clear: both;
+}
+
 #nav-bar {
 	margin-left: 2%;
 	width: 96%;

@@ -59,7 +59,7 @@ public class TaskServlet extends HttpServlet {
     String input = request.getParameter("task-detail-input");
     // If the input is valid, set the taskDetail value to the input value
     if (input != null) {
-      taskDetail = input;
+      taskDetail = input.trim();
     }
 
     // If input task detail is empty, reject the request to add a new task and send a 400 error.
@@ -77,7 +77,7 @@ public class TaskServlet extends HttpServlet {
     taskEntity.setProperty("timestamp", creationTime);
     taskEntity.setProperty("reward", rewardPts);
     taskEntity.setProperty("status", "OPEN");
-    taskEntity.setProperty("Owner", userService.getCurrentUser().getEmail());
+    taskEntity.setProperty("Owner", userService.getCurrentUser().getUserId());
     taskEntity.setProperty("Helper", "N/A");
     taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
 

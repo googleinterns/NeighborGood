@@ -7,17 +7,17 @@
   </head>
   <%@ page import = "com.google.appengine.api.users.UserService" %>
   <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
-  <%@ page import = "com.google.sps.helper.RetrieveInfo" %>
+  <%@ page import = "com.google.sps.helper.RetrieveUserInfo" %>
   <% UserService userService = UserServiceFactory.getUserService();
   if (!userService.isUserLoggedIn()) {
        response.sendRedirect(userService.createLoginURL("/account.jsp"));
-  } else if (RetrieveInfo.getInfo(userService) == null) { %>
+  } else if (RetrieveUserInfo.getInfo(userService) == null) { %>
   <body>
     <div id="container">
         <div id="header">
             <h1 id="title">Please input your personal information</h1>
         </div>
-        <div style="clear: both"><div/>
+        <div class="empty" style="clear: both"><div/>
         <hr/>
         <div id="form-container">
             <form id="new-user-info-form" action="/account" method="POST">
@@ -26,21 +26,21 @@
                     <br/>
                 </div>
                 <br/>
-                <textarea name="nickname-input" id="nickname-input" placeholder="Input your preferred nickname here:"></textarea>
+                <textarea name="nickname-input" id="nickname-input" required="true" placeholder="Input your preferred nickname here:"></textarea>
                 <br/><br/>
                 <div>
                     <label for="address-input">Your Address:</label>
                     <br/>
                 </div>
                 <br/>
-                <textarea name="address-input" id="address-input" placeholder="Input your address here:"></textarea>
+                <textarea name="address-input" id="address-input" required="true" placeholder="Input your address here:"></textarea>
                 <br/><br/>
                 <div>
                     <label for="phone-input">Your Phone Number:</label>
                     <br/>
                 </div>
                 <br/>
-                <textarea name="phone-input" id="phone-input" placeholder="Input your phone number here:"></textarea>
+                <textarea name="phone-input" id="phone-input" required="true" placeholder="Input your phone number here:"></textarea>
                 <br/><br/>
                 <button type="submit" id="submit-button"/>GET STARTED</button>
                 <br/><br/>

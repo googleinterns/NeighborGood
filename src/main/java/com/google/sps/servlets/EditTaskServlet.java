@@ -44,7 +44,7 @@ public class EditTaskServlet extends HttpServlet {
     String input = request.getParameter("task-detail-input");
     // If the input is valid, set the taskDetail value to the input value
     if (input != null) {
-      taskDetail = input;
+      taskDetail = input.trim();
     }
 
     // If input task detail is empty, reject the request to edit and send a 400 error.
