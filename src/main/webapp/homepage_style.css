@@ -55,9 +55,6 @@ section {
 }
 #categories {
     display: flex;
-    border-bottom: solid #222;
-    border-top: solid #222;
-    border-left: solid #222;;
 }
 .notFullWidth {
     width: 90%;
@@ -71,7 +68,8 @@ section {
     font-weight: bold;
 }
 .categories {
-    border-right: solid #222;
+    border: solid #222;
+    margin: -1.5px;
     cursor: pointer;
     text-align: center;
     width: 20%;
@@ -216,4 +214,33 @@ section {
     color: red;
     text-decoration: none;
     cursor: pointer;
+}
+
+@media only screen and (max-width: 600px) {
+    #title {
+        font-size: 2.5em;
+    }
+    #control-bar {
+        display: block;
+    }
+    #categories {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+    .categories {
+        min-width: 31%;
+        line-height: 2em;
+    }
+    #add-task {
+        text-align: right;
+        padding-right: 0.5em;
+    }
+    #addtaskbutton {
+        font-size: 2.5em;
+    }
+    .fa-3x {
+        font-size: 2.5em;
+    }
 }
