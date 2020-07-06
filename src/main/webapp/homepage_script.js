@@ -95,8 +95,14 @@ function confirmHelp(element) {
     const task = element.closest(".task");
     const url = "tasks/edit?task-id=" + task.dataset.key + "&action=helpout";
     const request = new Request(url, {method: "POST"});
-    fetch(request).then(() => {
-        if (JSON.stringify(neighborhood) != JSON.stringify([null, null])) {
+    fetch(request).then((response) => {
+        // checks if another user has already claimed the task
+        if (response.status == 409) {
+            window.alert
+                ("We're sorry, but the task you're trying to help with has already been claimed by another user.");
+            window.location.href = '/';
+        }
+        else if (JSON.stringify(neighborhood) != JSON.stringify([null, null])) {
             fetchTasks(currentCategory).then(response => displayTasks(response));
         }
     });

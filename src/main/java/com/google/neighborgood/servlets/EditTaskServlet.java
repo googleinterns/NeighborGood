@@ -50,12 +50,20 @@ public class EditTaskServlet extends HttpServlet {
     // Edits tasks that have been claimed by setting the "helper" property to the userId
     // of the helper and changing the task's status to "IN PROGRESS"
     if (request.getParameter("action").equals("helpout")) {
+
       UserService userService = UserServiceFactory.getUserService();
       if (!userService.isUserLoggedIn()) {
         System.err.println("User must be logged in to help out with a task");
         response.sendError(
             HttpServletResponse.SC_UNAUTHORIZED, "You must be logged in to help out with a task");
       }
+
+      if (!task.getProperty("status").equals("OPEN")) {
+        System.err.println("Task must be open to be claimed by a helper");
+        response.sendError(
+            HttpServletResponse.SC_CONFLICT, "Task has already been claimed by another helper");
+      }
+
       String userId = userService.getCurrentUser().getUserId();
       task.setProperty("Helper", userId);
       task.setProperty("status", "IN PROGRESS");
