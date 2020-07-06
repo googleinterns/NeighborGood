@@ -1,6 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
 body {
 	font-family: 'Roboto', sans-serif;;
     margin: auto;
+    padding-bottom: 3em;
+    color: #222;
 }
 
 /* Header Styling */
@@ -17,7 +21,7 @@ nav {
 }
 #login-logout a {
     text-decoration: none;
-    color: black;
+    color: #222;
     font-weight: bold;
     cursor: pointer;
 }
@@ -28,7 +32,7 @@ i:hover{
     color: grey;
 }
 i {
-    color: black;
+    color: #222;
 }
 #title {
     font-size: 4em;
@@ -47,22 +51,27 @@ section {
 #control-bar {
     display: flex;
     justify-content: space-between;
-    padding-bottom: 2em;
+    padding-bottom: 1.5em;
 }
 #categories {
     display: flex;
-    border-bottom: solid black;
-    border-top: solid black;
-    border-left: solid black;;
+    border-bottom: solid #222;
+    border-top: solid #222;
+    border-left: solid #222;;
+}
+.notFullWidth {
     width: 90%;
 }
-#category-all {
-    background-color:gray;
+.fullWidth {
+    width: 100%;
+}
+#all {
+    background-color:#222;
     color: white;
     font-weight: bold;
 }
 .categories {
-    border-right: solid black;
+    border-right: solid #222;
     cursor: pointer;
     text-align: center;
     width: 20%;
@@ -84,7 +93,13 @@ section {
 }
 
 /* Tasks Styling */
+.results-message {
+    display: none;
+    text-align: center;
+    padding-bottom: 0.5em;
+}
 #tasks-list {
+    display: none;
     border-top: solid;
     border-right: solid;
     border-left: solid;
@@ -110,6 +125,9 @@ section {
 }
 .help-button:hover{
     color: gray;
+}
+.disable-help:hover{
+    cursor:not-allowed;
 }
 .task-footer {
     font-style: italic;
@@ -144,7 +162,7 @@ section {
 }
 
 /* Add task modal styling */
-#createTaskModal {
+.modalWrapper {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
@@ -157,47 +175,45 @@ section {
     background-color: rgb(0,0,0); /* Fallback color */
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
-#modal {
+
+.modal {
     background-color: #fefefe;
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
     width: 50%;
 }
-#modal textarea {
+
+.modal textarea {
     width: 50%;
     box-sizing: border-box;
     border: 4px solid rgb(97, 245, 195);
     border-radius: 4px;
     font-size: 16px;
-    font-family:  'Roboto', sans-serif;
     padding: 10px 20px 10px 20px;
     transition: width 0.5s ease-in-out;
-    margin-bottom: 1em;
-}
-#new-task-form {
-    margin-bottom: 1em;
-    margin-left: 1em;
-    margin-right: 1em;
 }
 
-#modal textarea:focus {
+.modal textarea:focus {
     width: 100%;
     border: 4px solid lightcyan;
 }
-#modal label {
+
+.modal label {
     font-size: 24px;
     font-weight: bold;
 }
-#close-button {
-  color: #aaaaaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
+
+.close-button {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
 }
-#close-button:hover,
-#close-button:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
+
+.close-button:hover,
+.close-button:focus {
+    color: red;
+    text-decoration: none;
+    cursor: pointer;
 }
