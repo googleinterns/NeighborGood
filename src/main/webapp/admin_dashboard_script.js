@@ -9,6 +9,7 @@ google.charts.setOnLoadCallback(drawChart);
 window.addEventListener("resize", drawChart);
 
 window.addEventListener('load', drawMap);
+
 //window.onload(drawMap());
 
 function drawChart() {
@@ -141,12 +142,17 @@ function load(file){
 }
 
 function initUserTasks(){
-    fetch('/user-tasks').then(response => response.json()).then((tasks) => {
-    console.log(tasks);
-    //     let taskSection = document.getElementById('tasks-container');
-        
-    //     for(userTask of tasks){
-    //         commentSection.innerHTML += addComment(userComment);
-    //     }
-     });
+    fetch('/data').then(response => response.json()).then((tasks) => {
+        let taskSection = document.getElementById('tasks-container');
+        console.log(tasks);
+        for(userTask of tasks){
+            taskSection.innerHTML += addTask(userTask.propertyMap);
+        }
+    });
+}
+
+function addTask(task){
+    let string = `<li class="admin-task"><h3> ${task.category} </h3>`;
+    string += `<h4> ${task.Owner} </h4></li>`;
+    return string;
 }

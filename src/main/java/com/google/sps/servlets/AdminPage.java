@@ -37,7 +37,7 @@ class Comment {
 }
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/user-tasks")
-public class adminPage extends HttpServlet {
+public class AdminPage extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
