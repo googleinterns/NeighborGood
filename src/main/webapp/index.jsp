@@ -15,6 +15,7 @@
   boolean userLoggedIn = userService.isUserLoggedIn();
   String categoriesClass = userLoggedIn ? "notFullWidth" : "fullWidth";
   %>
+
   <body>
       <!--Site Header-->
       <header>
@@ -85,232 +86,17 @@
               }
               %>
           </div>
-
-          <!--Hard Coded List of Tasks-->
-          <div id="tasks-list">
-              <!-- New Task Begins-->
-              <div class="task garden">
-                  <%
-                  if (userLoggedIn) {
-                  %>
-                  <div class="confirm-overlay">
-                      <div class="exit-confirm"><a>&times</a></div>
-                      <a class="removetask">CONFIRM</a>
-                  </div>
-                  <%
-                  }
-                  %>
-                  <div class="task-container">
-                        <div class="task-header">
-                            <div class="username">
-                                JOHN SMITH
-                            </div>
-                            <%
-                            if (userLoggedIn) {
-                            %>
-                            <div class="help-button">
-                                HELP OUT
-                            </div>
-                            <%
-                            }
-                            %>
-                        </div>
-                        <div class="task-content">
-                            I need someone to help me mow my lawn.
-                        </div>
-                        <div class="task-footer">
-                            <div class="task-category">
-                                #garden
-                            </div> 
-                        </div>
-                  </div>
-              </div>
-              <!-- New Task Begins-->
-              <div class="task shopping">
-                  <%
-                  if (userLoggedIn) {
-                  %>
-                  <div class="confirm-overlay">
-                      <div class="exit-confirm"><a>&times</a></div>
-                      <a class="removetask">CONFIRM</a>
-                  </div>
-                  <%
-                  }
-                  %>
-                  <div class="task-container">
-                        <div class="task-header">
-                            <div class="username">
-                                CARMEN ROSA
-                            </div>
-                            <%
-                            if (userLoggedIn) {
-                            %>
-                            <div class="help-button">
-                                HELP OUT
-                            </div>
-                            <%
-                            }
-                            %>
-                        </div>
-                        <div class="task-content">
-                            Could someone pick up my pharmacy prescription?
-                        </div>
-                        <div class="task-footer">
-                            <div class="task-category">
-                                #shopping
-                            </div>
-                        </div>
-                  </div>
-              </div>
-              <!-- New Task Begins-->
-              <div class="task misc">
-                  <%
-                  if (userLoggedIn) {
-                  %>
-                  <div class="confirm-overlay">
-                      <div class="exit-confirm"><a>&times</a></div>
-                      <a class="removetask">CONFIRM</a>
-                  </div>
-                  <%
-                  }
-                  %>
-                  <div class="task-container">
-                        <div class="task-header">
-                            <div class="username">
-                                FRIENDLY NEIGHBOR
-                            </div>
-                            <%
-                            if (userLoggedIn) {
-                            %>
-                            <div class="help-button">
-                                HELP OUT
-                            </div>
-                            <%
-                            }
-                            %>
-                        </div>
-                        <div class="task-content">
-                            Can someone help me unload some furniture?
-                        </div>
-                        <div class="task-footer">
-                            <div class="task-category">
-                                #misc
-                            </div>
-                        </div>
-                  </div>
-              </div>
-              <!-- New Task Begins-->
-              <div class="task shopping">
-                  <%
-                  if (userLoggedIn) {
-                  %>
-                  <div class="confirm-overlay">
-                      <div class="exit-confirm"><a>&times</a></div>
-                      <a class="removetask">CONFIRM</a>
-                  </div>
-                  <%
-                  }
-                  %>
-                  <div class="task-container">
-                        <div class="task-header">
-                            <div class="username">
-                                SPONGE BOB
-                            </div>
-                            <%
-                            if (userLoggedIn) {
-                            %>
-                            <div class="help-button">
-                                HELP OUT
-                            </div>
-                            <%
-                            }
-                            %>
-                        </div>
-                        <div class="task-content">
-                            I need someone to go to the grocery store for me.
-                        </div>
-                        <div class="task-footer">
-                            <div class="task-category">
-                                #shopping
-                            </div>
-                        </div>
-                  </div>
-              </div>
-              <!-- New Task Begins-->
-              <div class="task pets">
-                  <%
-                  if (userLoggedIn) {
-                  %>
-                  <div class="confirm-overlay">
-                      <div class="exit-confirm"><a>&times</a></div>
-                      <a class="removetask">CONFIRM</a>
-                  </div>
-                  <%
-                  }
-                  %>
-                  <div class="task-container">
-                        <div class="task-header">
-                            <div class="username">
-                                BOB ROGERS
-                            </div>
-                            <%
-                            if (userLoggedIn) {
-                            %>
-                            <div class="help-button">
-                                HELP OUT
-                            </div>
-                            <%
-                            }
-                            %>
-                        </div>
-                        <div class="task-content">
-                            Could someone walk Fluffy for me? I am in bedrest for a week.
-                        </div>
-                        <div class="task-footer">
-                            <div class="task-category">
-                                #pets
-                            </div> 
-                        </div>
-                  </div>
-              </div>
-              <!-- New Task Begins-->
-              <div class="task garden">
-                  <%
-                  if (userLoggedIn) {
-                  %>
-                  <div class="confirm-overlay">
-                      <div class="exit-confirm"><a>&times</a></div>
-                      <a class="removetask">CONFIRM</a>
-                  </div>
-                  <%
-                  }
-                  %>
-                  <div class="task-container">
-                        <div class="task-header">
-                            <div class="username">
-                                GARDEN ENTHUSIAST
-                            </div>
-                            <%
-                            if (userLoggedIn) {
-                            %>
-                            <div class="help-button">
-                                HELP OUT
-                            </div>
-                            <%
-                            }
-                            %>
-                        </div>
-                        <div class="task-content">
-                            Can someone water my garden next week? I'll be out of town.
-                        </div>
-                        <div class="task-footer">
-                            <div class="task-category">
-                                #garden
-                            </div>
-                        </div>
-                  </div>
-              </div>
+          <div id="location-missing-message" class="results-message">
+              We could not retrieve your location to display your neighborhood tasks.
           </div>
+          <div id="tasks-message" class="results-message">
+              These are the 20 (or less) most recent tasks in your neighborhood:
+          </div>
+          <div id="no-tasks-message" class="results-message">
+              Sorry, there are currently no tasks within your neighborhood for you to help with.
+          </div>
+          <!--Listed Tasks Container-->
+          <div id="tasks-list"></div>
       </section>
       <div class="modalWrapper" id="createTaskModalWrapper">
         <div class="modal" id="createTaskModal">

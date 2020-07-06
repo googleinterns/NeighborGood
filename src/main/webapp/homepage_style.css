@@ -3,6 +3,7 @@
 body {
 	font-family: 'Roboto', sans-serif;;
     margin: auto;
+    padding-bottom: 3em;
     color: #222;
 }
 
@@ -50,7 +51,7 @@ section {
 #control-bar {
     display: flex;
     justify-content: space-between;
-    padding-bottom: 2em;
+    padding-bottom: 1.5em;
 }
 #categories {
     display: flex;
@@ -92,7 +93,13 @@ section {
 }
 
 /* Tasks Styling */
+.results-message {
+    display: none;
+    text-align: center;
+    padding-bottom: 0.5em;
+}
 #tasks-list {
+    display: none;
     border-top: solid;
     border-right: solid;
     border-left: solid;
@@ -118,6 +125,9 @@ section {
 }
 .help-button:hover{
     color: gray;
+}
+.disable-help:hover{
+    cursor:not-allowed;
 }
 .task-footer {
     font-style: italic;
@@ -195,15 +205,15 @@ section {
 }
 
 .close-button {
-  color: #aaaaaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
 }
 
 .close-button:hover,
 .close-button:focus {
-  color: red;
-  text-decoration: none;
-  cursor: pointer;
+    color: red;
+    text-decoration: none;
+    cursor: pointer;
 }

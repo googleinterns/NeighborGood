@@ -26,6 +26,10 @@ public final class Task {
   private final String owner;
   private final String helper;
   private final String address;
+  private final String userId;
+  private final String zipcode;
+  private final String country;
+  private final String category;
 
   public Task(
       String keyString,
@@ -35,7 +39,11 @@ public final class Task {
       long reward,
       String owner,
       String helper,
-      String address) {
+      String address,
+      String userId,
+      String zipcode,
+      String country,
+      String category) {
     this.keyString = keyString;
     this.detail = detail;
     this.creationTime = creationTime;
@@ -44,6 +52,10 @@ public final class Task {
     this.owner = owner;
     this.helper = helper;
     this.address = address;
+    this.userId = userId;
+    this.zipcode = zipcode;
+    this.country = country;
+    this.category = category;
   }
 
   public Task(Entity entity) {
@@ -55,5 +67,9 @@ public final class Task {
     this.owner = (String) entity.getProperty("Owner");
     this.helper = (String) entity.getProperty("Helper");
     this.address = (String) entity.getProperty("Address");
+    this.userId = (String) entity.getProperty("userId");
+    this.zipcode = (String) entity.getProperty("zipcode");
+    this.country = (String) entity.getProperty("country");
+    this.category = (String) entity.getProperty("category");
   }
 }
