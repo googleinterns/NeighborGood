@@ -5,9 +5,9 @@ var map_key = keys.MAP_KEY;
 load(`https://maps.googleapis.com/maps/api/js?key=${map_key}`); // Add maps API to html
 
 google.charts.load('current', {'packages':['line']});
+
 google.charts.setOnLoadCallback(drawChart);
 window.addEventListener("resize", drawChart);
-
 window.addEventListener('load', drawMap);
 
 //window.onload(drawMap());
