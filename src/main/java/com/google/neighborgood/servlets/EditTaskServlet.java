@@ -20,8 +20,10 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.neighborgood.helper.RewardingPoints;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -39,14 +41,6 @@ public class EditTaskServlet extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity task;
 
-    try {
-      task = datastore.get(taskKey);
-    } catch (EntityNotFoundException e) {
-      System.err.println("Unable to find the entity based on the input key");
-      response.sendError(HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
-      return;
-    }
-
     UserService userService = UserServiceFactory.getUserService();
     if (!userService.isUserLoggedIn()) {
       System.err.println("User must be logged in to edit a task");
@@ -57,78 +51,82 @@ public class EditTaskServlet extends HttpServlet {
 
     // Edits tasks that have been claimed by setting the "helper" property to the userId
     // of the helper and changing the task's status to "IN PROGRESS"
-    if (request.getParameter("action").equals("helpout")) {
+    if (request.getParameterMap().containsKey("action")) {
+      if (request.getParameter("action").equals("helpout")) {
 
-      if (!task.getProperty("status").equals("OPEN")) {
-        System.err.println("Task must be open to be claimed by a helper");
-        response.sendError(
-            HttpServletResponse.SC_CONFLICT, "Task has already been claimed by another helper");
-      }
+        // Makes use of Transactions to prevent race condition
+        Transaction transaction = datastore.beginTransaction();
 
-      String userId = userService.getCurrentUser().getUserId();
-      task.setProperty("Helper", userId);
-      task.setProperty("status", "IN PROGRESS");
-      datastore.put(task);
+        try {
+          task = datastore.get(taskKey);
 
-      return;
+          if (!task.getProperty("status").equals("OPEN")) {
+            System.err.println("Task must be open to be claimed by a helper");
+            response.sendError(
+                HttpServletResponse.SC_CONFLICT, "Task has already been claimed by another helper");
+          }
 
-      // Edits task's details and reward points
-    } else {
-      int rewardPts = getRewardingPoints(request, "reward-input");
-      if (rewardPts == -1) {
-        response.setContentType("text/html");
-        response.getWriter().println("Please enter a valid integer in the range of 0-200");
+          String userId = userService.getCurrentUser().getUserId();
+          task.setProperty("Helper", userId);
+          task.setProperty("status", "IN PROGRESS");
+          datastore.put(transaction, task);
+          transaction.commit();
+
+        } catch (EntityNotFoundException e) {
+          System.err.println("Unable to find the entity based on the input key");
+          response.sendError(
+              HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
+          return;
+
+        } finally {
+          if (transaction.isActive()) {
+            transaction.rollback();
+          }
+        }
         return;
       }
-
-      // Get the task detail from the form input
-      String taskDetail = "";
-      String input = request.getParameter("task-detail-input");
-      // If the input is valid, set the taskDetail value to the input value
-      if (input != null) {
-        taskDetail = input.trim();
-      }
-
-      // If input task detail is empty, reject the request to edit and send a 400 error.
-      if (taskDetail.equals("")) {
-        System.err.println("The input task detail is empty");
-        response.sendRedirect("/400.html");
-        return;
-      }
-
-      // Set the details and rewards to the newly input value
-      task.setProperty("detail", taskDetail);
-      task.setProperty("reward", rewardPts);
-
-      datastore.put(task);
-
-      response.sendRedirect("/user_profile.html");
     }
-  }
 
-  // Both TaskServlet and EditTaskServlet use this method. I will fix this by putting the function
-  // in a separate
-  // class in the next PR.
-  /** Return the input rewarding points by the user, or -1 if the input was invalid */
-  private int getRewardingPoints(HttpServletRequest request, String inputName) {
-    // Get the input from the form.
-    String rewardPtsString = request.getParameter(inputName);
+    try {
+      task = datastore.get(taskKey);
+    } catch (EntityNotFoundException e) {
+      System.err.println("Unable to find the entity based on the input key");
+      response.sendError(HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
+      return;
+    }
 
-    // Convert the input to an int.
+    // Edits task's details and reward points
     int rewardPts;
     try {
-      rewardPts = Integer.parseInt(rewardPtsString);
-    } catch (NumberFormatException e) {
-      System.err.println("Could not convert to int: " + rewardPtsString);
-      return -1;
+      rewardPts = RewardingPoints.get(request, "reward-input");
+    } catch (IllegalArgumentException e) {
+      response.setContentType("text/html");
+      response.getWriter().println("Please enter a valid integer in the range of 0-200");
+      return;
     }
 
-    // Check that the input is within the requested range.
-    if (rewardPts < 0 || rewardPts > 200) {
-      System.err.println("User input is out of range: " + rewardPtsString);
-      return -1;
+    // Get the task detail from the form input
+    String taskDetail = "";
+
+    String input = request.getParameter("task-detail-input");
+    // If the input is valid, set the taskDetail value to the input value
+    if (input != null) {
+      taskDetail = input.trim();
     }
 
-    return rewardPts;
+    // If input task detail is empty, reject the request to edit and send a 400 error.
+    if (taskDetail.equals("")) {
+      System.err.println("The input task detail is empty");
+      response.sendRedirect("/400.html");
+      return;
+    }
+
+    // Set the details and rewards to the newly input value
+    task.setProperty("detail", taskDetail);
+    task.setProperty("reward", rewardPts);
+
+    datastore.put(task);
+
+    response.sendRedirect("/user_profile.jsp");
   }
 }
