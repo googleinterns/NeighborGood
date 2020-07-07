@@ -119,6 +119,14 @@ public class TaskServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    // First check whether the user is logged in
+    UserService userService = UserServiceFactory.getUserService();
+
+    if (!userService.isUserLoggedIn()) {
+      response.sendRedirect(userService.createLoginURL("/"));
+      return;
+    }
+
     // Get the rewarding points from the form
     int rewardPts = getRewardingPoints(request, "reward-input");
     if (rewardPts == -1) {
@@ -132,20 +140,18 @@ public class TaskServlet extends HttpServlet {
     String input = request.getParameter("task-detail-input");
     // If the input is valid, set the taskDetail value to the input value
     if (input != null) {
-      taskDetail = input;
+      taskDetail = input.trim();
     }
 
     // If input task detail is empty, reject the request to add a new task and send a 400 error.
     if (taskDetail.equals("")) {
       System.err.println("The input task detail is empty");
-      response.sendError(
-          HttpServletResponse.SC_BAD_REQUEST, "The task detail field cannot be empty.");
+      response.sendRedirect("/400.html");
       return;
     }
 
     long creationTime = System.currentTimeMillis();
 
-    UserService userService = UserServiceFactory.getUserService();
     String userId = userService.getCurrentUser().getUserId();
 
     // Create an Entity that stores the input comment
@@ -155,7 +161,7 @@ public class TaskServlet extends HttpServlet {
     taskEntity.setProperty("timestamp", creationTime);
     taskEntity.setProperty("reward", rewardPts);
     taskEntity.setProperty("status", "OPEN");
-    taskEntity.setProperty("Owner", "Leonard");
+    taskEntity.setProperty("Owner", userId);
     taskEntity.setProperty("Helper", "N/A");
     taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
     taskEntity.setProperty("zipcode", "59715");
