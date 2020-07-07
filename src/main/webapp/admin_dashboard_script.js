@@ -7,10 +7,10 @@ load(`https://maps.googleapis.com/maps/api/js?key=${map_key}`); // Add maps API 
 google.charts.load("current", { packages: ["line"] });
 
 google.charts.setOnLoadCallback(drawChart);
-window.addEventListener("resize", drawChart);
 window.addEventListener("load", drawMap);
+window.addEventListener("load", initUserTasks());
+window.addEventListener("resize", drawChart);
 
-//window.onload(drawMap());
 
 function drawChart() {
   var data = new google.visualization.DataTable();
