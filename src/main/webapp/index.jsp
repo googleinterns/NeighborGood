@@ -20,7 +20,7 @@
       <!--Site Header-->
       <header>
           <nav>
-              <div id="user-icon">
+              <div id="dashboard-icon-container">
               <%
               if (userLoggedIn && !userService.isUserAdmin()) { 
               %>
@@ -33,10 +33,10 @@
               <%
               if (userLoggedIn && userService.isUserAdmin()) { 
               %>
-                  <a href="user_profile.jsp" class="user-icon">
+                  <a href="user_profile.jsp" class="dashboard-icon">
                       <i class="fas fa-user-circle fa-3x" title="Go to User Page"></i>
                   </a>
-                  <a href="admin_dashboard.html" class="user-icon">
+                  <a href="admin_dashboard.html" class="dashboard-icon">
                       <i class="fas fa-user-cog fa-3x" title="Go to Admin Dashboard"></i>
                   </a>
               <%

@@ -13,7 +13,7 @@ nav {
   justify-content: space-between;
 }
 
-#user-icon {
+#dashboard-icon-container {
   padding: 1em;
   height: 3em;
 }
@@ -33,7 +33,7 @@ a:hover {
   color: gray;
 }
 
-.user-icon {
+.dashboard-icon {
   padding-right: 0.8em;
 }
 
