@@ -135,6 +135,11 @@ function showModal() {
     modal.style.display = "block";
 }
 
+function showInfoModal() {
+    var modal = document.getElementById("updateInfoModalWrapper");
+    modal.style.display = "block";
+}
+
 function closeModal() {
     var modal = document.getElementById("createTaskModalWrapper");
     modal.style.display = "none";
@@ -142,6 +147,11 @@ function closeModal() {
 
 function closeEditModal() {
     var modal = document.getElementById("editTaskModalWrapper");
+    modal.style.display = "none";
+}
+
+function closeInfoModal() {
+    var modal = document.getElementById("updateInfoModalWrapper");
     modal.style.display = "none";
 }
 
