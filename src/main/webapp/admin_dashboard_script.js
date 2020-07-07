@@ -14,11 +14,7 @@ window.addEventListener("resize", drawChart);
 
 function drawChart() {
   var data = new google.visualization.DataTable();
-  data.addColumn("number", "Days");
-  data.addColumn("number", "Admins");
-  data.addColumn("number", "Consecutive Login");
-  data.addColumn("number", "Tasks");
-  data.addRows([
+  var rowData = [
     [1, 37.8, 80.8, 41.8],
     [2, 30.9, 69.5, 32.4],
     [3, 25.4, 57, 25.7],
@@ -33,7 +29,12 @@ function drawChart() {
     [12, 6.6, 8.4, 5.2],
     [13, 4.8, 6.3, 3.6],
     [14, 4.2, 6.2, 3.4],
-  ]);
+  ];
+  data.addColumn("number", "Days");
+  data.addColumn("number", "Admins");
+  data.addColumn("number", "Consecutive Login");
+  data.addColumn("number", "Tasks");
+  data.addRows(rowData);
   var chart = new google.charts.Line(document.getElementById("chart-div"));
   chart.draw(data);
 }
