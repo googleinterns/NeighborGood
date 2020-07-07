@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -49,7 +50,7 @@ main h1 {
   display: flex;
 }
 
-.flex-grid>div {
+.flex-grid > div {
   flex: 1;
   margin: 0 20px 20px 0;
   padding: 0;
@@ -146,7 +147,6 @@ main h1 {
   width: 100%;
 }
 
-
 /** Media Queries **/
 
 @media (max-width: 1300px) {
@@ -154,20 +154,24 @@ main h1 {
   .flex-grid {
     flex-direction: column;
   }
+
   .notification-grid>div {
     margin: 0;
     margin-top: 10px;
     margin-bottom: 10px;
   }
+
   .flex-grid>div {
     margin-right: 0;
     margin-left: 0;
   }
+
   #card-container {
     max-width: none;
     width: 100vw;
     min-width: 500px;
   }
+
   #chart-container,
   #map-container {
     max-height: 600px;
@@ -175,9 +179,11 @@ main h1 {
     width: 100vw;
     min-width: 500px;
   }
+  
   #map-div {
     max-height: 545px;
     min-height: 545px;
     width: initial;
   }
+
 }
