@@ -27,14 +27,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-class Comment {
-  public String name, content;
-
-  public Comment(String name, String content) {
-    this.name = name;
-    this.content = content;
-  }
-}
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/user-tasks")
 public class AdminPage extends HttpServlet {
