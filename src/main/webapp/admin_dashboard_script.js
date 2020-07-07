@@ -40,8 +40,10 @@ function drawChart() {
 
 function drawMap() {
   // Styles a map in night mode.
+  const LAT = 40.674;
+  const LNG = -73.945;
   var map = new google.maps.Map(document.getElementById("map-div"), {
-    center: { lat: 40.674, lng: -73.945 },
+    center: { lat: LAT, lng: LNG },
     zoom: 12,
     styles: [
       { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
