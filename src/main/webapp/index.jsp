@@ -68,32 +68,35 @@
       <section>
 
           <!--Control Bar for choosing categories and adding tasks-->
-          <div id="control-bar">
-              <div id="categories" class="<%=categoriesClass%>">
-                  <div class="categories" id="all">ALL</div>
-                  <div class="categories" id="garden">GARDEN</div>
-                  <div class="categories" id="shopping">SHOPPING</div>
-                  <div class="categories" id="pets">PETS</div>
-                  <div class="categories" id="misc">MISC</div>
+          <div id="control-bar-message-wrapper">
+              <div id="control-bar">
+                  <div id="categories" class="<%=categoriesClass%>">
+                      <div class="categories" id="all">ALL</div>
+                      <div class="categories" id="garden">GARDEN</div>
+                      <div class="categories" id="shopping">SHOPPING</div>
+                      <div class="categories" id="pets">PETS</div>
+                      <div class="categories" id="misc">MISC</div>
+                  </div>
+                  <%
+                  if (userLoggedIn) {
+                  %>
+                  <div id="add-task">
+                      <i class="fas fa-plus-circle" aria-hidden="true" id="addtaskbutton" title="Add Task"></i>
+                  </div>
+                  <% 
+                  }
+                  %>
               </div>
-              <%
-              if (userLoggedIn) {
-              %>
-              <div id="add-task">
-                  <i class="fas fa-plus-circle" aria-hidden="true" id="addtaskbutton" title="Add Task"></i>
+              
+              <div id="location-missing-message" class="results-message">
+                  We could not retrieve your location to display your neighborhood tasks.
               </div>
-              <% 
-              }
-              %>
-          </div>
-          <div id="location-missing-message" class="results-message">
-              We could not retrieve your location to display your neighborhood tasks.
-          </div>
-          <div id="tasks-message" class="results-message">
-              These are the 20 (or less) most recent tasks in your neighborhood:
-          </div>
-          <div id="no-tasks-message" class="results-message">
-              Sorry, there are currently no tasks within your neighborhood for you to help with.
+              <div id="tasks-message" class="results-message">
+                  These are the 20 (or less) most recent tasks in your neighborhood:
+              </div>
+              <div id="no-tasks-message" class="results-message">
+                  Sorry, there are currently no tasks within your neighborhood for you to help with.
+              </div>
           </div>
           <!--Listed Tasks Container-->
           <div id="tasks-list"></div>
