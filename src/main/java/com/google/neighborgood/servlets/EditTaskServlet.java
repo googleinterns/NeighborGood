@@ -86,14 +86,13 @@ public class EditTaskServlet extends HttpServlet {
       String input = request.getParameter("task-detail-input");
       // If the input is valid, set the taskDetail value to the input value
       if (input != null) {
-        taskDetail = input;
+        taskDetail = input.trim();
       }
 
       // If input task detail is empty, reject the request to edit and send a 400 error.
       if (taskDetail.equals("")) {
         System.err.println("The input task detail is empty");
-        response.sendError(
-            HttpServletResponse.SC_BAD_REQUEST, "The task detail field cannot be empty.");
+        response.sendRedirect("/400.html");
         return;
       }
 
@@ -105,7 +104,6 @@ public class EditTaskServlet extends HttpServlet {
 
       response.sendRedirect("/user_profile.html");
     }
-
   }
 
   // Both TaskServlet and EditTaskServlet use this method. I will fix this by putting the function
