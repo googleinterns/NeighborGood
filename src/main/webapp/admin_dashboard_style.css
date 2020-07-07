@@ -57,7 +57,7 @@ main h1 {
   border: 1px solid #eee;
   background: #eee;
   border-radius: 20px 20px 0 0;
-  box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
 }
 
 .flex-grid h2 {
@@ -99,7 +99,7 @@ main h1 {
 }
 
 #card-div ul li:hover {
-  box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
 }
 
 #card-div ul li h3 {
@@ -155,13 +155,13 @@ main h1 {
     flex-direction: column;
   }
 
-  .notification-grid>div {
+  .notification-grid > div {
     margin: 0;
     margin-top: 10px;
     margin-bottom: 10px;
   }
 
-  .flex-grid>div {
+  .flex-grid > div {
     margin-right: 0;
     margin-left: 0;
   }
@@ -179,11 +179,10 @@ main h1 {
     width: 100vw;
     min-width: 500px;
   }
-  
+
   #map-div {
     max-height: 545px;
     min-height: 545px;
     width: initial;
   }
-
 }
