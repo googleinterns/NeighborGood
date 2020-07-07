@@ -1,177 +1,183 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-
 * {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-html, body {
-	height: 100%;
-}
+
+html,
 body {
-	font: 15px 'Roboto', sans-serif;
-	color: #222;
+  height: 100%;
 }
+
+body {
+  font: 15px 'Roboto', sans-serif;
+  color: #222;
+}
+
 a {
-	cursor: pointer;
+  cursor: pointer;
 }
+
 ul {
-	list-style: none;
+  list-style: none;
 }
+
 .wrapper {
-	display: flex;
-	min-height: 100%;
+  display: flex;
+  min-height: 100%;
 }
 
 main {
-	flex: 1;
-	padding: 25px;
-	background: #d5d6d8;
+  flex: 1;
+  padding: 25px;
+  background: #d5d6d8;
 }
+
 main h1 {
-	height: 80px;
-	margin: -25px -25px 25px -25px;
-	padding: 0 25px;
-	line-height: 76px;
-	font-size: 24px;
-	font-weight: 400;
-	background: #eee;
-	color: #222;
+  height: 80px;
+  margin: -25px -25px 25px -25px;
+  padding: 0 25px;
+  line-height: 76px;
+  font-size: 24px;
+  font-weight: 400;
+  background: #eee;
+  color: #222;
 }
 
 .flex-grid {
-	display: flex;
+  display: flex;
 }
 
-.flex-grid > div {
-	flex: 1;
-    margin: 0 20px 20px 0;
-	padding: 0;
-	border: 1px solid #eee;
-	background: #eee;
-	border-radius: 20px 20px 0 0;
-	box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+.flex-grid>div {
+  flex: 1;
+  margin: 0 20px 20px 0;
+  padding: 0;
+  border: 1px solid #eee;
+  background: #eee;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
 }
 
 .flex-grid h2 {
-	padding: 12px 15px;
-	font-size: 20px;
-	font-weight: 400;
-	border-bottom: 1px solid #eee;
-	color: #eee;
-	background: #222;
-	line-height: 30px;
-	border-radius: inherit;
+  padding: 12px 15px;
+  font-size: 20px;
+  font-weight: 400;
+  border-bottom: 1px solid #eee;
+  color: #eee;
+  background: #222;
+  line-height: 30px;
+  border-radius: inherit;
 }
 
 #card-container {
-	max-height: 600px;
-	max-width: 500px;
-	min-width: 500px;
+  max-height: 600px;
+  max-width: 500px;
+  min-width: 500px;
 }
 
 #card-div {
-	max-height: 545px;
-	overflow: auto;
+  max-height: 545px;
+  overflow: auto;
 }
 
 #card-div ul {
-	list-style-type: none;
-	width: 90%;
-	margin: auto;
-	padding-top: 20px;
+  list-style-type: none;
+  width: 90%;
+  margin: auto;
+  padding-top: 20px;
 }
 
 #card-div ul li {
-	background: #222;
-	color: #eee;
-	border-radius: 10px;
-	padding: 15px 15px 15px 20px;
-	cursor: pointer;
-	margin-bottom: 20px;
+  background: #222;
+  color: #eee;
+  border-radius: 10px;
+  padding: 15px 15px 15px 20px;
+  cursor: pointer;
+  margin-bottom: 20px;
 }
 
 #card-div ul li:hover {
-	box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+  box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
 }
 
 #card-div ul li h3 {
-	font-size: 15px;
-	font-weight: 400;
-	margin-bottom: 5px;
+  font-size: 15px;
+  font-weight: 400;
+  margin-bottom: 5px;
 }
 
 #card-div ul li h4 {
-	font-size: 11px;
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 #card-div ul li .admin-task-infos {
-	display: flex;
-	margin-top: 18px;
-	justify-content: space-between;
+  display: flex;
+  margin-top: 18px;
+  justify-content: space-between;
 }
 
 #card-div ul li .admin-task-infos p {
-	font-size: 13px;
-	margin: 0;
+  font-size: 13px;
+  margin: 0;
 }
 
-#chart-container, #map-container { 
-	max-height: 600px;
-	min-height: 600px;
-	width: calc(100vw - 900px);
+#chart-container,
+#map-container {
+  max-height: 600px;
+  min-height: 600px;
+  width: calc(100vw - 900px);
 }
 
-#chart-div{
-	height: 545px;
-	width: 100%;
+#chart-div {
+  height: 545px;
+  width: 100%;
 }
 
 #map-container {
-	position: relative;
-	overflow: hidden;
+  position: relative;
+  overflow: hidden;
 }
+
 #map-div {
-	height: 100%;
-	width: 100%;
+  height: 100%;
+  width: 100%;
 }
+
 
 /** Media Queries **/
+
 @media (max-width: 1300px) {
-	.notification-grid, .flex-grid {
-		flex-direction: column;
-	}
-
-	.notification-grid > div {
-		margin: 0;
-		margin-top: 10px;
-		margin-bottom: 10px;
-	}
-
-	.flex-grid > div {
-		margin-right: 0;
-		margin-left: 0;
-	}
-
-	#card-container {
-		max-width: none;
-		width: 100vw;
-		min-width: 500px;
-	}
-
-	#chart-container, #map-container { 
-		max-height: 600px;
-		min-height: 600px;
-		width: 100vw;
-		min-width: 500px;
-	}
-
-	#map-div {
-		max-height: 545px;
-		min-height: 545px;
-		width: initial;
-	}
-
+  .notification-grid,
+  .flex-grid {
+    flex-direction: column;
+  }
+  .notification-grid>div {
+    margin: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .flex-grid>div {
+    margin-right: 0;
+    margin-left: 0;
+  }
+  #card-container {
+    max-width: none;
+    width: 100vw;
+    min-width: 500px;
+  }
+  #chart-container,
+  #map-container {
+    max-height: 600px;
+    min-height: 600px;
+    width: 100vw;
+    min-width: 500px;
+  }
+  #map-div {
+    max-height: 545px;
+    min-height: 545px;
+    width: initial;
+  }
 }
