@@ -59,6 +59,7 @@ public class UserInfoServlet extends HttpServlet {
       entity.setProperty("phone", phone);
       entity.setProperty("email", email);
       entity.setProperty("userId", userId);
+      entity.setProperty("points", 0);
     } else {
       entity.setProperty("nickname", nickname);
       entity.setProperty("address", address);

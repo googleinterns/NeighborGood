@@ -220,3 +220,15 @@ table button:hover i {
   text-decoration: none;
   cursor: pointer;
 }
+
+#info-setting {
+  cursor: pointer;
+  margin-top: 10px;
+  margin-left: 5px;
+}
+
+#info-setting:hover,
+#info-setting:focus {
+  color: gray;
+  text-decoration: none;
+}
