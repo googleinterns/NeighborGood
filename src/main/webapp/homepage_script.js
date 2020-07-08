@@ -19,8 +19,8 @@ window.onscroll = stickyControlBar;
 
 /* Scroll function so that the control bar sticks to the top of the page */
 function stickyControlBar() {
-    const controlBarWrapper = document.getElementById("control-bar-message-wrapper");
-    const taskListDiv = document.getElementById("tasks-list");
+    let controlBarWrapper = document.getElementById("control-bar-message-wrapper");
+    let taskListDiv = document.getElementById("tasks-list");
     const OFFSET = 165;
     if (window.pageYOffset >= OFFSET || document.body.scrollTop >= OFFSET || document.documentElement.scrollTop >= OFFSET) {
         controlBarWrapper.style.position = "fixed";
