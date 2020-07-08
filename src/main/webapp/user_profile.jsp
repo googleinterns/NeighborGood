@@ -5,11 +5,13 @@
     <title>My Account</title>
     <link rel="stylesheet" href="user_profile_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type='text/javascript' src='config.js'></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&libraries=places"></script>
     <script src="user_profile_script.js"></script>
   </head>
   <%@ page import = "com.google.appengine.api.users.UserService" %>
   <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
-  <%@ page import = "com.google.sps.helper.RetrieveUserInfo" %>
+  <%@ page import = "com.google.neighborgood.helper.RetrieveUserInfo" %>
   <%@ page import = "java.util.List" %>
   <% UserService userService = UserServiceFactory.getUserService();
   if (!userService.isUserLoggedIn()) { 
@@ -24,7 +26,7 @@
         String logoutURL = userService.createLogoutURL(urlToRedirectAfterUserLogsOut);
         String nickname = userInfo.get(0);
         String points = userInfo.get(3); %>
-  <body onload="showNeedHelp()">
+  <body onload="initialize()">
     <div id="nav-bar">
         <p id="return-link"><a href="index.jsp">BACK TO HOME</a> |    </p>
         <i class="fa fa-cog fa-2x" id="info-setting" onclick="editInfo()"></i>
@@ -149,6 +151,9 @@
                     <br/>
                 </div>
                 <textarea name="address-input" id="edit-address-input" required="true"></textarea>
+                <p id="rest-map">Click to mark your personal address on the map!</p>
+                <input id="place-input" class="controls" type="text" placeholder="Search Box">
+                <div id="map"></div>
                 <br/>
                 <div>
                     <label for="edit-phone-number-input">New phone number:</label>
