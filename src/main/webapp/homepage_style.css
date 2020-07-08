@@ -11,6 +11,9 @@ body {
 nav {
   display: flex;
   justify-content: space-between;
+  position: fixed;
+  width: 100%;
+  top: 0;
 }
 
 #dashboard-icon-container {
@@ -48,7 +51,8 @@ i:hover {
 #title {
   font-size: 4em;
   text-align: center;
-  margin-block-start: 0;
+  margin-top: 1em;
+  margin-bottom: 0.4em;
 }
 
 /* Main Content Styling */
@@ -63,6 +67,17 @@ section {
   display: flex;
   justify-content: space-between;
   padding-bottom: 1.5em;
+}
+
+#control-bar-message-wrapper {
+  width: 100%;
+  max-width: 55em;
+  z-index: 1;
+  background-image: linear-gradient(to bottom, white 90%, transparent);
+  padding-bottom: 1em;
+  padding-top: 1em;
+  top: 0;
+  transition: 0.3s;
 }
 
 #categories {
@@ -85,7 +100,7 @@ section {
 
 .categories {
   border: solid #222;
-  margin: -1.5px;
+  margin-right: -3px;
   cursor: pointer;
   text-align: center;
   width: 20%;
@@ -121,6 +136,7 @@ section {
   border-top: solid;
   border-right: solid;
   border-left: solid;
+  transition: 0.5s;
 }
 
 .task {
