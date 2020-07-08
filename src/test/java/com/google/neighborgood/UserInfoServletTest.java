@@ -33,6 +33,8 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalUserServiceTestConfig;
 import com.google.common.collect.ImmutableMap;
 import java.io.*;
+import java.time.Duration;
+import java.time.Instant;
 import javax.servlet.http.*;
 import org.junit.After;
 import org.junit.Before;
@@ -346,5 +348,72 @@ public final class UserInfoServletTest {
     // After sending the GET request, the doGet function should output the json string
     writer.flush();
     assertTrue(stringWriter.toString().contains("[\"Leonard\",\"xxx\",\"xxx\"]"));
+  }
+
+  @Test
+  public void stressTest() {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+
+    // Insert 999 dummy entities into datastore to simulate 999 users
+    for (int i = 0; i < 999; i++) {
+      String str = Integer.toString(i);
+      Entity dummy = new Entity("UserInfo");
+      dummy.setProperty("nickname", "Leonard" + str);
+      dummy.setProperty("address", "xxx" + str);
+      dummy.setProperty("phone", str + str);
+      dummy.setProperty("email", "test" + str + "@example.com");
+      dummy.setProperty("userId", str);
+      dummy.setProperty("points", 0);
+      ds.put(dummy);
+    }
+
+    // Check the number of entities in the datastore. The result should be 10,000
+    assertEquals(999, ds.prepare(new Query("UserInfo")).countEntities());
+
+    // Now we insert a target UserInfo Entity and check the time needed to find the entity
+    when(request.getParameter("nickname-input")).thenReturn("Leonard");
+    when(request.getParameter("address-input")).thenReturn("4xxx Centre Avenue");
+    when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
+
+    try {
+      new UserInfoServlet().doPost(request, response);
+    } catch (IOException e) {
+      assertTrue(false);
+    }
+
+    // After sending the POST request, there should be three entities in the datastore
+    assertEquals(1000, ds.prepare(new Query("UserInfo")).countEntities());
+
+    Instant start = Instant.now();
+
+    // Filter out the entity that has the userId of 1234567890
+    PreparedQuery results =
+        ds.prepare(
+            new Query("UserInfo")
+                .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, "1234567890")));
+    Entity entity = results.asSingleEntity();
+
+    Instant end = Instant.now();
+    Duration timeElapsed = Duration.between(start, end);
+
+    // Fetching the specific user info from datastore should take a reasonable amount of time
+    // I think 10ms is a reasonable threshold value.
+    assertTrue(timeElapsed.toMillis() < 10);
+
+    if (entity == null) {
+      // The entity can't be null
+      assertTrue(false);
+    }
+
+    // Test the fetched personal information is correct
+    assertEquals("Leonard", (String) entity.getProperty("nickname"));
+    assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
+    assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
+    assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
+    assertEquals("1234567890", (String) entity.getProperty("userId"));
+    assertEquals(0, (long) entity.getProperty("points"));
   }
 }
