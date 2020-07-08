@@ -72,7 +72,7 @@ section {
 #control-bar-message-wrapper {
   width: 100%;
   max-width: 55em;
-  z-index: 11;
+  z-index: 1;
   background-image: linear-gradient(to bottom, white 90%, transparent);
   padding-bottom: 1em;
   padding-top: 1em;

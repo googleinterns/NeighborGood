@@ -21,8 +21,8 @@ window.onscroll = stickyControlBar;
 function stickyControlBar() {
     const controlBarWrapper = document.getElementById("control-bar-message-wrapper");
     const taskListDiv = document.getElementById("tasks-list");
-    const offset = 165;
-    if (window.pageYOffset >= offset || document.body.scrollTop >= offset || document.documentElement.scrollTop >= offset) {
+    const OFFSET = 165;
+    if (window.pageYOffset >= OFFSET || document.body.scrollTop >= OFFSET || document.documentElement.scrollTop >= OFFSET) {
         controlBarWrapper.style.position = "fixed";
         taskListDiv.style.marginTop = "165px";
     } else {
