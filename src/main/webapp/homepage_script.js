@@ -187,7 +187,7 @@ function getUserNeighborhood() {
                     if (config.LOCAL_DEV_LAT_LONG) {
                         resolve(config.LOCAL_DEV_LAT_LONG);
                     } else {
-                        reject ("User location failed");
+                        reject("User location failed");
                     }
                 } else {
                     reject("User location failed");
