@@ -20,23 +20,21 @@
       <!--Site Header-->
       <header>
           <nav>
-              <div id="userpage-icon">
+              <div id="dashboard-icon-container">
               <%
-              if (userLoggedIn && !userService.isUserAdmin()) { 
+              if (userLoggedIn){ 
               %>
-                  <a href="user_profile.jsp">
+                  <a href="user_profile.jsp" class="dashboard-icon">
                       <i class="fas fa-user-circle fa-3x" title="Go to User Page"></i>
                   </a>
               <%
-              }
+                if (userService.isUserAdmin()) {
               %>
-              <%
-              if (userLoggedIn && userService.isUserAdmin()) { 
-              %>
-                  <a href="admin_dashboard.html">
+                  <a href="admin_dashboard.html" class="dashboard-icon">
                       <i class="fas fa-user-cog fa-3x" title="Go to Admin Dashboard"></i>
                   </a>
               <%
+                }
               }
               %>
               </div>
@@ -50,7 +48,7 @@
           	      <p class="login-messages"><%=userService.getCurrentUser().getEmail()%> | <a href="<%=logoutUrl%>">Logout</a></p>
                   <%
                   } else {
-                      String urlToRedirectToAfterUserLogsIn = "/";
+                      String urlToRedirectToAfterUserLogsIn = "/account.jsp";
                       String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
                   %>
                   <p class="login-messages"><a href="<%=loginUrl%>">Login to help out a neighbor!</a></p>

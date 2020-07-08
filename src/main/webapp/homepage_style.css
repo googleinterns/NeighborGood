@@ -16,7 +16,7 @@ nav {
   top: 0;
 }
 
-#userpage-icon {
+#dashboard-icon-container {
   padding: 1em;
   height: 3em;
 }
@@ -34,6 +34,10 @@ a {
 
 a:hover {
   color: gray;
+}
+
+.dashboard-icon {
+  padding-right: 0.8em;
 }
 
 i {
