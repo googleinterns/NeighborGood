@@ -169,7 +169,7 @@ public class TaskServlet extends HttpServlet {
     taskEntity.setProperty("timestamp", creationTime);
     taskEntity.setProperty("reward", rewardPts);
     taskEntity.setProperty("status", "OPEN");
-    taskEntity.setProperty("Owner", "userId");
+    taskEntity.setProperty("Owner", userId);
     taskEntity.setProperty("Helper", "N/A");
     taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
     taskEntity.setProperty("zipcode", "59715");
