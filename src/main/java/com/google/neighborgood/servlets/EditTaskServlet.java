@@ -51,40 +51,43 @@ public class EditTaskServlet extends HttpServlet {
 
     // Edits tasks that have been claimed by setting the "helper" property to the userId
     // of the helper and changing the task's status to "IN PROGRESS"
-    if (request.getParameterMap().containsKey("action")) {
-      if (request.getParameter("action").equals("helpout")) {
+    if (request.getParameterMap().containsKey("action")
+        && request.getParameter("action").equals("helpout")) {
 
-        // Makes use of Transactions to prevent race condition
-        Transaction transaction = datastore.beginTransaction();
+      // Makes use of Transactions to prevent race condition
+      Transaction transaction = datastore.beginTransaction();
 
-        try {
-          task = datastore.get(taskKey);
+      try {
+        task = datastore.get(taskKey);
 
-          if (!task.getProperty("status").equals("OPEN")) {
-            System.err.println("Task must be open to be claimed by a helper");
-            response.sendError(
-                HttpServletResponse.SC_CONFLICT, "Task has already been claimed by another helper");
-          }
-
-          String userId = userService.getCurrentUser().getUserId();
-          task.setProperty("Helper", userId);
-          task.setProperty("status", "IN PROGRESS");
-          datastore.put(transaction, task);
-          transaction.commit();
-
-        } catch (EntityNotFoundException e) {
-          System.err.println("Unable to find the entity based on the input key");
+        if (!task.getProperty("status").equals("OPEN")) {
+          transaction.rollback();
+          System.err.println("Task must be open to be claimed by a helper");
           response.sendError(
-              HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
-          return;
-
-        } finally {
-          if (transaction.isActive()) {
-            transaction.rollback();
-          }
+              HttpServletResponse.SC_CONFLICT, "Task has already been claimed by another helper");
         }
-        return;
+
+        String userId = userService.getCurrentUser().getUserId();
+        task.setProperty("Helper", userId);
+        task.setProperty("status", "IN PROGRESS");
+        datastore.put(transaction, task);
+        transaction.commit();
+
+      } catch (EntityNotFoundException e) {
+        transaction.rollback();
+        System.err.println("Unable to find the entity based on the input key");
+        response.sendError(
+            HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
+
+      } finally {
+        if (transaction.isActive()) {
+          transaction.rollback();
+          System.err.println("Task must be open to be claimed by a helper");
+          response.sendError(
+              HttpServletResponse.SC_CONFLICT, "Task has already been claimed by another helper");
+        }
       }
+      return;
     }
 
     try {
