@@ -55,7 +55,7 @@
                   <%
                     }
                   %>
-                  <p class="login-messages"><a id="highscore-link">Check out your neighborhood highscorers!</a></p>
+                  <p class="login-messages"><a id="topscore-button">Check out your neighborhood topscorers!</a></p>
               </div>
           </nav>
           <h1 id="title">
@@ -119,16 +119,16 @@
         <div class="modal" id="topScoresModal">
             <span class="close-button" id="close-button">&times;</span>
             <h1>HIGHSCORES</h1>
-            <div id="highscores">
+            <div id="topscores">
               <table>
               <%
               for (int rank = 1; rank <= 5; rank++) {
                 String rowId = "rank" + rank;
               %> 
                 <tr id="<%=rowId%>">
-                  <td class="highscore-rank"><%=rank%>.</td>
-                  <td class="highscore-nickname">Mafe</td>
-                  <td class="highscore-score">150</td>
+                  <td class="topscore-rank"><%=rank%>.</td>
+                  <td class="topscore-nickname">Mafe</td>
+                  <td class="topscore-score">150</td>
                 </tr>
               <%
               }
