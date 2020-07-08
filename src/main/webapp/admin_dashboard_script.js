@@ -1,8 +1,8 @@
 var map;
 var styledMapType;
-var map_key = keys.MAP_KEY;
+var mapKey = config.MAP_KEY;
 
-load(`https://maps.googleapis.com/maps/api/js?key=${map_key}`); // Add maps API to html
+load(`https://maps.googleapis.com/maps/api/js?key=${mapKey}`); // Add maps API to html
 
 google.charts.load("current", { packages: ["line"] });
 

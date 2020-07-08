@@ -43,7 +43,4 @@ public class AdminPage extends HttpServlet {
     response.setContentType("application/json;");
     response.getWriter().println(gson.toJson(results.asList(FetchOptions.Builder.withLimit(10))));
   }
-
-  @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {}
 }
