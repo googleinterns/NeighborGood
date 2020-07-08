@@ -186,6 +186,8 @@ function getUserNeighborhood() {
                 if (err.code === 1 && !window.isSecureContext) {
                     if (config.LOCAL_DEV_LAT_LONG) {
                         resolve(config.LOCAL_DEV_LAT_LONG);
+                    } else {
+                        reject ("User location failed");
                     }
                 } else {
                     reject("User location failed");
