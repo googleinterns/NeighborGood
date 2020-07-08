@@ -226,4 +226,92 @@ public final class UserInfoServletTest {
     assertEquals("1234567890", (String) entity.getProperty("userId"));
     assertEquals(0, (long) entity.getProperty("points"));
   }
+
+  @Test
+  public void edgeCaseTest() {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    // Check whether the datastore is empty before the test
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    assertEquals(0, ds.prepare(new Query("UserInfo")).countEntities(withLimit(10)));
+
+    // Set the nickname input to be empty
+    when(request.getParameter("nickname-input")).thenReturn("");
+    when(request.getParameter("address-input")).thenReturn("4xxx Centre Avenue");
+    when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
+
+    try {
+      new UserInfoServlet().doPost(request, response);
+    } catch (IOException e) {
+      assertTrue(false);
+    }
+
+    // The POST request should lead to an error handling clause, there should be no entity in the
+    // datastore
+    assertEquals(0, ds.prepare(new Query("UserInfo")).countEntities(withLimit(10)));
+
+    // Set the nickname input to empty spaces
+    when(request.getParameter("nickname-input")).thenReturn("   ");
+
+    try {
+      new UserInfoServlet().doPost(request, response);
+    } catch (IOException e) {
+      assertTrue(false);
+    }
+
+    // Spaces will also lead to error handling clause, there should be still no entity in the
+    // datastore
+    assertEquals(0, ds.prepare(new Query("UserInfo")).countEntities(withLimit(10)));
+
+    // Now we give the servlet a valid nickname input, but an invalid address input
+    when(request.getParameter("nickname-input")).thenReturn("Leonard");
+    when(request.getParameter("address-input")).thenReturn(" ");
+
+    try {
+      new UserInfoServlet().doPost(request, response);
+    } catch (IOException e) {
+      assertTrue(false);
+    }
+
+    // The POST request should lead to an error handling clause, there should be no entity in the
+    // datastore
+    assertEquals(0, ds.prepare(new Query("UserInfo")).countEntities(withLimit(10)));
+
+    // Now we give the servlet an invalid phone number input
+    when(request.getParameter("address-input")).thenReturn("4xxx Centre Avenue");
+    when(request.getParameter("phone-input")).thenReturn("");
+
+    try {
+      new UserInfoServlet().doPost(request, response);
+    } catch (IOException e) {
+      assertTrue(false);
+    }
+    assertEquals(0, ds.prepare(new Query("UserInfo")).countEntities(withLimit(10)));
+
+    // Finally we give the servlet a valid phone number input
+    when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
+
+    try {
+      new UserInfoServlet().doPost(request, response);
+    } catch (IOException e) {
+      assertTrue(false);
+    }
+
+    assertEquals(1, ds.prepare(new Query("UserInfo")).countEntities(withLimit(10)));
+    PreparedQuery results = ds.prepare(new Query("UserInfo"));
+    Entity entity = results.asSingleEntity();
+    if (entity == null) {
+      // The entity can't be null
+      assertTrue(false);
+    }
+
+    // Test the stored personal information
+    assertEquals("Leonard", (String) entity.getProperty("nickname"));
+    assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
+    assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
+    assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
+    assertEquals("1234567890", (String) entity.getProperty("userId"));
+    assertEquals(0, (long) entity.getProperty("points"));
+  }
 }
