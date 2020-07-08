@@ -147,6 +147,72 @@ main h1 {
   width: 100%;
 }
 
+#popup-overlay {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, .7);
+  width: 100%;
+  height: 100%;
+  visibility: hidden;
+  opacity: 0;
+}
+
+#popup-overlay:target {
+  visibility: visible;
+  opacity: 1;
+}
+
+.popup {
+  position: relative;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 80px;
+  width: 50%;
+  height: auto;
+  background: #fff;
+  border-radius: 5px;
+  text-transform: uppercase;
+  font-size: 16px;
+}
+
+.popup h2 {
+  padding: 16px 0;
+}
+
+.popup .popup-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  color: #000;
+  font-size: 70px;
+  text-decoration: none;
+}
+
+.popup form input {
+  display: block;
+  padding: 20px;
+  outline: none;
+  border: 1px solid #1d1d1b;
+  margin: 20px;
+	 
+}
+
+.popup form input[type=text] {
+  width: 40%;
+}
+
+.popup form input[type=submit] {
+  background: #1d1d1b;
+  color: #c7c7c7;
+}
+
 /** Media Queries **/
 
 @media (max-width: 1300px) {
