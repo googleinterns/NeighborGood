@@ -143,7 +143,7 @@ function load(file) {
 }
 
 function initUserTasks() {
-  fetch("/data")
+  fetch("/user-tasks")
     .then((response) => response.json())
     .then((tasks) => {
       let taskSection = document.getElementById("tasks-container");
