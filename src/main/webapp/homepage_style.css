@@ -141,23 +141,14 @@ section {
 .username {
   width: 70%;
 }
-<<<<<<< HEAD
-.help-out {
-    cursor: pointer;
-    font-weight: bold;
-}
-.help-out:hover{
-    color: gray;
-=======
 
-.help-button {
+.help-out {
   cursor: pointer;
   font-weight: bold;
 }
 
-.help-button:hover {
+.help-out:hover{
   color: gray;
->>>>>>> master
 }
 
 .disable-help:hover {
