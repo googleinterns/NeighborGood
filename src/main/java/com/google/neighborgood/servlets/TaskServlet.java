@@ -25,6 +25,7 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
+import com.google.neighborgood.helper.RewardingPoints;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +64,7 @@ public class TaskServlet extends HttpServlet {
     List<Query.Filter> filters = new ArrayList<Query.Filter>();
     filters.add(new Query.FilterPredicate("zipcode", Query.FilterOperator.EQUAL, zipcode));
     filters.add(new Query.FilterPredicate("country", Query.FilterOperator.EQUAL, country));
+    filters.add(new Query.FilterPredicate("status", Query.FilterOperator.EQUAL, "OPEN"));
 
     // Applies a category filter, if any
     if (request.getParameterMap().containsKey("category")) {
@@ -80,11 +82,13 @@ public class TaskServlet extends HttpServlet {
 
     // Builds and stores HTML for each task
     for (Entity entity : results) {
-      out.append("<div class='task'>");
+      out.append("<div class='task' data-key='")
+          .append(KeyFactory.keyToString(entity.getKey()))
+          .append("'>");
       if (userLoggedIn) {
-        out.append("<div class='confirm-overlay'>");
-        out.append("<div class='exit-confirm'><a>&times</a></div>");
-        out.append("<a class='removetask'>CONFIRM</a>");
+        out.append("<div class='help-overlay'>");
+        out.append("<div class='exit-help'><a>&times</a></div>");
+        out.append("<a class='confirm-help'>CONFIRM</a>");
         out.append("</div>");
       }
       out.append("<div class='task-container'>");
@@ -95,10 +99,10 @@ public class TaskServlet extends HttpServlet {
       if (userLoggedIn) {
         // changes the Help Button div if the current user is the owner of the task
         if (!userId.equals((String) entity.getProperty("userId"))) {
-          out.append("<div class='help-button'>HELP OUT</div>");
+          out.append("<div class='help-out'>HELP OUT</div>");
         } else {
           out.append(
-              "<div class='help-button disable-help' title='This is your own task'>HELP OUT</div>");
+              "<div class='help-out disable-help' title='This is your own task'>HELP OUT</div>");
         }
       }
       out.append("</div>");
@@ -128,8 +132,10 @@ public class TaskServlet extends HttpServlet {
     }
 
     // Get the rewarding points from the form
-    int rewardPts = getRewardingPoints(request, "reward-input");
-    if (rewardPts == -1) {
+    int rewardPts;
+    try {
+      rewardPts = RewardingPoints.get(request, "reward-input");
+    } catch (IllegalArgumentException e) {
       response.setContentType("text/html");
       response.getWriter().println("Please enter a valid integer in the range of 0-200");
       return;
@@ -173,29 +179,6 @@ public class TaskServlet extends HttpServlet {
 
     // Redirect back to the user page.
     response.sendRedirect("/user_profile.jsp");
-  }
-
-  /** Return the input rewarding points by the user, or -1 if the input was invalid */
-  private int getRewardingPoints(HttpServletRequest request, String inputName) {
-    // Get the input from the form.
-    String rewardPtsString = request.getParameter(inputName);
-
-    // Convert the input to an int.
-    int rewardPts;
-    try {
-      rewardPts = Integer.parseInt(rewardPtsString);
-    } catch (NumberFormatException e) {
-      System.err.println("Could not convert to int: " + rewardPtsString);
-      return -1;
-    }
-
-    // Check that the input is within the requested range.
-    if (rewardPts < 0 || rewardPts > 200) {
-      System.err.println("User input is out of range: " + rewardPtsString);
-      return -1;
-    }
-
-    return rewardPts;
   }
 
   @Override

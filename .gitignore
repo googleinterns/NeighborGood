@@ -1,3 +1,4 @@
 /target
 .idea
 /src/main/webapp/config.js
+/node_modules
