@@ -147,7 +147,7 @@ section {
   font-weight: bold;
 }
 
-.help-out:hover{
+.help-out:hover {
   color: gray;
 }
 
@@ -179,7 +179,7 @@ section {
 
 .help-overlay a:hover {
   color: gray;
-  cursor:pointer;
+  cursor: pointer;
 }
 
 .exit-help {
