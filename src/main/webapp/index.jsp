@@ -11,9 +11,12 @@
   </head>
   <%@ page import = "com.google.appengine.api.users.UserService" %>
   <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
+  <%@ page import = "com.google.neighborgood.helper.RetrieveUserInfo" %>
+  <%@ page import = "java.util.List" %>
   <% UserService userService = UserServiceFactory.getUserService(); 
   boolean userLoggedIn = userService.isUserLoggedIn();
   String categoriesClass = userLoggedIn ? "notFullWidth" : "fullWidth";
+  if (userLoggedIn) 
   %>
 
   <body>
@@ -40,21 +43,23 @@
               </div>
 
               <div id="login-logout">
-          	      <%
+          	    <%
             	  if (userLoggedIn) {
-                      String urlToRedirectToAfterUserLogsOut = "/";
-                      String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
-                  %>
-          	      <p class="login-messages"><%=userService.getCurrentUser().getEmail()%> | <a href="<%=logoutUrl%>">Logout</a></p>
-                  <%
-                  } else {
+                  List<String> userInfo = RetrieveUserInfo.getInfo(userService);
+                  String urlToRedirectToAfterUserLogsOut = "/";
+                  String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
+                  String nickname = (userInfo == null) ? userService.getCurrentUser().getEmail() : userInfo.get(0);
+                %>
+          	      <p class="login-messages"> <%=nickname%> | <a href="<%=logoutUrl%>">Logout</a></p>
+                <%
+                } else {
                       String urlToRedirectToAfterUserLogsIn = "/account.jsp";
                       String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
-                  %>
+                %>
                   <p class="login-messages"><a href="<%=loginUrl%>">Login to help out a neighbor!</a></p>
-                  <%
-                    }
-                  %>
+                <%
+                }
+                %>
               </div>
           </nav>
           <h1 id="title">
