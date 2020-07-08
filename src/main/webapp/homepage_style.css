@@ -19,7 +19,9 @@ nav {
 }
 
 #login-logout {
-  padding: 0 1em;
+  padding-right: 1em;
+  padding-top: 0.8em;
+  text-align: right;
 }
 
 a {
@@ -49,6 +51,11 @@ i:hover {
   font-size: 4em;
   text-align: center;
   margin-block-start: 0;
+}
+
+.login-message{
+  margin-top: 0;
+  margin-bottom: 0.5em;
 }
 
 /* Main Content Styling */
