@@ -49,7 +49,7 @@ function filterTasksBy(category) {
     currentCategory = category;
 
     // only fetches tasks if user's neighborhood has been retrieved
-    if (JSON.stringify(neighborhood) != JSON.stringify([null, null])) {
+    if (userNeighborhoodIsKnown()) {
         fetchTasks(category)
             .then(response => displayTasks(response));
     }
@@ -93,7 +93,7 @@ offers to help out, edits the task's status and helper properties, and
 then reloads the task list */
 function confirmHelp(element) {
     const task = element.closest(".task");
-    const url = "tasks/edit?task-id=" + task.dataset.key + "&action=helpout";
+    const url = "/tasks/edit?task-id=" + task.dataset.key + "&action=helpout";
     const request = new Request(url, {method: "POST"});
     fetch(request).then((response) => {
         // checks if another user has already claimed the task
@@ -103,7 +103,7 @@ function confirmHelp(element) {
             window.location.href = '/';
         }
         // fetches tasks again if user's current neighborhood was successfully retrieved and stored
-        else if (JSON.stringify(neighborhood) != JSON.stringify([null, null])) {
+        else if (userNeighborhoodIsKnown()) {
             fetchTasks(currentCategory).then(response => displayTasks(response));
         }
     });
@@ -254,4 +254,8 @@ function addTasksClickHandlers() {
                 });
             }
         }
+}
+
+function userNeighborhoodIsKnown() {
+  return (neighborhood[0] !== null && neighborhood[1] !== null);
 }
