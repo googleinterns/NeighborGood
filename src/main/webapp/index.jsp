@@ -11,8 +11,6 @@
   </head>
   <%@ page import = "com.google.appengine.api.users.UserService" %>
   <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
-  <%@ page import = "com.google.neighborgood.helper.RetrieveUserInfo" %>
-  <%@ page import = "java.util.List" %>
   <% UserService userService = UserServiceFactory.getUserService(); 
   boolean userLoggedIn = userService.isUserLoggedIn();
   String categoriesClass = userLoggedIn ? "notFullWidth" : "fullWidth";
@@ -46,11 +44,8 @@
             	  if (userLoggedIn) {
                       String urlToRedirectToAfterUserLogsOut = "/";
                       String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
-                      List<String> userInfo = RetrieveUserInfo.getInfo(userService);
-                      String points = userInfo.get(3);
                   %>
           	      <p class="login-messages"><%=userService.getCurrentUser().getEmail()%> | <a href="<%=logoutUrl%>">Logout</a></p>
-                  <p class="login-messages">My current points: <%=points%> pts</p>
                   <%
                   } else {
                       String urlToRedirectToAfterUserLogsIn = "/account.jsp";
@@ -60,6 +55,7 @@
                   <%
                     }
                   %>
+                  <p class="login-messages"><a id="highscore-link">Check out your neighborhood highscorers!</a></p>
               </div>
           </nav>
           <h1 id="title">
