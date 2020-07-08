@@ -314,4 +314,37 @@ public final class UserInfoServletTest {
     assertEquals("1234567890", (String) entity.getProperty("userId"));
     assertEquals(0, (long) entity.getProperty("points"));
   }
+
+  @Test
+  public void doGetTest() throws IOException {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    // Check whether the datastore is empty before the test
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    assertEquals(0, ds.prepare(new Query("UserInfo")).countEntities(withLimit(10)));
+
+    Entity dummy = new Entity("UserInfo");
+    dummy.setProperty("nickname", "Leonard");
+    dummy.setProperty("address", "xxx");
+    dummy.setProperty("phone", "xxx");
+    dummy.setProperty("email", "test@example.com");
+    dummy.setProperty("userId", "1234567890");
+    dummy.setProperty("points", 0);
+    ds.put(dummy);
+
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    try {
+      new UserInfoServlet().doGet(request, response);
+    } catch (IOException e) {
+      assertTrue(false);
+    }
+
+    // After sending the GET request, the doGet function should output the json string
+    writer.flush();
+    assertTrue(stringWriter.toString().contains("[\"Leonard\",\"xxx\",\"xxx\"]"));
+  }
 }
