@@ -458,9 +458,13 @@ async function initMap() {
     });
     map.setTilt(45);
 
+    var geocoder = new google.maps.Geocoder();
+    var infowindow = new google.maps.InfoWindow();
+
     // When the map is clicked, display a marker and fill out the address info
     map.addListener("click", function(event) {
-        displayMarker(event.latLng);
+        var marker = displayMarker(event.latLng);
+        geocodeLatLng(geocoder, map, infowindow, event.latLng, marker);
     });
 
     var input = document.getElementById("place-input");
@@ -507,6 +511,7 @@ function displayMarker(position) {
     })
     
     markers.push(marker);
+    return marker;
 }
 
 function deleteMarker(latitude, longitude) {
@@ -517,6 +522,36 @@ function deleteMarker(latitude, longitude) {
         } else {
             marker.setMap(null);
             return false;
+        }
+    });
+}
+
+function geocodeLatLng(geocoder, map, infowindow, position, marker) {
+    geocoder.geocode({ location: position }, function(results, status) {
+        if (status === "OK") {
+            if (results[0]) {
+                map.setZoom(19);
+                infowindow.setContent(results[0].formatted_address);
+                infowindow.open(map, marker);
+
+                // Set the input address field to the formatted address
+                document.getElementById("edit-address-input").value = results[0].formatted_address;
+                
+                // Get the zipcode and country from the Geocoding response
+                // Since the postal code and country are often at the end of address_components, we loop from back to front
+                for (var i = results[0].address_components.length - 1; i >= 0; i--) {
+                    if (results[0].address_components[i].types[0] === "country") {
+                        document.getElementById("edit-country-input").value = results[0].address_components[i].long_name;
+                    }
+                    if (results[0].address_components[i].types[0] === "postal_code") {
+                        document.getElementById("edit-zipcode-input").value = results[0].address_components[i].long_name;
+                    }
+                }
+            } else {
+                window.alert("No results found");
+            }
+        } else {
+            window.alert("Geocoder failed due to: " + status);
         }
     });
 }

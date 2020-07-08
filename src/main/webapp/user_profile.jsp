@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="user_profile_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script type='text/javascript' src='config.js'></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&libraries=places&language=en;"></script>
     <script src="user_profile_script.js"></script>
   </head>
   <%@ page import = "com.google.appengine.api.users.UserService" %>
@@ -154,6 +154,18 @@
                 <p id="rest-map">Click to mark your personal address on the map!</p>
                 <input id="place-input" class="controls" type="text" placeholder="Search Box">
                 <div id="map"></div>
+                <br/>
+                <div>
+                    <label for="edit-zipcode-input">New Zip Code:</label>
+                    <br/>
+                </div>
+                <textarea name="zipcode-input" id="edit-zipcode-input" required="true"></textarea>
+                <br/>
+                <div>
+                    <label for="edit-country-input">New Country:</label>
+                    <br/>
+                </div>
+                <textarea name="country-input" id="edit-country-input" required="true"></textarea>
                 <br/>
                 <div>
                     <label for="edit-phone-number-input">New phone number:</label>
