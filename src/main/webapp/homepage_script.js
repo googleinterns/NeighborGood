@@ -15,6 +15,22 @@
 const MAPSKEY = config.MAPS_KEY
 let neighborhood = [null , null];
 
+window.onscroll = stickyControlBar;
+
+/* Scroll function so that the control bar sticks to the top of the page */
+function stickyControlBar() {
+    let controlBarWrapper = document.getElementById("control-bar-message-wrapper");
+    let taskListDiv = document.getElementById("tasks-list");
+    const OFFSET = 165;
+    if (window.pageYOffset >= OFFSET || document.body.scrollTop >= OFFSET || document.documentElement.scrollTop >= OFFSET) {
+        controlBarWrapper.style.position = "fixed";
+        taskListDiv.style.marginTop = "165px";
+    } else {
+        controlBarWrapper.style.position = "static";
+        taskListDiv.style.marginTop = "auto";
+    }
+}
+
 /* Calls addUIClickHandlers and getUserNeighborhood once page has loaded */
 if (document.readyState === 'loading') {
     // adds on load event listeners if document hasn't yet loaded
