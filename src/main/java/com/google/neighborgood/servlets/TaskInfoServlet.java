@@ -94,12 +94,12 @@ public class TaskInfoServlet extends HttpServlet {
             HttpServletResponse.SC_NOT_FOUND,
             "The helper of the task could not be found in the database");
         return;
-      } else {
-        long points = (long) userEntity.getProperty("points");
-        long reward = (long) entity.getProperty("reward");
-        userEntity.setProperty("points", points + reward);
-        datastore.put(userEntity);
       }
+
+      long points = (long) userEntity.getProperty("points");
+      long reward = (long) entity.getProperty("reward");
+      userEntity.setProperty("points", points + reward);
+      datastore.put(userEntity);
     }
     entity.setProperty("status", newStatus);
     datastore.put(entity);
