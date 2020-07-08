@@ -54,6 +54,14 @@ public class EditTaskServlet extends HttpServlet {
       return;
     }
 
+    // Get task category from the form input
+    String taskCategory = request.getParameter("category-input");
+    if (taskCategory == null || taskCategory.isEmpty()) {
+      System.err.println("The task must have a category");
+      response.sendRedirect("/400.html");
+      return;
+    }
+
     Key taskKey = KeyFactory.stringToKey(keyString);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity task;
@@ -68,6 +76,7 @@ public class EditTaskServlet extends HttpServlet {
     // Set the details and rewards to the newly input value
     task.setProperty("detail", taskDetail);
     task.setProperty("reward", rewardPts);
+    task.setProperty("category", taskCategory);
     datastore.put(task);
 
     response.sendRedirect("/user_profile.html");
