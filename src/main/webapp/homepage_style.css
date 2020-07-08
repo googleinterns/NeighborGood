@@ -190,7 +190,7 @@ section {
   padding-top: 1em;
 }
 
-/* Add task modal styling */
+/* Add modal styling */
 .modalWrapper {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
@@ -245,6 +245,16 @@ section {
   color: red;
   text-decoration: none;
   cursor: pointer;
+}
+
+/* Top Scores modal specific styling */
+#topScoresModalWrapper {
+  padding-top: 180px;
+}
+
+#topScoresModal {
+  height: 50%;
+  width: 60%;
 }
 
 @media only screen and (max-width: 600px) {

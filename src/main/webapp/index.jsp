@@ -114,5 +114,26 @@
             </form>
         </div>
     </div>
+    <div class="modalWrapper" id="topScoresModalWrapper">
+        <div class="modal" id="topScoresModal">
+            <span class="close-button" id="close-button">&times;</span>
+            <h1>HIGHSCORES</h1>
+            <div id="highscores">
+              <table>
+              <%
+              for (int rank = 1; rank <= 5; rank++) {
+                String rowId = "rank" + rank;
+              %> 
+                <tr id="<%=rowId%>">
+                  <td class="highscore-rank"><%=rank%>.</td>
+                  <td class="highscore-nickname">Mafe</td>
+                  <td class="highscore-score">150</td>
+                </tr>
+              <%
+              }
+              %>
+            </div> 
+        </div>
+    </div>
   </body>
 </html>
