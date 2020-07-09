@@ -24,6 +24,8 @@ body {
   margin-top: 20px;
   margin-left: 2%;
   margin-right: 2%;
+  max-height: 80%;
+  overflow-y: auto;
 }
 
 textarea {
@@ -73,4 +75,24 @@ label {
 #submit-button:hover,
 #submit-button:focus {
   background: #169674;
+}
+
+#map {
+  border: thin solid black;
+  height: 400px;
+  max-width: 100%;
+  color: black;
+}
+
+#place-input {
+    margin-top: 16px;
+    background-color: white;
+    font-family: Roboto;
+    font-size: 16px;
+    width: 500px;
+    text-overflow: ellipsis;
+}
+
+#place-input:focus {
+    border-color: skyblue;
 }

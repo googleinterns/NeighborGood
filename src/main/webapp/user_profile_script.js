@@ -16,7 +16,6 @@ var markers = [];
 var map;
 const GOOGLE_KIRKLAND_LAT = 47.669846;
 const GOOGLE_KIRKLAND_LNG = -122.1996099;
-const MAPSKEY = config.MAPS_KEY;
 
 async function getTaskInfo(keyString) {
     const queryURL = "/tasks/info?key=" + keyString;

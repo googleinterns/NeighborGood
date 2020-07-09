@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>My Personal Info</title>
     <link rel="stylesheet" href="account_style.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&libraries=places&language=en;"></script>
+    <script src="user_profile_script.js"></script>
   </head>
   <%@ page import = "com.google.appengine.api.users.UserService" %>
   <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
@@ -12,7 +14,7 @@
   if (!userService.isUserLoggedIn()) {
        response.sendRedirect(userService.createLoginURL("/account.jsp"));
   } else if (RetrieveUserInfo.getInfo(userService) == null) { %>
-  <body>
+  <body onload="initMap()">
     <div id="container">
         <div id="header">
             <h1 id="title">Please input your personal information</h1>
@@ -33,7 +35,24 @@
                     <br/>
                 </div>
                 <br/>
-                <textarea name="address-input" id="address-input" required="true" placeholder="Input your address here:"></textarea>
+                <textarea name="address-input" id="edit-address-input" required="true" placeholder="Input your address here:"></textarea>
+                <p id="rest-map">Click to mark your personal address on the map!</p>
+                <input id="place-input" class="controls" type="text" placeholder="Search Box">
+                <div id="map"></div>
+                <br/><br/>
+                <div>
+                    <label for="edit-zipcode-input">Your Zip Code:</label>
+                    <br/>
+                </div>
+                <br/>
+                <textarea name="zipcode-input" id="edit-zipcode-input" required="true"></textarea>
+                <br/><br/>
+                <div>
+                    <label for="edit-country-input">Your Country:</label>
+                    <br/>
+                </div>
+                <br/>
+                <textarea name="country-input" id="edit-country-input" required="true"></textarea>
                 <br/><br/>
                 <div>
                     <label for="phone-input">Your Phone Number:</label>
