@@ -34,19 +34,7 @@ async function deleteTask(keyString) {
     }
 }
 
-async function editTask(keyString) {
-    const info = await getTaskInfo(keyString);
-    if (info.status !== "OPEN") {
-        window.alert("You can only edit an 'OPEN' task.")
-    } else {
-        document.getElementById("edit-detail-input").value = info.detail;
-        document.getElementById("edit-point-input").value = info.reward.toString();
-        const id_input = document.getElementById("task-id-input");
-        id_input.value = info.keyString;
-        document.getElementById("editTaskModalWrapper").style.display = "block";
-        showNeedHelp()
-    }
-}
+
 
 async function editInfo() {
     const request = new Request("/account", {method: "GET"});
