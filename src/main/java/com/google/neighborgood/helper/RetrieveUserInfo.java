@@ -38,10 +38,12 @@ public final class RetrieveUserInfo {
       return null;
     }
 
+    long points = (long) entity.getProperty("points");
     List<String> result = new ArrayList<>();
     result.add((String) entity.getProperty("nickname"));
     result.add((String) entity.getProperty("address"));
     result.add((String) entity.getProperty("phone"));
+    result.add(Long.toString(points));
     return result;
   }
 

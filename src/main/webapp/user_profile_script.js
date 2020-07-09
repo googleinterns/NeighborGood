@@ -48,6 +48,16 @@ async function editTask(keyString) {
     }
 }
 
+async function editInfo() {
+    const request = new Request("/account", {method: "GET"});
+    const response = await fetch(request);
+    const userInfo = await response.json();
+    document.getElementById("edit-nickname-input").value = userInfo[0];
+    document.getElementById("edit-address-input").value = userInfo[1];
+    document.getElementById("edit-phone-number-input").value = userInfo[2];
+    showInfoModal();
+}
+
 async function completeTask(keyString) {
     const info = await getTaskInfo(keyString);
     if (info.status !== "IN PROGRESS") {
@@ -135,6 +145,11 @@ function showModal() {
     modal.style.display = "block";
 }
 
+function showInfoModal() {
+    var modal = document.getElementById("updateInfoModalWrapper");
+    modal.style.display = "block";
+}
+
 function closeModal() {
     var modal = document.getElementById("createTaskModalWrapper");
     modal.style.display = "none";
@@ -142,6 +157,11 @@ function closeModal() {
 
 function closeEditModal() {
     var modal = document.getElementById("editTaskModalWrapper");
+    modal.style.display = "none";
+}
+
+function closeInfoModal() {
+    var modal = document.getElementById("updateInfoModalWrapper");
     modal.style.display = "none";
 }
 

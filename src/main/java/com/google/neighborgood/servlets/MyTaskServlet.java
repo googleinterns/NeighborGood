@@ -24,6 +24,8 @@ import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import com.google.neighborgood.task.Task;
 import java.io.IOException;
@@ -39,11 +41,17 @@ import javax.servlet.http.HttpServletResponse;
 public class MyTaskServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // "Leonard" will be replaced with the user's accound id in the future
     String keyword = request.getParameter("keyword");
+    UserService userService = UserServiceFactory.getUserService();
+    if (!userService.isUserLoggedIn()) {
+      response.sendRedirect(userService.createLoginURL("/account.jsp"));
+      return;
+    }
     // keyword is either "Owner" or "Helper". Depending on the keyword, the filter will filter
     // on different fields accordingly.
-    Filter filter = new FilterPredicate(keyword, FilterOperator.EQUAL, "Leonard");
+    Filter filter =
+        new FilterPredicate(
+            keyword, FilterOperator.EQUAL, userService.getCurrentUser().getUserId());
 
     // Depending on the input complete parameter, the status filter will be different.
     String complete = request.getParameter("complete");
