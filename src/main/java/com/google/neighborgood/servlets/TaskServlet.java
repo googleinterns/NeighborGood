@@ -170,7 +170,7 @@ public class TaskServlet extends HttpServlet {
     taskEntity.setProperty("Owner", userId);
     taskEntity.setProperty("Helper", "N/A");
     taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
-    taskEntity.setProperty("zipcode", "59715");
+    taskEntity.setProperty("zipcode", "98033");
     taskEntity.setProperty("country", "United States");
     taskEntity.setProperty("category", "misc");
 
