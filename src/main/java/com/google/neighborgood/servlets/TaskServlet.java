@@ -20,7 +20,10 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -154,6 +157,27 @@ public class TaskServlet extends HttpServlet {
 
     String userId = userService.getCurrentUser().getUserId();
 
+    // Try to get the user's address, zipcode and country stored in datastore
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    Query query =
+        new Query("UserInfo")
+            .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, userId));
+    PreparedQuery results = datastore.prepare(query);
+
+    Entity entity = results.asSingleEntity();
+    if (entity == null) {
+      System.err.println("Unable to find the personal information of the owner of the task");
+      response.sendError(
+          HttpServletResponse.SC_NOT_FOUND,
+          "The owner information of the task could not be found in the database");
+      return;
+    }
+
+    String formattedAddress = (String) entity.getProperty("address");
+    String country = (String) entity.getProperty("country");
+    String zipcode = (String) entity.getProperty("zipcode");
+
     // Create an Entity that stores the input comment
     Entity taskEntity = new Entity("Task");
     taskEntity.setProperty("userId", userId);
@@ -163,12 +187,11 @@ public class TaskServlet extends HttpServlet {
     taskEntity.setProperty("status", "OPEN");
     taskEntity.setProperty("Owner", userId);
     taskEntity.setProperty("Helper", "N/A");
-    taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
-    taskEntity.setProperty("zipcode", "59715");
-    taskEntity.setProperty("country", "United States");
+    taskEntity.setProperty("Address", formattedAddress);
+    taskEntity.setProperty("zipcode", zipcode);
+    taskEntity.setProperty("country", country);
     taskEntity.setProperty("category", "misc");
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(taskEntity);
 
     // Redirect back to the user page.

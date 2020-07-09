@@ -60,6 +60,8 @@ async function editInfo() {
     document.getElementById("edit-nickname-input").value = userInfo[0];
     document.getElementById("edit-address-input").value = userInfo[1];
     document.getElementById("edit-phone-number-input").value = userInfo[2];
+    document.getElementById("edit-zipcode-input").value = userInfo[3];
+    document.getElementById("edit-country-input").value = userInfo[4];
     showInfoModal();
 }
 

@@ -94,6 +94,8 @@ public final class UserInfoServletTest {
     when(request.getParameter("nickname-input")).thenReturn("Leonard");
     when(request.getParameter("address-input")).thenReturn("4xxx Centre Avenue");
     when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
+    when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
+    when(request.getParameter("country-input")).thenReturn("United States");
 
     try {
       new UserInfoServlet().doPost(request, response);
@@ -114,6 +116,8 @@ public final class UserInfoServletTest {
     assertEquals("Leonard", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
     assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
+    assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
+    assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
     assertEquals("1234567890", (String) entity.getProperty("userId"));
     assertEquals(0, (long) entity.getProperty("points"));
@@ -139,6 +143,8 @@ public final class UserInfoServletTest {
     assertEquals("Leo", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
     assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
+    assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
+    assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
     assertEquals("1234567890", (String) entity.getProperty("userId"));
     assertEquals(0, (long) entity.getProperty("points"));
@@ -171,6 +177,8 @@ public final class UserInfoServletTest {
     when(request.getParameter("nickname-input")).thenReturn("Leonard");
     when(request.getParameter("address-input")).thenReturn("4xxx Centre Avenue");
     when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
+    when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
+    when(request.getParameter("country-input")).thenReturn("United States");
 
     try {
       new UserInfoServlet().doPost(request, response);
@@ -196,6 +204,8 @@ public final class UserInfoServletTest {
     assertEquals("Leonard", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
     assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
+    assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
+    assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
     assertEquals("1234567890", (String) entity.getProperty("userId"));
     assertEquals(0, (long) entity.getProperty("points"));
@@ -224,6 +234,8 @@ public final class UserInfoServletTest {
     assertEquals("Leo", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
     assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
+    assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
+    assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
     assertEquals("1234567890", (String) entity.getProperty("userId"));
     assertEquals(0, (long) entity.getProperty("points"));
@@ -242,6 +254,8 @@ public final class UserInfoServletTest {
     when(request.getParameter("nickname-input")).thenReturn("");
     when(request.getParameter("address-input")).thenReturn("4xxx Centre Avenue");
     when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
+    when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
+    when(request.getParameter("country-input")).thenReturn("United States");
 
     try {
       new UserInfoServlet().doPost(request, response);
@@ -312,6 +326,8 @@ public final class UserInfoServletTest {
     assertEquals("Leonard", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
     assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
+    assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
+    assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
     assertEquals("1234567890", (String) entity.getProperty("userId"));
     assertEquals(0, (long) entity.getProperty("points"));
@@ -333,6 +349,8 @@ public final class UserInfoServletTest {
     dummy.setProperty("email", "test@example.com");
     dummy.setProperty("userId", "1234567890");
     dummy.setProperty("points", 0);
+    dummy.setProperty("zipcode", "xxxxx");
+    dummy.setProperty("country", "US");
     ds.put(dummy);
 
     StringWriter stringWriter = new StringWriter();
@@ -347,7 +365,7 @@ public final class UserInfoServletTest {
 
     // After sending the GET request, the doGet function should output the json string
     writer.flush();
-    assertTrue(stringWriter.toString().contains("[\"Leonard\",\"xxx\",\"xxx\"]"));
+    assertTrue(stringWriter.toString().contains("[\"Leonard\",\"xxx\",\"xxx\",\"xxxxx\",\"US\"]"));
   }
 
   @Test
@@ -377,6 +395,8 @@ public final class UserInfoServletTest {
     when(request.getParameter("nickname-input")).thenReturn("Leonard");
     when(request.getParameter("address-input")).thenReturn("4xxx Centre Avenue");
     when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
+    when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
+    when(request.getParameter("country-input")).thenReturn("United States");
 
     try {
       new UserInfoServlet().doPost(request, response);
@@ -412,6 +432,8 @@ public final class UserInfoServletTest {
     assertEquals("Leonard", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
     assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
+    assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
+    assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
     assertEquals("1234567890", (String) entity.getProperty("userId"));
     assertEquals(0, (long) entity.getProperty("points"));

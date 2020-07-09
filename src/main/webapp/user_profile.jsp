@@ -144,33 +144,38 @@
                     <label for="edit-nickname-input">New nickname:</label>
                     <br/>
                 </div>
-                <textarea name="nickname-input" id="edit-nickname-input" required="true"></textarea>
                 <br/>
+                <textarea name="nickname-input" id="edit-nickname-input" required="true"></textarea>
+                <br/><br/>
                 <div>
                     <label for="edit-address-input">New address:</label>
                     <br/>
                 </div>
+                <br/>
                 <textarea name="address-input" id="edit-address-input" required="true"></textarea>
                 <p id="rest-map">Click to mark your personal address on the map!</p>
                 <input id="place-input" class="controls" type="text" placeholder="Search Box">
                 <div id="map"></div>
-                <br/>
+                <br/><br/>
                 <div>
                     <label for="edit-zipcode-input">New Zip Code:</label>
                     <br/>
                 </div>
-                <textarea name="zipcode-input" id="edit-zipcode-input" required="true"></textarea>
                 <br/>
+                <textarea name="zipcode-input" id="edit-zipcode-input" required="true"></textarea>
+                <br/><br/>
                 <div>
                     <label for="edit-country-input">New Country:</label>
                     <br/>
                 </div>
-                <textarea name="country-input" id="edit-country-input" required="true"></textarea>
                 <br/>
+                <textarea name="country-input" id="edit-country-input" required="true"></textarea>
+                <br/><br/>
                 <div>
                     <label for="edit-phone-number-input">New phone number:</label>
                     <br/>
                 </div>
+                <br/>
                 <textarea name="phone-input" id="edit-phone-number-input" required="true"></textarea>
                 <br/>
                 <br/>

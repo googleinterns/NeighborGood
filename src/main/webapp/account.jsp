@@ -45,14 +45,14 @@
                     <br/>
                 </div>
                 <br/>
-                <textarea name="zipcode-input" id="edit-zipcode-input" required="true"></textarea>
+                <textarea name="zipcode-input" id="edit-zipcode-input" required="true" placeholder="Input your zipcode here:"></textarea>
                 <br/><br/>
                 <div>
                     <label for="edit-country-input">Your Country:</label>
                     <br/>
                 </div>
                 <br/>
-                <textarea name="country-input" id="edit-country-input" required="true"></textarea>
+                <textarea name="country-input" id="edit-country-input" required="true" placeholder="Input your country here:"></textarea>
                 <br/><br/>
                 <div>
                     <label for="phone-input">Your Phone Number:</label>
