@@ -42,10 +42,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-/** */
+/** Unit test on the UserInfoServlet file */
 @RunWith(JUnit4.class)
 public final class UserInfoServletTest {
 
+  /* Set up the test environment with Datastore and UserService and simulate the situation
+   * that the user is logged in as admin, has a specific email and userID.
+   */
   private LocalServiceTestHelper helper =
       new LocalServiceTestHelper(
               new LocalDatastoreServiceTestConfig(), new LocalUserServiceTestConfig())
@@ -370,7 +373,7 @@ public final class UserInfoServletTest {
       ds.put(dummy);
     }
 
-    // Check the number of entities in the datastore. The result should be 10,000
+    // Check the number of entities in the datastore. The result should be 999
     assertEquals(999, ds.prepare(new Query("UserInfo")).countEntities());
 
     // Now we insert a target UserInfo Entity and check the time needed to find the entity
