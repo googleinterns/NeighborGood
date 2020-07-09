@@ -70,7 +70,7 @@ public class EditTaskServlet extends HttpServlet {
     task.setProperty("reward", rewardPts);
     datastore.put(task);
 
-    response.sendRedirect("/user_profile.html");
+    response.sendRedirect("/user_profile.jsp");
   }
 
   // Both TaskServlet and EditTaskServlet use this method. I will fix this by putting the function
