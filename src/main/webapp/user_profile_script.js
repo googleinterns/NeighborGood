@@ -47,6 +47,7 @@ async function editTask(keyString) {
         document.getElementById("editTaskModalWrapper").style.display = "block";
         showNeedHelp()
     }
+}
 
 async function editInfo() {
     const request = new Request("/account", {method: "GET"});
