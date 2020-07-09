@@ -1,6 +1,6 @@
 var map;
 var styledMapType;
-var mapKey = config.MAP_KEY;
+var mapKey = config.MAPS_KEY;
 var userTasksArray;
 
 load(`https://maps.googleapis.com/maps/api/js?key=${mapKey}`); // Add maps API to html
