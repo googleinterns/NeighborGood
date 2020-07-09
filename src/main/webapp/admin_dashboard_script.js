@@ -146,6 +146,7 @@ function getUserTasks() {
   fetch("/user-tasks")
     .then((response) => response.json())
     .then((tasks) => {
+      console.log(tasks);
       userTasksArray = tasks;
       let taskSection = document.getElementById("user-tasks");
       for (userTask of tasks) {
@@ -170,6 +171,8 @@ function searchTasks(id){
 
 async function openWithPopup(id){
   const task = await searchTasks(id);
-  document.getElementById("task-details").value = task.propertyMap.detail;
+  document.getElementById("owner").value = task.propertyMap.Owner;
   document.getElementById("category").value = task.propertyMap.category;
+  document.getElementById("task-details").value = task.propertyMap.detail;
+  document.getElementById("reward").value = task.propertyMap.reward;
 }
