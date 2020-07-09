@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -143,6 +143,8 @@ function closeCreateTaskModal() {
     modal.style.display = "none";
 }
 
+/* Function that calls the loadTopScorersBy functions
+   and then shows the top scores modal */
 function showTopScoresModal() {
     loadTopScorersBy("world");
     if (userNeighborhoodIsKnown()){
@@ -151,10 +153,12 @@ function showTopScoresModal() {
     document.getElementById("topScoresModalWrapper").style.display = "block";
 }
 
+/* Function closes the top scores modal */
 function closeTopScoresModal() {
     document.getElementById("topScoresModalWrapper").style.display = "none";
 }
 
+/* Function loads the data for the top scorers table */
 function loadTopScorersBy(location) {
     let url = "/account?action=topscorers";
     if (location === "neighborhood") {
@@ -163,6 +167,7 @@ function loadTopScorersBy(location) {
     fetch(url)
       .then(response => response.json())
       .then(users => {
+        // Inserts Nickname and Points for every top scorer
         for (let i = 0; i < users.length; i++) {
           let points = users[i].points;
           let nickname = users[i].nickname;
@@ -172,6 +177,7 @@ function loadTopScorersBy(location) {
           let rowScore = row.getElementsByClassName("topscore-score")[0];
           rowNickname.innerText = nickname;
           rowScore.innerText = points;
+          // Adds different styling if row includes current user
           if (users[i].isCurrentUser) {
             row.style.fontWeight = "bold";
             row.setAttribute("title", "Congratulations, you made it to the Top Scorers Board!");
@@ -316,6 +322,7 @@ function addTasksClickHandlers() {
         }
 }
 
+/* Helper function that determines if the current user's neighborhood is known */
 function userNeighborhoodIsKnown() {
   return (neighborhood[0] !== null && neighborhood[1] !== null);
 }

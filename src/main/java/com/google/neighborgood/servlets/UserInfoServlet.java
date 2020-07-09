@@ -1,3 +1,15 @@
+// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package com.google.neighborgood.servlets;
@@ -31,11 +43,13 @@ public class UserInfoServlet extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     UserService userService = UserServiceFactory.getUserService();
 
+    // Retrieves user accounts for the topscorers board
     if (request.getParameterMap().containsKey("action")
         && request.getParameter("action").equals("topscorers")) {
 
       Query query = new Query("UserInfo").addSort("points", SortDirection.DESCENDING);
 
+      // Adds additional filters for the nearby neighbors board
       if (request.getParameterMap().containsKey("zipcode")
           && request.getParameterMap().containsKey("country")) {
         String zipcode = request.getParameter("zipcode");
@@ -46,7 +60,8 @@ public class UserInfoServlet extends HttpServlet {
         query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, filters));
       }
 
-      List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(5));
+      // Gathers the top 10 results
+      List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(10));
 
       List<User> users = new ArrayList<>();
 
@@ -57,7 +72,6 @@ public class UserInfoServlet extends HttpServlet {
             && user.getUserId().equals(userService.getCurrentUser().getUserId())) {
           user.isCurrentUser();
         }
-
         users.add(user);
       }
 
