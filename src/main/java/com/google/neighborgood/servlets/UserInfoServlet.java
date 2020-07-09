@@ -29,6 +29,7 @@ public class UserInfoServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    UserService userService = UserServiceFactory.getUserService();
 
     if (request.getParameterMap().containsKey("action")
         && request.getParameter("action").equals("topscorers")) {
@@ -50,7 +51,14 @@ public class UserInfoServlet extends HttpServlet {
       List<User> users = new ArrayList<>();
 
       for (Entity entity : results) {
-        users.add(new User(entity));
+        User user = new User(entity);
+
+        if (userService.isUserLoggedIn()
+            && user.getUserId().equals(userService.getCurrentUser().getUserId())) {
+          user.isCurrentUser();
+        }
+
+        users.add(user);
       }
 
       Gson gson = new Gson();
@@ -58,8 +66,6 @@ public class UserInfoServlet extends HttpServlet {
       response.getWriter().println(gson.toJson(users));
       return;
     }
-
-    UserService userService = UserServiceFactory.getUserService();
 
     if (!userService.isUserLoggedIn()) {
       response.sendRedirect(userService.createLoginURL("/account.jsp"));

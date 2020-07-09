@@ -25,6 +25,7 @@ public final class User {
   private final String email;
   private final String userId;
   private final long points;
+  private boolean isCurrentUser;
 
   public User(Entity entity) {
 
@@ -36,5 +37,14 @@ public final class User {
     this.email = (String) entity.getProperty("email");
     this.userId = (String) entity.getProperty("userId");
     this.points = (Long) entity.getProperty("points");
+    this.isCurrentUser = false;
+  }
+
+  public void isCurrentUser() {
+    this.isCurrentUser = true;
+  }
+
+  public String getUserId() {
+    return this.userId;
   }
 }

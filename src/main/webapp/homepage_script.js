@@ -167,10 +167,15 @@ function loadTopScorersBy(location) {
           let points = users[i].points;
           let nickname = users[i].nickname;
           let rowId = location + (i + 1);
-          let rowNickname = document.getElementById(rowId).getElementsByClassName("topscore-nickname")[0];
-          let rowScore = document.getElementById(rowId).getElementsByClassName("topscore-score")[0];
+          let row = document.getElementById(rowId);
+          let rowNickname = row.getElementsByClassName("topscore-nickname")[0];
+          let rowScore = row.getElementsByClassName("topscore-score")[0];
           rowNickname.innerText = nickname;
           rowScore.innerText = points;
+          if (users[i].isCurrentUser) {
+            row.style.fontWeight = "bold";
+            row.setAttribute("title", "Congratulations, you made it to the Top Scorers Board!");
+          }
         }
     });
 }
