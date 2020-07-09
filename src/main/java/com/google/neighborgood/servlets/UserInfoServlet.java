@@ -1,6 +1,20 @@
+// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.sps.servlets;
+// limitations under the License.
+
+package com.google.neighborgood.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -11,7 +25,10 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gson.Gson;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +36,41 @@ import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/account")
 public class UserInfoServlet extends HttpServlet {
+  @Override
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    UserService userService = UserServiceFactory.getUserService();
+
+    if (!userService.isUserLoggedIn()) {
+      response.sendRedirect(userService.createLoginURL("/account.jsp"));
+      return;
+    }
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Query query =
+        new Query("UserInfo")
+            .setFilter(
+                new FilterPredicate(
+                    "userId", FilterOperator.EQUAL, userService.getCurrentUser().getUserId()));
+    PreparedQuery results = datastore.prepare(query);
+    Entity entity = results.asSingleEntity();
+
+    if (entity == null) {
+      System.err.println("Unable to find the UserInfo entity based on the current user id");
+      response.sendError(
+          HttpServletResponse.SC_NOT_FOUND, "The requested user info could not be found");
+      return;
+    }
+    List<String> result = new ArrayList<>();
+    result.add((String) entity.getProperty("nickname"));
+    result.add((String) entity.getProperty("address"));
+    result.add((String) entity.getProperty("phone"));
+
+    Gson gson = new Gson();
+    String json = gson.toJson(result);
+    response.setContentType("application/json;");
+    response.getWriter().println(json);
+  }
+
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     UserService userService = UserServiceFactory.getUserService();
@@ -59,6 +111,7 @@ public class UserInfoServlet extends HttpServlet {
       entity.setProperty("phone", phone);
       entity.setProperty("email", email);
       entity.setProperty("userId", userId);
+      entity.setProperty("points", 0);
     } else {
       entity.setProperty("nickname", nickname);
       entity.setProperty("address", address);

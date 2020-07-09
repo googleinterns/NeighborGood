@@ -1,3 +1,19 @@
+/**
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 body {
@@ -11,6 +27,9 @@ body {
 nav {
   display: flex;
   justify-content: space-between;
+  position: fixed;
+  width: 100%;
+  top: 0;
 }
 
 #dashboard-icon-container {
@@ -48,7 +67,8 @@ i:hover {
 #title {
   font-size: 4em;
   text-align: center;
-  margin-block-start: 0;
+  margin-top: 1em;
+  margin-bottom: 0.4em;
 }
 
 /* Main Content Styling */
@@ -63,6 +83,17 @@ section {
   display: flex;
   justify-content: space-between;
   padding-bottom: 1.5em;
+}
+
+#control-bar-message-wrapper {
+  width: 100%;
+  max-width: 55em;
+  z-index: 1;
+  background-image: linear-gradient(to bottom, white 90%, transparent);
+  padding-bottom: 1em;
+  padding-top: 1em;
+  top: 0;
+  transition: 0.3s;
 }
 
 #categories {
@@ -85,7 +116,7 @@ section {
 
 .categories {
   border: solid #222;
-  margin: -1.5px;
+  margin-right: -3px;
   cursor: pointer;
   text-align: center;
   width: 20%;
@@ -121,6 +152,7 @@ section {
   border-top: solid;
   border-right: solid;
   border-left: solid;
+  transition: 0.5s;
 }
 
 .task {
@@ -142,12 +174,12 @@ section {
   width: 70%;
 }
 
-.help-button {
+.help-out {
   cursor: pointer;
   font-weight: bold;
 }
 
-.help-button:hover {
+.help-out:hover {
   color: gray;
 }
 
@@ -162,7 +194,7 @@ section {
   justify-content: space-between;
 }
 
-.confirm-overlay {
+.help-overlay {
   position: absolute;
   z-index: 99;
   display: none;
@@ -177,12 +209,12 @@ section {
   overflow: hidden;
 }
 
-.confirm-overlay a:hover {
+.help-overlay a:hover {
   color: gray;
   cursor: pointer;
 }
 
-.exit-confirm {
+.exit-help {
   font-size: 30px;
   line-height: 0em;
   text-align: right;

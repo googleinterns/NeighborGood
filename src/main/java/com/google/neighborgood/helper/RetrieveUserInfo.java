@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.sps.helper;
+package com.google.neighborgood.helper;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -38,10 +38,12 @@ public final class RetrieveUserInfo {
       return null;
     }
 
+    long points = (long) entity.getProperty("points");
     List<String> result = new ArrayList<>();
     result.add((String) entity.getProperty("nickname"));
     result.add((String) entity.getProperty("address"));
     result.add((String) entity.getProperty("phone"));
+    result.add(Long.toString(points));
     return result;
   }
 

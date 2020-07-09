@@ -7,7 +7,7 @@
   </head>
   <%@ page import = "com.google.appengine.api.users.UserService" %>
   <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
-  <%@ page import = "com.google.sps.helper.RetrieveUserInfo" %>
+  <%@ page import = "com.google.neighborgood.helper.RetrieveUserInfo" %>
   <% UserService userService = UserServiceFactory.getUserService();
   if (!userService.isUserLoggedIn()) {
        response.sendRedirect(userService.createLoginURL("/account.jsp"));
