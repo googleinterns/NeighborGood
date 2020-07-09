@@ -20,7 +20,10 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -93,8 +96,17 @@ public class TaskServlet extends HttpServlet {
       }
       out.append("<div class='task-container'>");
       out.append("<div class='task-header'>");
+
+      // Retrieves task's user to get user's nickname
+      String taskUserId = (String) entity.getProperty("userId");
+      Query userQuery =
+          new Query("UserInfo")
+              .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, taskUserId));
+      PreparedQuery userResults = datastore.prepare(userQuery);
+      Entity userEntity = userResults.asSingleEntity();
+
       out.append("<div class='username'>")
-          .append((String) entity.getProperty("Owner"))
+          .append((String) userEntity.getProperty("nickname"))
           .append("</div>");
       if (userLoggedIn) {
         // changes the Help Button div if the current user is the owner of the task
