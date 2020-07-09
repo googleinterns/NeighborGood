@@ -1,6 +1,7 @@
 var map;
 var styledMapType;
 var mapKey = config.MAP_KEY;
+var userTasksArray;
 
 load(`https://maps.googleapis.com/maps/api/js?key=${mapKey}`); // Add maps API to html
 
@@ -8,9 +9,8 @@ google.charts.load("current", { packages: ["line"] });
 
 google.charts.setOnLoadCallback(drawChart);
 window.addEventListener("load", drawMap);
-window.addEventListener("load", initUserTasks());
+window.addEventListener("load", getUserTasks());
 window.addEventListener("resize", drawChart);
-
 
 function drawChart() {
   var data = new google.visualization.DataTable();
@@ -142,20 +142,37 @@ function load(file) {
   document.getElementsByTagName("head")[0].appendChild(src);
 }
 
-function initUserTasks() {
+function getUserTasks() {
   fetch("/user-tasks")
     .then((response) => response.json())
     .then((tasks) => {
-      let taskSection = document.getElementById("tasks-container");
+      
       console.log(tasks);
+      userTasksArray = tasks;
+      let taskSection = document.getElementById("tasks-container");
       for (userTask of tasks) {
-        taskSection.innerHTML += addTask(userTask.propertyMap);
+        taskSection.innerHTML += addTask(userTask);
       }
     });
 }
 
 function addTask(task) {
-  let string = `<li class="admin-task"><h3> ${task.category} </h3>`;
-  string += `<h4> ${task.Owner} </h4></li>`;
+  let string = `<a href="#popup-overlay"><li class="admin-task user-task"  onclick="openWithPopup(${task.key.id})"><h3> ${task.propertyMap.category} </h3>`;
+  string += `<h4> ${task.propertyMap.Owner} </h4></li></a>`;
   return string;
+}
+
+function searchTasks(id){
+  for(task of userTasksArray){
+    if(id == task.key.id){
+      return task;
+    }
+  }
+}
+
+async function openWithPopup(id){
+  const task = await searchTasks(id);
+  console.log(task);
+  document.getElementById("task-details").value = task.propertyMap.detail;
+  document.getElementById("category").value = task.propertyMap.category;
 }
