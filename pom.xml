@@ -35,34 +35,6 @@
       <artifactId>appengine-api-1.0-sdk</artifactId>
       <version>1.9.59</version>
     </dependency>
-
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>3.141.59</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.github.bonigarcia</groupId>
-      <artifactId>webdrivermanager</artifactId>
-      <version>4.0.0</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.github.bonigarcia</groupId>
-      <artifactId>selenium-jupiter</artifactId>
-      <version>3.3.4</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
   <build>
