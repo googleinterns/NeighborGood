@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.sps.servlets;
+package com.google.neighborgood.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -20,8 +20,12 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.gson.Gson;
-import com.google.sps.task.Task;
+import com.google.neighborgood.task.Task;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -77,6 +81,25 @@ public class TaskInfoServlet extends HttpServlet {
 
     if (newStatus.equals("OPEN")) {
       entity.setProperty("Helper", "N/A");
+    } else if (newStatus.equals("COMPLETE")) {
+      String userId = (String) entity.getProperty("Helper");
+      Query query =
+          new Query("UserInfo")
+              .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, userId));
+      PreparedQuery results = datastore.prepare(query);
+      Entity userEntity = results.asSingleEntity();
+      if (userEntity == null) {
+        System.err.println("Unable to find the helper of the task");
+        response.sendError(
+            HttpServletResponse.SC_NOT_FOUND,
+            "The helper of the task could not be found in the database");
+        return;
+      }
+
+      long points = (long) userEntity.getProperty("points");
+      long reward = (long) entity.getProperty("reward");
+      userEntity.setProperty("points", points + reward);
+      datastore.put(userEntity);
     }
     entity.setProperty("status", newStatus);
     datastore.put(entity);

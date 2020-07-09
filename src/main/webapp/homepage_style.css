@@ -17,219 +17,299 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 body {
-	font-family: 'Roboto', sans-serif;;
-    margin: auto;
-    padding-bottom: 3em;
-    color: #222;
+  font-family: 'Roboto', sans-serif;
+  margin: auto;
+  padding-bottom: 3em;
+  color: #222;
 }
 
 /* Header Styling */
 nav {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
+  position: fixed;
+  width: 100%;
+  top: 0;
 }
-#userpage-icon {
-    padding: 1em;
-    height: 3em;
+
+#dashboard-icon-container {
+  padding: 1em;
+  height: 3em;
 }
+
 #login-logout {
-    padding: 0 1em;
+  padding: 0 1em;
 }
-#login-logout a {
-    text-decoration: none;
-    color: #222;
-    font-weight: bold;
-    cursor: pointer;
+
+a {
+  text-decoration: none;
+  color: #222;
+  font-weight: bold;
+  cursor: pointer;
 }
-#login-logout a:hover {
-    color: gray;
+
+a:hover {
+  color: gray;
 }
-i:hover{
-    color: grey;
+
+.dashboard-icon {
+  padding-right: 0.8em;
 }
+
 i {
-    color: #222;
+  color: #222;
 }
+
+i:hover {
+  color: grey;
+}
+
 #title {
-    font-size: 4em;
-    text-align: center;
-    margin-block-start: 0;
+  font-size: 4em;
+  text-align: center;
+  margin-top: 1em;
+  margin-bottom: 0.4em;
 }
 
 /* Main Content Styling */
 section {
-    max-width: 55em;
-    margin: auto;
-    padding: 0 1em;
+  max-width: 55em;
+  margin: auto;
+  padding: 0 1em;
 }
 
 /* Styling for control bar (categories and add task) */
 #control-bar {
-    display: flex;
-    justify-content: space-between;
-    padding-bottom: 1.5em;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 1.5em;
 }
+
+#control-bar-message-wrapper {
+  width: 100%;
+  max-width: 55em;
+  z-index: 1;
+  background-image: linear-gradient(to bottom, white 90%, transparent);
+  padding-bottom: 1em;
+  padding-top: 1em;
+  top: 0;
+  transition: 0.3s;
+}
+
 #categories {
-    display: flex;
-    border-bottom: solid #222;
-    border-top: solid #222;
-    border-left: solid #222;;
+  display: flex;
 }
+
 .notFullWidth {
-    width: 90%;
+  width: 90%;
 }
+
 .fullWidth {
-    width: 100%;
+  width: 100%;
 }
+
 #all {
-    background-color:#222;
-    color: white;
-    font-weight: bold;
+  background-color: #222;
+  color: white;
+  font-weight: bold;
 }
+
 .categories {
-    border-right: solid #222;
-    cursor: pointer;
-    text-align: center;
-    width: 20%;
-    min-width: 0;
-    overflow: hidden;
-    line-height: 3em;
+  border: solid #222;
+  margin-right: -3px;
+  cursor: pointer;
+  text-align: center;
+  width: 20%;
+  min-width: 0;
+  overflow: hidden;
+  line-height: 3em;
 }
+
 .categories:hover {
-    background-color: lightgray;
+  background-color: lightgray;
 }
+
 #add-task {
-    padding-left: 1em;
-    cursor: pointer;
-    min-width: 0;
-    overflow: hidden;
+  padding-left: 1em;
+  cursor: pointer;
+  min-width: 0;
+  overflow: hidden;
 }
+
 #addtaskbutton {
-    font-size: 3.5em;
+  font-size: 3.5em;
 }
 
 /* Tasks Styling */
 .results-message {
-    display: none;
-    text-align: center;
-    padding-bottom: 0.5em;
+  display: none;
+  text-align: center;
+  padding-bottom: 0.5em;
 }
+
 #tasks-list {
-    display: none;
-    border-top: solid;
-    border-right: solid;
-    border-left: solid;
+  display: none;
+  border-top: solid;
+  border-right: solid;
+  border-left: solid;
+  transition: 0.5s;
 }
+
 .task {
-    border-bottom: solid;
-    position: relative;
+  border-bottom: solid;
+  position: relative;
 }
+
 .task-container {
-    padding: 1em;
+  padding: 1em;
 }
+
 .task-header {
-    display: flex;
-    padding-bottom: 1em;
-    justify-content: space-between;
+  display: flex;
+  padding-bottom: 1em;
+  justify-content: space-between;
 }
+
 .username {
-    width: 70%;
+  width: 70%;
 }
-.help-button {
-    cursor: pointer;
-    font-weight: bold;
+
+.help-out {
+  cursor: pointer;
+  font-weight: bold;
 }
-.help-button:hover{
-    color: gray;
+
+.help-out:hover {
+  color: gray;
 }
-.disable-help:hover{
-    cursor:not-allowed;
+
+.disable-help:hover {
+  cursor: not-allowed;
 }
+
 .task-footer {
-    font-style: italic;
-    padding-top: 1em;
-    display: flex;
-    justify-content: space-between;
+  font-style: italic;
+  padding-top: 1em;
+  display: flex;
+  justify-content: space-between;
 }
-.confirm-overlay {
-    position: absolute;
-    z-index: 99;
-    display: none;
-    background: rgba(236, 236, 240, 0.85);
-    backdrop-filter: blur(4px);
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    line-height: 2em;
-    font-size: 2em;
-    font-weight: bold;
-    overflow: hidden;
+
+.help-overlay {
+  position: absolute;
+  z-index: 99;
+  display: none;
+  background: rgba(236, 236, 240, 0.85);
+  backdrop-filter: blur(4px);
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  line-height: 2em;
+  font-size: 2em;
+  font-weight: bold;
+  overflow: hidden;
 }
-.confirm-overlay a:hover {
-    color: gray;
-    cursor:pointer;
+
+.help-overlay a:hover {
+  color: gray;
+  cursor: pointer;
 }
-.exit-confirm {
-    font-size: 30px;
-    line-height: 0em;
-    text-align: right;
-    padding-right: 1em;
-    padding-top: 1em;
+
+.exit-help {
+  font-size: 30px;
+  line-height: 0em;
+  text-align: right;
+  padding-right: 1em;
+  padding-top: 1em;
 }
 
 /* Add task modal styling */
 .modalWrapper {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    padding-top: 100px; /* Location of the box */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 }
 
 .modal {
-    background-color: #fefefe;
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 50%;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
 }
 
 .modal textarea {
-    width: 50%;
-    box-sizing: border-box;
-    border: 4px solid rgb(97, 245, 195);
-    border-radius: 4px;
-    font-size: 16px;
-    padding: 10px 20px 10px 20px;
-    transition: width 0.5s ease-in-out;
+  width: 50%;
+  box-sizing: border-box;
+  border: 4px solid rgb(97, 245, 195);
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 10px 20px 10px 20px;
+  transition: width 0.5s ease-in-out;
 }
 
 .modal textarea:focus {
-    width: 100%;
-    border: 4px solid lightcyan;
+  width: 100%;
+  border: 4px solid lightcyan;
 }
 
 .modal label {
-    font-size: 24px;
-    font-weight: bold;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 .close-button {
-    color: #aaaaaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
 }
 
 .close-button:hover,
 .close-button:focus {
-    color: red;
-    text-decoration: none;
-    cursor: pointer;
+  color: red;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+@media only screen and (max-width: 600px) {
+  #title {
+    font-size: 2.5em;
+  }
+
+  #control-bar {
+    display: block;
+  }
+
+  #categories {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .categories {
+    min-width: 31%;
+    line-height: 2em;
+  }
+
+  #add-task {
+    text-align: right;
+    padding-right: 0.5em;
+  }
+
+  #addtaskbutton {
+    font-size: 2.5em;
+  }
+
+  .fa-3x {
+    font-size: 2.5em;
+  }
 }

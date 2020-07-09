@@ -34,18 +34,16 @@ async function deleteTask(keyString) {
     }
 }
 
-async function editTask(keyString) {
-    const info = await getTaskInfo(keyString);
-    if (info.status !== "OPEN") {
-        window.alert("You can only edit an 'OPEN' task.")
-    } else {
-        document.getElementById("edit-detail-input").value = info.detail;
-        document.getElementById("edit-point-input").value = info.reward.toString();
-        const id_input = document.getElementById("task-id-input");
-        id_input.value = info.keyString;
-        document.getElementById("editTaskModalWrapper").style.display = "block";
-        showNeedHelp()
-    }
+
+
+async function editInfo() {
+    const request = new Request("/account", {method: "GET"});
+    const response = await fetch(request);
+    const userInfo = await response.json();
+    document.getElementById("edit-nickname-input").value = userInfo[0];
+    document.getElementById("edit-address-input").value = userInfo[1];
+    document.getElementById("edit-phone-number-input").value = userInfo[2];
+    showInfoModal();
 }
 
 async function completeTask(keyString) {
@@ -135,6 +133,11 @@ function showModal() {
     modal.style.display = "block";
 }
 
+function showInfoModal() {
+    var modal = document.getElementById("updateInfoModalWrapper");
+    modal.style.display = "block";
+}
+
 function closeModal() {
     var modal = document.getElementById("createTaskModalWrapper");
     modal.style.display = "none";
@@ -142,6 +145,11 @@ function closeModal() {
 
 function closeEditModal() {
     var modal = document.getElementById("editTaskModalWrapper");
+    modal.style.display = "none";
+}
+
+function closeInfoModal() {
+    var modal = document.getElementById("updateInfoModalWrapper");
     modal.style.display = "none";
 }
 
