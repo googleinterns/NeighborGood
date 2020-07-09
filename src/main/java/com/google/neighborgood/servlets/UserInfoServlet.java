@@ -27,6 +27,38 @@ import javax.servlet.http.HttpServletResponse;
 public class UserInfoServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    if (request.getParameterMap().containsKey("action")
+        && request.getParameter("action").equals("topscorers")) {
+
+      Query query = new Query("UserInfo").addSort("points", SortDirection.DESCENDING);
+
+      if (request.getParameterMap().containsKey("zipcode")
+          && request.getParameterMap().containsKey("country")) {
+        String zipcode = request.getParameter("zipcode");
+        String country = request.getParameter("country");
+        List<Query.Filter> filters = new ArrayList<Query.Filter>();
+        filters.add(new Query.FilterPredicate("zipcode", Query.FilterOperator.EQUAL, zipcode));
+        filters.add(new Query.FilterPredicate("country", Query.FilterOperator.EQUAL, country));
+        query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, filters));
+      }
+
+      List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(5));
+
+      List<User> users = new ArrayList<>();
+
+      for (Entity entity : results) {
+        users.add(new User(entity));
+      }
+
+      Gson gson = new Gson();
+      response.setContentType("application/json;");
+      response.getWriter().println(gson.toJson(users));
+      return;
+    }
+
     UserService userService = UserServiceFactory.getUserService();
 
     if (!userService.isUserLoggedIn()) {
@@ -34,7 +66,6 @@ public class UserInfoServlet extends HttpServlet {
       return;
     }
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Query query =
         new Query("UserInfo")
             .setFilter(
@@ -97,6 +128,8 @@ public class UserInfoServlet extends HttpServlet {
       entity = new Entity("UserInfo");
       entity.setProperty("nickname", nickname);
       entity.setProperty("address", address);
+      entity.setProperty("zipcode", "59715");
+      entity.setProperty("country", "United States");
       entity.setProperty("phone", phone);
       entity.setProperty("email", email);
       entity.setProperty("userId", userId);
@@ -109,22 +142,5 @@ public class UserInfoServlet extends HttpServlet {
     datastore.put(entity);
 
     response.sendRedirect("/user_profile.jsp");
-  }
-
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Query query = new Query("UserInfo").addSort("points", SortDirection.DESCENDING);
-    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(5));
-
-    List<User> users = new ArrayList<>();
-
-    for (Entity entity : results) {
-      users.add(new User(entity));
-    }
-
-    Gson gson = new Gson();
-    response.setContentType("application/json;");
-    response.getWriter().println(gson.toJson(users));
   }
 }

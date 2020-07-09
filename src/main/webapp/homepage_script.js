@@ -48,7 +48,7 @@ function addUIClickHandlers() {
     // adds showCreateTaskModal and closeCreateTaskModal click events for the add task button
     if (document.body.contains(document.getElementById("addtaskbutton"))) {
         document.getElementById("addtaskbutton").addEventListener("click", showCreateTaskModal);
-    	document.getElementById("close-button").addEventListener("click", closeCreateTaskModal);
+    	document.getElementById("close-addtask-button").addEventListener("click", closeCreateTaskModal);
     }
 
     // adds filterTasksBy click event listener to category buttons
@@ -60,6 +60,7 @@ function addUIClickHandlers() {
     }
     // adds showTopScoresModal click event 
     document.getElementById("topscore-button").addEventListener("click", showTopScoresModal);
+    document.getElementById("close-topscore-button").addEventListener("click", closeTopScoresModal);
 }
 
 /* Function filters tasks by categories and styles selected categories */
@@ -144,13 +145,21 @@ function closeCreateTaskModal() {
 
 function showTopScoresModal() {
     loadTopScorersBy("world");
-    loadTopScorersBy(neighborhood);
-    document.getElementById("topScoresModalWrapper").style.display = "blockF";
-      
+    if (userNeighborhoodIsKnown()){
+      loadTopScorersBy("neighborhood");
+    }
+    document.getElementById("topScoresModalWrapper").style.display = "block";
+}
+
+function closeTopScoresModal() {
+    document.getElementById("topScoresModalWrapper").style.display = "none";
 }
 
 function loadTopScorersBy(location) {
-    const url = "/account?location=" + location;
+    let url = "/account?action=topscorers";
+    if (location === "neighborhood") {
+      url += "&zipcode=" + neighborhood[0] + "&country=" + neighborhood[1];
+    }
     fetch(url)
       .then(response => response.json())
       .then(users => {

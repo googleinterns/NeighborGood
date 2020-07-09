@@ -60,7 +60,7 @@
                   <%
                     }
                   %>
-                  <p class="login-messages"><a id="topscore-button">Check out your neighborhood topscorers!</a></p>
+                  <p class="login-messages"><a id="topscore-button">NeighborGood's Top Scorers</a></p>
               </div>
           </nav>
           <h1 id="title">
@@ -107,7 +107,7 @@
       </section>
       <div class="modalWrapper" id="createTaskModalWrapper">
         <div class="modal" id="createTaskModal">
-            <span class="close-button" id="close-button">&times;</span>
+            <span class="close-button" id="close-addtask-button">&times;</span>
             <form id="new-task-form" action="/tasks" method="POST">
                 <h1>CREATE A NEW TASK: </h1>
                 <div>
@@ -125,37 +125,45 @@
     </div>
     <div class="modalWrapper" id="topScoresModalWrapper">
         <div class="modal" id="topScoresModal">
-            <span class="close-button" id="close-button">&times;</span>
-            <h1>HIGHSCORES</h1>
-            <div id="world-topscores">
-              <table>
-              <%
-              for (int rank = 1; rank <= 10; rank++) {
-                String rowId = "world" + rank;
-              %> 
-                <tr id="<%=rowId%>">
-                  <td class="topscore-rank"><%=rank%>.</td>
-                  <td class="topscore-nickname"></td>
-                  <td class="topscore-score"></td>
-                </tr>
-              <%
-              }
-              %>
-            </div> 
-            <div id="neighborhood-topscore">
-              <table>
-              <%
-              for (int rank = 1; rank <= 10; rank++) {
-                String rowId = "neighborhood" + rank;
-              %> 
-                <tr id="<%=rowId%>">
-                  <td class="topscore-rank"><%=rank%>.</td>
-                  <td class="topscore-nickname"></td>
-                  <td class="topscore-score"></td>
-                </tr>
-              <%
-              }
-              %>
+            <span class="close-button" id="close-topscore-button">&times;</span>
+            <h1 id="topScoresTitle">Top Scorers</h1>
+            <div id="topScoresTitlesWrapper">
+            </div>
+            <div id="topScoresTablesWrapper">
+              <div id="world-topscores" class="topScoresDiv">
+                <h2>World Wide</h2>
+                <table class="topScoresTable">
+                <%
+                for (int rank = 1; rank <= 10; rank++) {
+                  String rowId = "world" + rank;
+                %> 
+                  <tr id="<%=rowId%>">
+                    <td class="topscore-rank topscores"><%=rank%>.</td>
+                    <td class="topscore-nickname topscores">-</td>
+                    <td class="topscore-score topscores">-</td>
+                  </tr>
+                <%
+                }
+                %>
+                </table>
+              </div> 
+              <div id="neighborhood-topscore" class="topScoresDiv">
+                <h2>Nearby Neighbors</h2>
+                <table class="topScoresTable">
+                <%
+                for (int rank = 1; rank <= 10; rank++) {
+                  String rowId = "neighborhood" + rank;
+                %> 
+                  <tr id="<%=rowId%>">
+                    <td class="topscore-rank topscores"><%=rank%>.</td>
+                    <td class="topscore-nickname topscores">-</td>
+                    <td class="topscore-score topscores">-</td>
+                  </tr>
+                <%
+                }
+                %>
+                </table>
+              </div>
             </div>
         </div>
     </div>
