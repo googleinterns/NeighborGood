@@ -16,6 +16,22 @@ const MAPSKEY = config.MAPS_KEY
 let neighborhood = [null , null];
 let currentCategory = "all";
 
+window.onscroll = stickyControlBar;
+
+/* Scroll function so that the control bar sticks to the top of the page */
+function stickyControlBar() {
+    let controlBarWrapper = document.getElementById("control-bar-message-wrapper");
+    let taskListDiv = document.getElementById("tasks-list");
+    const OFFSET = 165;
+    if (window.pageYOffset >= OFFSET || document.body.scrollTop >= OFFSET || document.documentElement.scrollTop >= OFFSET) {
+        controlBarWrapper.style.position = "fixed";
+        taskListDiv.style.marginTop = "165px";
+    } else {
+        controlBarWrapper.style.position = "static";
+        taskListDiv.style.marginTop = "auto";
+    }
+}
+
 /* Calls addUIClickHandlers and getUserNeighborhood once page has loaded */
 if (document.readyState === 'loading') {
     // adds on load event listeners if document hasn't yet loaded
@@ -49,7 +65,7 @@ function filterTasksBy(category) {
     currentCategory = category;
 
     // only fetches tasks if user's neighborhood has been retrieved
-    if (JSON.stringify(neighborhood) != JSON.stringify([null, null])) {
+    if (userNeighborhoodIsKnown()) {
         fetchTasks(category)
             .then(response => displayTasks(response));
     }
@@ -93,7 +109,7 @@ offers to help out, edits the task's status and helper properties, and
 then reloads the task list */
 function confirmHelp(element) {
     const task = element.closest(".task");
-    const url = "tasks/edit?task-id=" + task.dataset.key + "&action=helpout";
+    const url = "/tasks/edit?task-id=" + task.dataset.key + "&action=helpout";
     const request = new Request(url, {method: "POST"});
     fetch(request).then((response) => {
         // checks if another user has already claimed the task
@@ -103,7 +119,7 @@ function confirmHelp(element) {
             window.location.href = '/';
         }
         // fetches tasks again if user's current neighborhood was successfully retrieved and stored
-        else if (JSON.stringify(neighborhood) != JSON.stringify([null, null])) {
+        else if (userNeighborhoodIsKnown()) {
             fetchTasks(currentCategory).then(response => displayTasks(response));
         }
     });
@@ -254,4 +270,8 @@ function addTasksClickHandlers() {
                 });
             }
         }
+}
+
+function userNeighborhoodIsKnown() {
+  return (neighborhood[0] !== null && neighborhood[1] !== null);
 }
