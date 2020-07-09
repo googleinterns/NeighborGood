@@ -497,6 +497,26 @@ async function initMap() {
         });
         map.fitBounds(bounds);
     });
+
+    function onError() {
+        console.log("Unable to resolve the user's current location");
+    }
+
+    function onSuccess(geo) {
+        const position = {
+            lat: geo.coords.latitude,
+            lng: geo.coords.longitude
+        };
+
+        // Set the center to the user's current location
+        map.setCenter(position);
+    }
+
+    if (!navigator.geolocation) {
+        onError();
+    } else {
+        await navigator.geolocation.getCurrentPosition(onSuccess, onError);
+    }
 }
 
 function displayMarker(position) {
