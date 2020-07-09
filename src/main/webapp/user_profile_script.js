@@ -531,6 +531,11 @@ function displayMarker(position) {
         deleteMarker(lat, lng);
     })
     
+    // There is at most one marker displayed on the map
+    if (markers.length > 0) {
+        markers[0].setMap(null);
+    }
+    markers = [];
     markers.push(marker);
     return marker;
 }
