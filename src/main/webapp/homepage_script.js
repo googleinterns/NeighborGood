@@ -127,21 +127,27 @@ function closeCreateTaskModal() {
 }
 
 function showTopScoresModal() {
-  fetch("/account")
-    .then(response => response.json())
-    .then(users => {
-      for (int i = 0; i < users.length; i++) {
-        let points = users[i].propertyMap.points;
-        let nickname = users[i].propertyMap.nickname;
-        let rowId = "rank" + (i + 1);
-        let rowNickname = document.getElementById(rowId).childNodes[0];
-        let rowScore = document.getElementById(rowId).childNodes[1];
-        rowNickname.innerText = nickname;
-        rowScore.innerText = points;
-      }
-      document.getElementById("topScoresModalWrapper").style.display = "block";
-    });
+    loadTopScorersBy("world");
+    loadTopScorersBy(neighborhood);
+    document.getElementById("topScoresModalWrapper").style.display = "blockF";
+      
+}
 
+function loadTopScorersBy(location) {
+    const url = "/account?location=" + location;
+    fetch(url)
+      .then(response => response.json())
+      .then(users => {
+        for (let i = 0; i < users.length; i++) {
+          let points = users[i].points;
+          let nickname = users[i].nickname;
+          let rowId = location + (i + 1);
+          let rowNickname = document.getElementById(rowId).getElementsByClassName("topscore-nickname")[0];
+          let rowScore = document.getElementById(rowId).getElementsByClassName("topscore-score")[0];
+          rowNickname.innerText = nickname;
+          rowScore.innerText = points;
+        }
+    });
 }
 // If the user clicks outside of the modals, closes the modals directly
 window.onclick = function(event) {

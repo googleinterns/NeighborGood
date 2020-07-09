@@ -14,7 +14,9 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
+import com.google.neighborgood.User;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -80,11 +82,14 @@ public class UserInfoServlet extends HttpServlet {
     Query query = new Query("UserInfo").addSort("points", SortDirection.DESCENDING);
     List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(5));
 
-    List<Task> users = new ArrayList<>();
-    for (Entity entity : results) {}
+    List<User> users = new ArrayList<>();
+
+    for (Entity entity : results) {
+      users.add(new User(entity));
+    }
 
     Gson gson = new Gson();
     response.setContentType("application/json;");
-    response.getWriter().println(gson.toJson(results));
+    response.getWriter().println(gson.toJson(users));
   }
 }

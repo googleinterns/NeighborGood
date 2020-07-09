@@ -22,7 +22,7 @@ public final class User {
   private final String phone;
   private final String email;
   private final String userId;
-  private final int points;
+  private final long points;
 
   public User(Entity entity) {
 
@@ -31,6 +31,6 @@ public final class User {
     this.phone = (String) entity.getProperty("phone");
     this.email = (String) entity.getProperty("email");
     this.userId = (String) entity.getProperty("userId");
-    this.points = (Integer) entity.getProperty("points");
+    this.points = (Long) entity.getProperty("points");
   }
 }

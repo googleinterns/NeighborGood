@@ -264,6 +264,22 @@ section {
   width: 60%;
 }
 
+table {
+  width: 50%;
+}
+
+tr:nth-child(even) {
+  background-color: #eee;
+}
+
+tr:nth-child(odd) {
+  background-color: #fff;
+}
+
+td {
+  text-align: center;
+}
+
 @media only screen and (max-width: 600px) {
   #title {
     font-size: 2.5em;

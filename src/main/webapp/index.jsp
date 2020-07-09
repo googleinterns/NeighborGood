@@ -119,21 +119,36 @@
         <div class="modal" id="topScoresModal">
             <span class="close-button" id="close-button">&times;</span>
             <h1>HIGHSCORES</h1>
-            <div id="topscores">
+            <div id="world-topscores">
               <table>
               <%
-              for (int rank = 1; rank <= 5; rank++) {
-                String rowId = "rank" + rank;
+              for (int rank = 1; rank <= 10; rank++) {
+                String rowId = "world" + rank;
               %> 
                 <tr id="<%=rowId%>">
                   <td class="topscore-rank"><%=rank%>.</td>
-                  <td class="topscore-nickname">Mafe</td>
-                  <td class="topscore-score">150</td>
+                  <td class="topscore-nickname"></td>
+                  <td class="topscore-score"></td>
                 </tr>
               <%
               }
               %>
             </div> 
+            <div id="neighborhood-topscore">
+              <table>
+              <%
+              for (int rank = 1; rank <= 10; rank++) {
+                String rowId = "neighborhood" + rank;
+              %> 
+                <tr id="<%=rowId%>">
+                  <td class="topscore-rank"><%=rank%>.</td>
+                  <td class="topscore-nickname"></td>
+                  <td class="topscore-score"></td>
+                </tr>
+              <%
+              }
+              %>
+            </div>
         </div>
     </div>
   </body>
