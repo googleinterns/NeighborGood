@@ -71,7 +71,7 @@ main h1 {
   border-radius: inherit;
 }
 
-#card-container {
+.card-container {
   max-height: 600px;
   max-width: 500px;
   min-width: 500px;
@@ -195,7 +195,7 @@ main h1 {
   text-decoration: none;
 }
 
-.popup form input {
+#popup form input {
   display: block;
   padding: 20px;
   outline: none;
@@ -203,11 +203,11 @@ main h1 {
   margin: 20px;
 }
 
-.popup form input[type=text] {
+#popup form input[type=text] {
   width: 40%;
 }
 
-.popup form input[type=submit] {
+#popup form input[type=submit] {
   background: #1d1d1b;
   color: #c7c7c7;
 }
