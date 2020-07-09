@@ -32,7 +32,6 @@ public final class Task {
   private final String owner;
   private final String helper;
   private final String address;
-  private final String userId;
   private final String zipcode;
   private final String country;
   private final String category;

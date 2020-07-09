@@ -98,12 +98,19 @@ public class TaskServlet extends HttpServlet {
       out.append("<div class='task-header'>");
 
       // Retrieves task's user to get user's nickname
-      String taskUserId = (String) entity.getProperty("userId");
+      String taskOwner = (String) entity.getProperty("Owner");
       Query userQuery =
           new Query("UserInfo")
-              .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, taskUserId));
+              .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, taskOwner));
       PreparedQuery userResults = datastore.prepare(userQuery);
       Entity userEntity = userResults.asSingleEntity();
+
+      if (userEntity == null) {
+        System.err.println("Unable to find the user entity based on the current user id");
+        response.sendError(
+            HttpServletResponse.SC_NOT_FOUND, "The requested user could not be found");
+        return;
+      }
 
       out.append("<div class='username'>")
           .append((String) userEntity.getProperty("nickname"))
@@ -174,7 +181,6 @@ public class TaskServlet extends HttpServlet {
 
     // Create an Entity that stores the input comment
     Entity taskEntity = new Entity("Task");
-    taskEntity.setProperty("userId", userId);
     taskEntity.setProperty("detail", taskDetail);
     taskEntity.setProperty("timestamp", creationTime);
     taskEntity.setProperty("reward", rewardPts);
