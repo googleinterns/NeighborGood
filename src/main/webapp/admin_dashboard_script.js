@@ -146,10 +146,8 @@ function getUserTasks() {
   fetch("/user-tasks")
     .then((response) => response.json())
     .then((tasks) => {
-      
-      console.log(tasks);
       userTasksArray = tasks;
-      let taskSection = document.getElementById("tasks-container");
+      let taskSection = document.getElementById("user-tasks");
       for (userTask of tasks) {
         taskSection.innerHTML += addTask(userTask);
       }
@@ -157,7 +155,7 @@ function getUserTasks() {
 }
 
 function addTask(task) {
-  let string = `<a href="#popup-overlay"><li class="admin-task user-task"  onclick="openWithPopup(${task.key.id})"><h3> ${task.propertyMap.category} </h3>`;
+  let string = `<a href="#popup-overlay"><li class="user-task"  onclick="openWithPopup(${task.key.id})"><h3> ${task.propertyMap.category} </h3>`;
   string += `<h4> ${task.propertyMap.Owner} </h4></li></a>`;
   return string;
 }
@@ -172,7 +170,6 @@ function searchTasks(id){
 
 async function openWithPopup(id){
   const task = await searchTasks(id);
-  console.log(task);
   document.getElementById("task-details").value = task.propertyMap.detail;
   document.getElementById("category").value = task.propertyMap.category;
 }

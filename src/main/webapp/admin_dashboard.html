@@ -13,10 +13,10 @@
       <main>
         <h1>Admin Prototype</h1>
         <div class="flex-grid">
-          <div id="card-container">
+          <div class="card-container">
             <h2>Administrator Tasks</h2>
             <div id="card-div">
-              <ul class="admin-tasks">
+              <ul id="admin-tasks">
                 <li class="admin-task">
                   <h3>New Homepage Design</h3>
                   <h4>Mafe Ponce</h4>
@@ -78,10 +78,10 @@
             <h2>Map</h2>
             <div id="map-div"></div>
           </div>
-          <div id="card-container">
+          <div class="card-container">
             <h2> Last 10 User Tasks</h2>
             <div id="card-div">
-              <ul id="tasks-container" class="admin-tasks">
+              <ul id="user-tasks">
               </ul>
             </div>
           </div>
@@ -89,18 +89,16 @@
       </main>
     </div>
     <div id="popup-overlay">
-		<div class="popup">
-			<h2>Edit Info for Task</h2>
+		<div id="popup">
+			<h2>Edit Task</h2>
 			<form action="">
 				<input type="text" placeholder="Task Details" id="task-details">
 
 				<input type="text" placeholder="Category" id="category">
 				<input type="submit" value="Submit">
 			</form>
-			<a href="#" class="popup-close">&times;</a>
+			<a href="#" id="popup-close">&times;</a>
 		</div>
 	</div>
-	
-	<h1>Click <a href="#popup-overlay">here</a> to open the popup box</h1>
   </body>
 </html>
