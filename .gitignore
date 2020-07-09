@@ -2,3 +2,4 @@
 .idea
 /src/main/webapp/config.js
 /src/main/webapp/WEB-INF/appengine-generated
+/node_modules
