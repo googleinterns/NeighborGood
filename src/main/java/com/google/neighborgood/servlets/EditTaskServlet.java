@@ -132,9 +132,6 @@ public class EditTaskServlet extends HttpServlet {
       return;
     }
 
-    Key taskKey = KeyFactory.stringToKey(keyString);
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity task;
     try {
       task = datastore.get(taskKey);
     } catch (EntityNotFoundException e) {
