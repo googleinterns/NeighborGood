@@ -115,7 +115,7 @@ public class TaskServlet extends HttpServlet {
           out.append(userNickname);
         } catch (EntityNotFoundException e) {
           System.err.println(
-              "Unable to find the user entity based on the current user id. Setting a default nickname.");
+              "Unable to find the task's owner info to retrieve the owner's nickname. Setting a default nickname.");
           out.append("Neighbor");
         }
       }
