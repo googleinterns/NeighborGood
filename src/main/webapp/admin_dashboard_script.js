@@ -171,10 +171,9 @@ function searchTasks(id){
 
 async function openWithPopup(id){
   const task = await searchTasks(id);
-  document.getElementById("owner").value = task.propertyMap.Owner;
-  document.getElementById("category").value = task.propertyMap.category;
-  document.getElementById("task-details").value = task.propertyMap.detail;
-  document.getElementById("reward").value = task.propertyMap.reward;
+  document.getElementById("task-detail-input").value = task.propertyMap.detail;
+  document.getElementById("reward-input").value = task.propertyMap.reward;
+  document.getElementById("task-id-input").value = id;
 }
 
 async function deleteTask(keyString) {

@@ -91,12 +91,11 @@
     <div id="popup-overlay">
 		<div id="popup">
 			<h2>Edit Task</h2>
-			<form name="edit-form">
-				Owner: <input type="text" id="owner" name="owner">
-				Category: <input type="text" id="category" name="category">
-                Task Details: <input type="text" id="task-details" name="task-details">
-				Reward: <input type="text" id="reward" name="reward">
+			<form action="/tasks/edit" method="POST">
+                Task Details: <input type="text" id="task-detail-input" name="task-detail-input">
+				Reward: <input type="text" id="reward-input" name="reward-input" min="0" max="200">
 				<input type="submit" value="Submit">
+                <input type="hidden" name="task-id" id="task-id-input">
 			</form>
 			<a href="#" id="popup-close">&times;</a>
 		</div>
