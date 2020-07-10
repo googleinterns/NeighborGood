@@ -9,19 +9,33 @@
   </head>
   <%@ page import = "com.google.appengine.api.users.UserService" %>
   <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
+  <%@ page import = "com.google.neighborgood.helper.RetrieveUserInfo" %>
+  <%@ page import = "java.util.List" %>
   <% UserService userService = UserServiceFactory.getUserService();
-  if (userService.isUserLoggedIn()) { %>
+  if (!userService.isUserLoggedIn()) { 
+      response.sendRedirect(userService.createLoginURL("/account.jsp"));
+  } else {
+    List<String> userInfo = RetrieveUserInfo.getInfo(userService);
+    if (userInfo == null) {
+        response.sendRedirect("/account.jsp");
+        return;
+    } else {
+        String urlToRedirectAfterUserLogsOut = "/index.jsp";
+        String logoutURL = userService.createLogoutURL(urlToRedirectAfterUserLogsOut);
+        String nickname = userInfo.get(0);
+        String points = userInfo.get(3); %>
   <body onload="showNeedHelp()">
     <div id="nav-bar">
-        <p id="return-link"><a href="index.jsp">BACK TO HOME</a></p>
-        <p id="log-out-link">Leonard Zhang |  <a href="logout.html">Logout</a></p>
+        <p id="return-link"><a href="index.jsp">BACK TO HOME</a> |    </p>
+        <i class="fa fa-cog fa-2x" id="info-setting" onclick="editInfo()"></i>
+        <p id="log-out-link"><%=nickname%> |  <a href="<%=logoutURL%>">Logout</a></p>
     </div>
-    <div style="clear: both"></div>
+    <div class="empty"></div>
     <div id="header">
         <h1 id="title">My Tasks</h1>
-        <p id="points">My current points: 347pts</p>
+        <p id="points">My current points: <%=points%>pts</p>
     </div>
-    <div style="clear: both"><div/>
+    <div class="empty"><div/>
     <hr/>
     <div id="button-container-wrap">
         <div id="container">
@@ -90,10 +104,18 @@
                     <label for="task-detail-input">Task Detail:</label>
                     <br/>
                 </div>
-                <textarea name="task-detail-input" id="task-detail-input" placeholder="Describe your task here:"></textarea>
+                <textarea name="task-detail-input" id="task-detail-input" required="true" placeholder="Describe your task here:"></textarea>
                 <br/>
                 <label for="rewarding-point-input">Rewarding Points:</label>
-                <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50">
+                <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50" required="true">
+                <br/>
+                <label for="category-input">Task Category:</label>
+                <select name="category-input" id="category-input" form="new-task-form">
+                  <option value="garden">Garden</option>
+                  <option value="shopping">Shopping</option>
+                  <option value="pets">Pets</option>
+                  <option value="misc">Misc</option>
+                </select>
                 <br/><br/>
                 <input type="submit" />
             </form>
@@ -108,11 +130,47 @@
                     <label for="edit-detail-input">Task Detail:</label>
                     <br/>
                 </div>
-                <textarea name="task-detail-input" id="edit-detail-input"></textarea>
+                <textarea name="task-detail-input" id="edit-detail-input" required="true"></textarea>
                 <br/>
                 <label for="edit-point-input">Rewarding Points: </label>
-                <input type="number" id="edit-point-input" name="reward-input" min="0" max="200">
+                <input type="number" id="edit-point-input" name="reward-input" min="0" max="200" required="true">
                 <input type="hidden" name="task-id" id="task-id-input">
+                <br/>
+                <label for="edit-category-input">Task Category:</label>
+                <select name="edit-category-input" id="edit-category-input" form="edit-task-form">
+                  <option value="garden">Garden</option>
+                  <option value="shopping">Shopping</option>
+                  <option value="pets">Pets</option>
+                  <option value="misc">Misc</option>
+                </select>
+                <br/>
+                <br/>
+                <input type="submit" />
+            </form>
+        </div>
+    </div>
+    <div class="modalWrapper" id="updateInfoModalWrapper">
+        <div class="modal" id="updateInfoModal">
+            <span class="close-button" id="info-close-button" onclick="closeInfoModal()">&times;</span>
+            <form id="update-info-form" action="/account" method="POST">
+                <h1>EDIT YOUR PERSONAL INFORMATION: </h1>
+                <div>
+                    <label for="edit-nickname-input">New nickname:</label>
+                    <br/>
+                </div>
+                <textarea name="nickname-input" id="edit-nickname-input" required="true"></textarea>
+                <br/>
+                <div>
+                    <label for="edit-address-input">New address:</label>
+                    <br/>
+                </div>
+                <textarea name="address-input" id="edit-address-input" required="true"></textarea>
+                <br/>
+                <div>
+                    <label for="edit-phone-number-input">New phone number:</label>
+                    <br/>
+                </div>
+                <textarea name="phone-input" id="edit-phone-number-input" required="true"></textarea>
                 <br/>
                 <br/>
                 <input type="submit" />
@@ -121,8 +179,7 @@
     </div>
   </body>
   <%
-  } else {
-      response.sendRedirect(userService.createLoginURL("/"));
+    }
   }
   %>
 </html>

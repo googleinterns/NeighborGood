@@ -14,6 +14,23 @@
 
 const MAPSKEY = config.MAPS_KEY
 let neighborhood = [null , null];
+let currentCategory = "all";
+
+window.onscroll = stickyControlBar;
+
+/* Scroll function so that the control bar sticks to the top of the page */
+function stickyControlBar() {
+    let controlBarWrapper = document.getElementById("control-bar-message-wrapper");
+    let taskListDiv = document.getElementById("tasks-list");
+    const OFFSET = 165;
+    if (window.pageYOffset >= OFFSET || document.body.scrollTop >= OFFSET || document.documentElement.scrollTop >= OFFSET) {
+        controlBarWrapper.style.position = "fixed";
+        taskListDiv.style.marginTop = "165px";
+    } else {
+        controlBarWrapper.style.position = "static";
+        taskListDiv.style.marginTop = "auto";
+    }
+}
 
 /* Calls addUIClickHandlers and getUserNeighborhood once page has loaded */
 if (document.readyState === 'loading') {
@@ -43,48 +60,15 @@ function addUIClickHandlers() {
     }
 }
 
-/* Function adds all the necessary tasks 'click' event listeners*/
-function addTasksClickHandlers() {
-
-    // adds removeTask click event listener to remove task buttons
-    const removeTaskButtons = document.getElementsByClassName("removetask");
-    for (let i = 0; i < removeTaskButtons.length; i++){
-        if (document.body.contains(removeTaskButtons[i])){
-            removeTaskButtons[i].addEventListener("click", function(e) {
-            	removeTask(e.target);
-        	});
-        }
-    }
-    // adds cancelHelpOut click event listener to exit confirm buttons
-    const exitConfirmButtons = document.getElementsByClassName("exit-confirm");
-    for (let i = 0; i < exitConfirmButtons.length; i++) {
-        if (document.body.contains(exitConfirmButtons[i])){
-            exitConfirmButtons[i].addEventListener("click", function(e) {
-                cancelHelpOut(e.target);
-            });
-        }
-    }
-    // adds helpOut click event listener to help out buttons
-    const helpOutButtons = document.getElementsByClassName("help-button");
-        for (let i = 0; i < helpOutButtons.length; i++) {
-            if (document.body.contains(helpOutButtons[i])){
-                if (!helpOutButtons[i].classList.contains("disable-help")) {
-                    helpOutButtons[i].addEventListener("click", function(e) {
-                        helpOut(e.target);
-                    });
-                }
-            }
-        }
-}
-
 /* Function filters tasks by categories and styles selected categories */
 function filterTasksBy(category) {
+    currentCategory = category;
 
-// only fetches tasks if user's neighborhood has been retrieved
-if (JSON.stringify(neighborhood) != JSON.stringify([null, null])) {
-    fetchTasks(category)
-        .then(response => displayTasks(response));
-}
+    // only fetches tasks if user's neighborhood has been retrieved
+    if (userNeighborhoodIsKnown()) {
+        fetchTasks(category)
+            .then(response => displayTasks(response));
+    }
 	// Unhighlights and resets styling for all category buttons
     const categoryButtons = document.getElementsByClassName("categories");
     for (let i = 0; i < categoryButtons.length; i++){
@@ -113,21 +97,37 @@ if (JSON.stringify(neighborhood) != JSON.stringify([null, null])) {
     }
 }
 
-/* Function that display the help out confirmation overlay */
+/* Function that display the help out overlay */
 function helpOut(element) {
     const task = element.closest(".task");
-    const overlay = task.getElementsByClassName("confirm-overlay");
+    const overlay = task.getElementsByClassName("help-overlay");
     overlay[0].style.display = "block";
 }
 
-/* Function that hides the task after user confirms they want to help out */
-function removeTask(element) {
-    element.closest(".task").style.display = "none";
+/* Function sends a fetch request to the edit task servlet when the user
+offers to help out, edits the task's status and helper properties, and
+then reloads the task list */
+function confirmHelp(element) {
+    const task = element.closest(".task");
+    const url = "/tasks/edit?task-id=" + task.dataset.key + "&action=helpout";
+    const request = new Request(url, {method: "POST"});
+    fetch(request).then((response) => {
+        // checks if another user has already claimed the task
+        if (response.status == 409) {
+            window.alert
+                ("We're sorry, but the task you're trying to help with has already been claimed by another user.");
+            window.location.href = '/';
+        }
+        // fetches tasks again if user's current neighborhood was successfully retrieved and stored
+        else if (userNeighborhoodIsKnown()) {
+            fetchTasks(currentCategory).then(response => displayTasks(response));
+        }
+    });
 }
 
-/* Function that hides the help out confirmation overlay */
-function cancelHelpOut(element) {
-	element.closest(".confirm-overlay").style.display = "none";
+/* Function that hides the help out overlay */
+function exitHelp(element) {
+	element.closest(".help-overlay").style.display = "none";
 }
 
 /* Leonard's implementation of the Add Task modal */
@@ -173,14 +173,25 @@ function getUserNeighborhood() {
 }
 
 /* Function that returns a promise to get and return the user's location */
- function getUserLocation() {
+function getUserLocation() {
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 var location = {lat: position.coords.latitude, lng: position.coords.longitude};
                 resolve(location);
-            }, function() {
-                reject("User location failed");
+            }, function(err) {
+                // Check to see if this failed because we're in an insecure
+                // context, such as a local dev environment that isn't
+                // http://localhost (https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts).
+                if (err.code === 1 && !window.isSecureContext) {
+                    if (config.LOCAL_DEV_LAT_LNG) {
+                        resolve(config.LOCAL_DEV_LAT_LNG);
+                    } else {
+                        reject("User location failed");
+                    }
+                } else {
+                    reject("User location failed");
+                }
             });
         } else {
             reject("User location is not supported by this browser");
@@ -231,7 +242,6 @@ function displayTasks(response) {
     response.json().then(html => {
         if (html){
             document.getElementById("no-tasks-message").style.display = "none";
-            document.getElementById("location-missing-message").style.display = "none";
             document.getElementById("tasks-message").style.display = "block";
             document.getElementById("tasks-list").innerHTML = html;
             document.getElementById("tasks-list").style.display = "block";
@@ -239,8 +249,40 @@ function displayTasks(response) {
         } else {
             document.getElementById("no-tasks-message").style.display = "block";
             document.getElementById("tasks-message").style.display = "none";
-            document.getElementById("location-missing-message").style.display = "none";
             document.getElementById("tasks-list").style.display = "none";
         }
     });
+}
+
+/* Function adds all the necessary tasks 'click' event listeners*/
+function addTasksClickHandlers() {
+
+    // adds confirmHelp click event listener to confirm help buttons
+    const confirmHelpButtons = document.getElementsByClassName("confirm-help");
+    for (let i = 0; i < confirmHelpButtons.length; i++){
+        confirmHelpButtons[i].addEventListener("click", function(e) {
+            confirmHelp(e.target);
+        });
+        
+    }
+    // adds exitHelp click event listener to exit help buttons
+    const exitHelpButtons = document.getElementsByClassName("exit-help");
+    for (let i = 0; i < exitHelpButtons.length; i++) {
+        exitHelpButtons[i].addEventListener("click", function(e) {
+            exitHelp(e.target);
+        });
+    }
+    // adds helpOut click event listener to help out buttons
+    const helpOutButtons = document.getElementsByClassName("help-out");
+        for (let i = 0; i < helpOutButtons.length; i++) {
+            if (!helpOutButtons[i].classList.contains("disable-help")) {
+                helpOutButtons[i].addEventListener("click", function(e) {
+                    helpOut(e.target);
+                });
+            }
+        }
+}
+
+function userNeighborhoodIsKnown() {
+  return (neighborhood[0] !== null && neighborhood[1] !== null);
 }

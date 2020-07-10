@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
 <!--
  Copyright 2020 Google LLC
 
@@ -15,12 +15,17 @@
  limitations under the License.
 -->
 
-<appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-  <threadsafe>false</threadsafe>
-  <sessions-enabled>true</sessions-enabled>
-  <runtime>java8</runtime>
-  <static-files>
-    <!-- prevent unwanted caching when accessing via the web preview server -->
-    <include path="/**" expiration="0s" />
-  </static-files>
-</appengine-web-app>
+<html>
+	<head>
+        <title>400 Page</title>
+		<link rel="stylesheet" href="404_style.css">
+        <meta http-equiv="refresh" content="5;url=/account.jsp">
+
+	</head>
+	<body>
+		<div id="main">
+			<h1>Error 400</h1>
+			<p>All input fields cannot be empty</p>
+		</div>
+	</body>
+</html>

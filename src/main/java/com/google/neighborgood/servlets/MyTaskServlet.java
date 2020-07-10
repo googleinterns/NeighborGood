@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.sps.servlets;
+package com.google.neighborgood.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -24,8 +24,10 @@ import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
-import com.google.sps.task.Task;
+import com.google.neighborgood.task.Task;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +41,17 @@ import javax.servlet.http.HttpServletResponse;
 public class MyTaskServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // "Leonard" will be replaced with the user's accound id in the future
     String keyword = request.getParameter("keyword");
+    UserService userService = UserServiceFactory.getUserService();
+    if (!userService.isUserLoggedIn()) {
+      response.sendRedirect(userService.createLoginURL("/account.jsp"));
+      return;
+    }
     // keyword is either "Owner" or "Helper". Depending on the keyword, the filter will filter
     // on different fields accordingly.
-    Filter filter = new FilterPredicate(keyword, FilterOperator.EQUAL, "Leonard");
+    Filter filter =
+        new FilterPredicate(
+            keyword, FilterOperator.EQUAL, userService.getCurrentUser().getUserId());
 
     // Depending on the input complete parameter, the status filter will be different.
     String complete = request.getParameter("complete");
