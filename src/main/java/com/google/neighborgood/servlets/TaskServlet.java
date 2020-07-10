@@ -21,6 +21,7 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.PropertyProjection;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
@@ -112,6 +113,7 @@ public class TaskServlet extends HttpServlet {
         Query userQuery =
             new Query("UserInfo")
                 .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, taskOwner));
+        query.addProjection(new PropertyProjection("nickname", String.class));
         PreparedQuery userResults = datastore.prepare(userQuery);
         Entity userEntity = userResults.asSingleEntity();
 
