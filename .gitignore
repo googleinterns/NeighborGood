@@ -1,3 +1,5 @@
 /target
 .idea
 /src/main/webapp/config.js
+/WEB-INF/appengine-generated
+/node_modules
