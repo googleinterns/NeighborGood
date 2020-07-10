@@ -40,7 +40,7 @@ public final class User {
     this.isCurrentUser = false;
   }
 
-  public void isCurrentUser() {
+  public void setCurrentUser() {
     this.isCurrentUser = true;
   }
 
