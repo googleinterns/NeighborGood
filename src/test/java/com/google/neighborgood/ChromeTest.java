@@ -44,11 +44,11 @@ public class ChromeTest {
   @Test
   public void test() {
     WebDriverWait wait = new WebDriverWait(driver, 30);
-    driver.get("https://neighborgood-step.appspot.com/");
-    By loginLogout = By.id("title");
-    wait.until(presenceOfElementLocated(loginLogout));
-    WebElement element = driver.findElement(loginLogout);
+    driver.get("http://localhost:8080/");
+    By title = By.id("title");
+    wait.until(presenceOfElementLocated(title));
+    WebElement element = driver.findElement(title);
     String actualElementText = element.getText();
-    assertEquals("Login to help out a neighbor!", actualElementText);
+    assertEquals("NeighborGood", actualElementText);
   }
 }
