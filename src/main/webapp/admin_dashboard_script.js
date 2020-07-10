@@ -176,3 +176,11 @@ async function openWithPopup(id){
   document.getElementById("task-details").value = task.propertyMap.detail;
   document.getElementById("reward").value = task.propertyMap.reward;
 }
+
+async function deleteTask(keyString) {
+  if (confirm("Are you sure that you want to delete the task?")) {
+    const queryURL = "/tasks?key=" + keyString;
+    const request = new Request(queryURL, {method: "DELETE"});
+    const response = await fetch(request);
+  }
+}
