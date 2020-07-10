@@ -17,14 +17,11 @@ package com.google.neighborgood.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.PropertyProjection;
 import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -104,27 +101,22 @@ public class TaskServlet extends HttpServlet {
       out.append("<div class='task-header'>");
       out.append("<div class='user-nickname'>");
 
-      // Retrieves task's user to get user's nickname
+      // Checks if tasks's user nickname has already been retrieved,
+      // otherwise retrieves it and temporarily stores it
       String taskOwner = (String) entity.getProperty("Owner");
-
       if (usersNicknames.containsKey(taskOwner)) {
         out.append(usersNicknames.get(taskOwner));
       } else {
-        Query userQuery =
-            new Query("UserInfo")
-                .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, taskOwner));
-        query.addProjection(new PropertyProjection("nickname", String.class));
-        PreparedQuery userResults = datastore.prepare(userQuery);
-        Entity userEntity = userResults.asSingleEntity();
-
-        if (userEntity == null) {
-          System.err.println(
-              "Unable to find the user entity based on the current user id. Setting a default nickname.");
-          out.append("Neighbor");
-        } else {
+        Key taskOwnerKey = entity.getParent();
+        try {
+          Entity userEntity = datastore.get(taskOwnerKey);
           String userNickname = (String) userEntity.getProperty("nickname");
           usersNicknames.put(taskOwner, userNickname);
           out.append(userNickname);
+        } catch (EntityNotFoundException e) {
+          System.err.println(
+              "Unable to find the user entity based on the current user id. Setting a default nickname.");
+          out.append("Neighbor");
         }
       }
       out.append("</div>");
@@ -192,24 +184,34 @@ public class TaskServlet extends HttpServlet {
 
     String userId = userService.getCurrentUser().getUserId();
 
-    // Create an Entity that stores the input comment
-    Entity taskEntity = new Entity("Task");
-    taskEntity.setProperty("detail", taskDetail);
-    taskEntity.setProperty("timestamp", creationTime);
-    taskEntity.setProperty("reward", rewardPts);
-    taskEntity.setProperty("status", "OPEN");
-    taskEntity.setProperty("Owner", userId);
-    taskEntity.setProperty("Helper", "N/A");
-    taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
-    taskEntity.setProperty("zipcode", "98033");
-    taskEntity.setProperty("country", "United States");
-    taskEntity.setProperty("category", "misc");
-
+    // Retrieves current user entity to include as the task's parent
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    datastore.put(taskEntity);
+    Key userEntityKey = KeyFactory.createKey("UserInfo", userId);
 
-    // Redirect back to the user page.
-    response.sendRedirect("/user_profile.jsp");
+    try {
+      Entity userEntity = datastore.get(userEntityKey);
+      // Create an Entity that stores the input comment
+      Entity taskEntity = new Entity("Task", userEntity.getKey());
+      taskEntity.setProperty("detail", taskDetail);
+      taskEntity.setProperty("timestamp", creationTime);
+      taskEntity.setProperty("reward", rewardPts);
+      taskEntity.setProperty("status", "OPEN");
+      taskEntity.setProperty("Owner", userId);
+      taskEntity.setProperty("Helper", "N/A");
+      taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
+      taskEntity.setProperty("zipcode", "98033");
+      taskEntity.setProperty("country", "United States");
+      taskEntity.setProperty("category", "misc");
+      datastore.put(taskEntity);
+
+      // Redirect back to the user page.
+      response.sendRedirect("/user_profile.jsp");
+    } catch (EntityNotFoundException e) {
+      System.err.println("Unable to find the UserInfo entity based on the current user id");
+      response.sendError(
+          HttpServletResponse.SC_NOT_FOUND, "The requested user info could not be found");
+      return;
+    }
   }
 
   @Override
