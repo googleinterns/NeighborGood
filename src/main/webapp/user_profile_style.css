@@ -172,12 +172,14 @@ table button:hover i {
 }
 
 .edit-task:hover,
-.complete-task:hover {
+.complete-task:hover,
+.verify-task:hover {
   background-color: #4caf50;
 }
 
 .delete-task:hover,
-.abandon-task:hover {
+.abandon-task:hover,
+.disapprove-task:hover {
   background-color: red;
 }
 
