@@ -110,6 +110,14 @@
                 <br/>
                 <label for="rewarding-point-input">Rewarding Points:</label>
                 <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50" required="true">
+                <br/>
+                <label for="category-input">Task Category:</label>
+                <select name="category-input" id="category-input" form="new-task-form">
+                  <option value="garden">Garden</option>
+                  <option value="shopping">Shopping</option>
+                  <option value="pets">Pets</option>
+                  <option value="misc">Misc</option>
+                </select>
                 <br/><br/>
                 <input type="submit" />
             </form>
@@ -129,6 +137,14 @@
                 <label for="edit-point-input">Rewarding Points: </label>
                 <input type="number" id="edit-point-input" name="reward-input" min="0" max="200" required="true">
                 <input type="hidden" name="task-id" id="task-id-input">
+                <br/>
+                <label for="edit-category-input">Task Category:</label>
+                <select name="edit-category-input" id="edit-category-input" form="edit-task-form">
+                  <option value="garden">Garden</option>
+                  <option value="shopping">Shopping</option>
+                  <option value="pets">Pets</option>
+                  <option value="misc">Misc</option>
+                </select>
                 <br/>
                 <br/>
                 <input type="submit" />

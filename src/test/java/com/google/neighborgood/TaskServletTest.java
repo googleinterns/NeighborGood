@@ -107,6 +107,7 @@ public final class TaskServletTest {
 
     when(request.getParameter("reward-input")).thenReturn("50");
     when(request.getParameter("task-detail-input")).thenReturn("Help me please");
+    when(request.getParameter("category-input")).thenReturn("misc");
 
     new TaskServlet().doPost(request, response);
 
@@ -136,6 +137,7 @@ public final class TaskServletTest {
 
       when(request.getParameter("reward-input")).thenReturn(rewardPts);
       when(request.getParameter("task-detail-input")).thenReturn(taskContent);
+      when(request.getParameter("category-input")).thenReturn("misc");
 
       // Send a POST request to the task servlet
       new TaskServlet().doPost(request, response);

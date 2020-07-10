@@ -144,6 +144,14 @@ public class TaskServlet extends HttpServlet {
       return;
     }
 
+    // Get task category from the form input
+    String taskCategory = request.getParameter("category-input");
+    if (taskCategory == null || taskCategory.isEmpty()) {
+      System.err.println("The task must have a category");
+      response.sendRedirect("/400.html");
+      return;
+    }
+
     // Get the task detail from the form input
     String taskDetail = "";
     String input = request.getParameter("task-detail-input");
@@ -197,6 +205,7 @@ public class TaskServlet extends HttpServlet {
     taskEntity.setProperty("zipcode", zipcode);
     taskEntity.setProperty("country", country);
     taskEntity.setProperty("category", "misc");
+    taskEntity.setProperty("category", taskCategory);
 
     datastore.put(taskEntity);
 
