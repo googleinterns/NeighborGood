@@ -184,7 +184,7 @@ public class TaskServlet extends HttpServlet {
 
     String userId = userService.getCurrentUser().getUserId();
 
-    // Retrieves current user entity to include as the task's parent
+    // Creates current user entity key to include as the task's parent
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Key userEntityKey = KeyFactory.createKey("UserInfo", userId);
 
