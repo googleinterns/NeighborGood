@@ -31,6 +31,7 @@ import com.google.gson.Gson;
 import com.google.neighborgood.helper.RewardingPoints;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -83,6 +84,10 @@ public class TaskServlet extends HttpServlet {
 
     StringBuilder out = new StringBuilder();
 
+    // Stores task owner's user info to prevent querying multiple
+    // times in datastore for the same user's info
+    HashMap<String, String> usersNicknames = new HashMap<String, String>();
+
     // Builds and stores HTML for each task
     for (Entity entity : results) {
       out.append("<div class='task' data-key='")
@@ -96,23 +101,30 @@ public class TaskServlet extends HttpServlet {
       }
       out.append("<div class='task-container'>");
       out.append("<div class='task-header'>");
+      out.append("<div class='user-nickname'>");
 
       // Retrieves task's user to get user's nickname
       String taskOwner = (String) entity.getProperty("Owner");
-      Query userQuery =
-          new Query("UserInfo")
-              .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, taskOwner));
-      PreparedQuery userResults = datastore.prepare(userQuery);
-      Entity userEntity = userResults.asSingleEntity();
 
-      out.append("<div class='user-nickname'>");
+      if (usersNicknames.containsKey(taskOwner)) {
+        out.append(usersNicknames.get(taskOwner));
+      } else {
+        Query userQuery =
+            new Query("UserInfo")
+                .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, taskOwner));
+        PreparedQuery userResults = datastore.prepare(userQuery);
+        Entity userEntity = userResults.asSingleEntity();
 
-      if (userEntity == null) {
-        System.err.println(
-            "Unable to find the user entity based on the current user id. Setting a default nickname.");
-        out.append("Neighbor");
-      } else out.append((String) userEntity.getProperty("nickname"));
-
+        if (userEntity == null) {
+          System.err.println(
+              "Unable to find the user entity based on the current user id. Setting a default nickname.");
+          out.append("Neighbor");
+        } else {
+          String userNickname = (String) userEntity.getProperty("nickname");
+          usersNicknames.put(taskOwner, userNickname);
+          out.append(userNickname);
+        }
+      }
       out.append("</div>");
       if (userLoggedIn) {
         // changes the Help Button div if the current user is the owner of the task
