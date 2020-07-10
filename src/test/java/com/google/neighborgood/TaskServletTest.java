@@ -16,6 +16,7 @@ package com.google.neighborgood.servlets;
 
 import static com.google.appengine.api.datastore.FetchOptions.Builder.withLimit;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -76,7 +77,7 @@ public final class TaskServletTest {
   }
 
   @Test
-  public void setUpTest() {
+  public void testEnvironmentTest() {
     // Test the UserService feature
     assertTrue(userService.isUserAdmin());
     assertTrue(userService.isUserLoggedIn());
@@ -89,27 +90,22 @@ public final class TaskServletTest {
   }
 
   @Test
-  public void singleInputDoPostTest() {
+  public void singleInputDoPostTest() throws IOException {
     // Check whether the datastore is empty before the test
     assertEquals(0, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
 
     when(request.getParameter("reward-input")).thenReturn("50");
     when(request.getParameter("task-detail-input")).thenReturn("Help me please");
 
-    try {
-      new TaskServlet().doPost(request, response);
-    } catch (IOException e) {
-      assertTrue(false);
-    }
+    new TaskServlet().doPost(request, response);
 
     // After sending the POST request, there should be one entity in the datastore
     assertEquals(1, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
     PreparedQuery results = ds.prepare(new Query("Task"));
     Entity entity = results.asSingleEntity();
-    if (entity == null) {
-      // The entity can't be null
-      assertTrue(false);
-    }
+
+    // The entity can't be null
+    assertNotNull(entity);
 
     // Test the stored task information
     assertEquals("1234567890", (String) entity.getProperty("Owner"));
@@ -118,55 +114,37 @@ public final class TaskServletTest {
   }
 
   @Test
-  public void multipleInputDoPostTest() {
+  public void multipleInputDoPostTest() throws IOException {
     // Check whether the datastore is empty before the test
     assertEquals(0, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
 
-    when(request.getParameter("reward-input")).thenReturn("50");
-    when(request.getParameter("task-detail-input")).thenReturn("Help me please");
+    for (int i = 1; i <= 4; i++) {
+      // Set the rewarding points of each task to 50i;
+      String rewardPts = Integer.toString(50 * i);
+      String taskContent = "Testing task " + Integer.toString(i);
 
-    try {
+      when(request.getParameter("reward-input")).thenReturn(rewardPts);
+      when(request.getParameter("task-detail-input")).thenReturn(taskContent);
+
+      // Send a POST request to the task servlet
       new TaskServlet().doPost(request, response);
-    } catch (IOException e) {
-      assertTrue(false);
+
+      // After sending the ith POST request, there should be i entities in the datastore
+      assertEquals(i, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
+
+      // After sending the first POST request, check the stored task entity content
+      if (i == 1) {
+        PreparedQuery results = ds.prepare(new Query("Task"));
+        Entity entity = results.asSingleEntity();
+
+        // The entity can't be null
+        assertNotNull(entity);
+
+        // Test the stored task information
+        assertEquals("1234567890", (String) entity.getProperty("Owner"));
+        assertEquals("Testing task 1", (String) entity.getProperty("detail"));
+        assertEquals(50, (long) entity.getProperty("reward"));
+      }
     }
-
-    // After sending the POST request, there should be one entity in the datastore
-    assertEquals(1, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
-    PreparedQuery results = ds.prepare(new Query("Task"));
-    Entity entity = results.asSingleEntity();
-    if (entity == null) {
-      // The entity can't be null
-      assertTrue(false);
-    }
-
-    // Test the stored task information
-    assertEquals("1234567890", (String) entity.getProperty("Owner"));
-    assertEquals("Help me please", (String) entity.getProperty("detail"));
-    assertEquals(50, (long) entity.getProperty("reward"));
-
-    when(request.getParameter("reward-input")).thenReturn("200");
-    when(request.getParameter("task-detail-input")).thenReturn("Testing task 2");
-
-    try {
-      new TaskServlet().doPost(request, response);
-    } catch (IOException e) {
-      assertTrue(false);
-    }
-
-    // After sending the second POST request, there should be two entities in the datastore
-    assertEquals(2, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
-
-    when(request.getParameter("reward-input")).thenReturn("150");
-    when(request.getParameter("task-detail-input")).thenReturn("Testing task 3");
-
-    try {
-      new TaskServlet().doPost(request, response);
-    } catch (IOException e) {
-      assertTrue(false);
-    }
-
-    // After sending the third POST request, there should be three entities in the datastore
-    assertEquals(3, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
   }
 }
