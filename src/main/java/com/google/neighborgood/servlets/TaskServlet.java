@@ -105,16 +105,15 @@ public class TaskServlet extends HttpServlet {
       PreparedQuery userResults = datastore.prepare(userQuery);
       Entity userEntity = userResults.asSingleEntity();
 
-      if (userEntity == null) {
-        System.err.println("Unable to find the user entity based on the current user id");
-        response.sendError(
-            HttpServletResponse.SC_NOT_FOUND, "The requested user could not be found");
-        return;
-      }
+      out.append("<div class='user-nickname'>");
 
-      out.append("<div class='user-nickname'>")
-          .append((String) userEntity.getProperty("nickname"))
-          .append("</div>");
+      if (userEntity == null) {
+        System.err.println(
+            "Unable to find the user entity based on the current user id. Setting a default nickname.");
+        out.append("Neighbor");
+      } else out.append((String) userEntity.getProperty("nickname"));
+
+      out.append("</div>");
       if (userLoggedIn) {
         // changes the Help Button div if the current user is the owner of the task
         if (!userId.equals((String) entity.getProperty("userId"))) {
