@@ -112,7 +112,7 @@ public class TaskServlet extends HttpServlet {
         return;
       }
 
-      out.append("<div class='username'>")
+      out.append("<div class='user-nickname'>")
           .append((String) userEntity.getProperty("nickname"))
           .append("</div>");
       if (userLoggedIn) {
