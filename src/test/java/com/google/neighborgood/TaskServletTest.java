@@ -61,6 +61,7 @@ public final class TaskServletTest {
   private DatastoreService ds;
   private HttpServletRequest request;
   private HttpServletResponse response;
+  private Entity userEntity;
 
   @Before
   public void setUp() {
@@ -69,6 +70,16 @@ public final class TaskServletTest {
     ds = DatastoreServiceFactory.getDatastoreService();
     request = mock(HttpServletRequest.class);
     response = mock(HttpServletResponse.class);
+    userEntity = new Entity("UserInfo");
+    userEntity.setProperty("nickname", "Leonard");
+    userEntity.setProperty("address", "xxx");
+    userEntity.setProperty("phone", "xxx");
+    userEntity.setProperty("email", "leonardzhang@google.com");
+    userEntity.setProperty("userId", "1234567890");
+    userEntity.setProperty("country", "US");
+    userEntity.setProperty("zipcode", "15213");
+    userEntity.setProperty("points", 0);
+    ds.put(userEntity);
   }
 
   @After
