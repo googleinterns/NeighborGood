@@ -14,6 +14,9 @@
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
+import static org.openqa.selenium.support.ui.ExpectedConditions.urlContains;
+import static org.openqa.selenium.support.ui.ExpectedConditions.urlMatches;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import java.util.List;
@@ -26,7 +29,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class IntegrationTest {
@@ -46,8 +50,34 @@ public class IntegrationTest {
 
   @Before
   public void setupTest() {
-    driver = new ChromeDriver();
-    wait = new WebDriverWait(driver, 5);
+    ChromeOptions options = new ChromeOptions();
+    options.addArguments("--headless");
+    options.addArguments("--disable-gpu");
+    driver = new ChromeDriver(options);
+    wait = new WebDriverWait(driver, 10);
+
+    // Clears datastore entities for start of test
+    driver.get("http://localhost:8080/_ah/admin");
+    By entityKindSelect = By.id("kind_input");
+    wait.until(presenceOfElementLocated(entityKindSelect));
+    // Retrieves number of Entity Kind select options to iterate through them
+    Select kindSelect = new Select(driver.findElement(entityKindSelect));
+    List<WebElement> allEntityKinds = kindSelect.getOptions();
+    By listButton;
+    By allKeys;
+    By deleteButton;
+    for (int i = 0; i < allEntityKinds.size(); i++) {
+      listButton = By.id("list_button");
+      wait.until(presenceOfElementLocated(listButton));
+      driver.findElement(listButton).click();
+      allKeys = By.id("allkeys");
+      wait.until(presenceOfElementLocated(allKeys));
+      driver.findElement(allKeys).click();
+      deleteButton = By.id("delete_button");
+      wait.until(presenceOfElementLocated(deleteButton));
+      driver.findElement(deleteButton).click();
+      driver.switchTo().alert().accept();
+    }
   }
 
   @After
@@ -85,18 +115,16 @@ public class IntegrationTest {
 
     loginElement.click();
     By emailInput = By.id("email");
+    wait.until(presenceOfElementLocated(emailInput));
     WebElement emailInputElement = driver.findElement(emailInput);
 
-    // In order to mimic a true new user situation the user must
-    // not have filled out its details before, so if you must run
-    // this test multiple times, make sure to do `mvn clean` after
-    // each test to clear the stored userinfo or clear all user
-    // entities from the admin console
     emailInputElement.clear();
     emailInputElement.sendKeys(USER_EMAIL);
     By loginButton = By.id("btn-login");
+    wait.until(presenceOfElementLocated(loginButton));
     WebElement loginButtonElement = driver.findElement(loginButton);
     loginButtonElement.click();
+    wait.until(urlContains("/account.jsp"));
 
     // User should now be logged in and redirected to the
     // account page to enter their user info
@@ -104,18 +132,22 @@ public class IntegrationTest {
     assertEquals("My Personal Info", driver.getTitle());
 
     By nicknameInput = By.id("nickname-input");
+    wait.until(presenceOfElementLocated(nicknameInput));
     WebElement nicknameInputElement = driver.findElement(nicknameInput);
     nicknameInputElement.sendKeys(USER_NICKNAME);
 
     By addressInput = By.id("address-input");
+    wait.until(presenceOfElementLocated(addressInput));
     WebElement addressInputElement = driver.findElement(addressInput);
     addressInputElement.sendKeys(USER_ADDRESS);
 
     By phoneInput = By.id("phone-input");
+    wait.until(presenceOfElementLocated(phoneInput));
     WebElement phoneInputElement = driver.findElement(phoneInput);
     phoneInputElement.sendKeys(USER_PHONE);
 
     By submitButton = By.id("submit-button");
+    wait.until(presenceOfElementLocated(submitButton));
     WebElement submitButtonElement = driver.findElement(submitButton);
     submitButtonElement.click();
 
@@ -124,8 +156,10 @@ public class IntegrationTest {
     assertEquals("My Account", driver.getTitle());
 
     driver.get("http://localhost:8080/");
+    wait.until(urlMatches("http://localhost:8080/"));
 
     By logoutMessage = By.id("login-logout");
+    wait.until(presenceOfElementLocated(logoutMessage));
     WebElement logoutElement = driver.findElement(logoutMessage);
     String actualLogoutText = logoutElement.getText();
 
