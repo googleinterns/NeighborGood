@@ -26,7 +26,7 @@
         String points = userInfo.get(3); %>
   <body onload="showNeedHelp()">
     <div id="nav-bar">
-        <p id="return-link"><a href="index.jsp">BACK TO HOME</a> |    </p>
+        <p id="return-link"><a href="index.jsp" id="backtohome">BACK TO HOME</a> |    </p>
         <i class="fa fa-cog fa-2x" id="info-setting" onclick="editInfo()"></i>
         <p id="log-out-link"><%=nickname%> |  <a href="<%=logoutURL%>">Logout</a></p>
     </div>

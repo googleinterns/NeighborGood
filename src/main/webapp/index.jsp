@@ -50,13 +50,13 @@
                   String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
                   String nickname = (userInfo == null) ? userService.getCurrentUser().getEmail() : userInfo.get(0);
                 %>
-          	      <p class="login-messages"> <%=nickname%> | <a href="<%=logoutUrl%>" id="loginLogoutURL">Logout</a></p>
+          	      <p class="login-messages"> <%=nickname%> | <a href="<%=logoutUrl%>" id="loginLogoutMessage">Logout</a></p>
                 <%
                 } else {
                       String urlToRedirectToAfterUserLogsIn = "/account.jsp";
                       String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
                 %>
-                  <p class="login-messages"><a href="<%=loginUrl%>" id="loginLogoutURL">Login to help out a neighbor!</a></p>
+                  <p class="login-messages"><a href="<%=loginUrl%>" id="loginLogoutMessage">Login to help out a neighbor!</a></p>
                 <%
                 }
                 %>

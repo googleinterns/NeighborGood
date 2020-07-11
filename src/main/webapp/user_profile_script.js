@@ -23,7 +23,7 @@ async function getTaskInfo(keyString) {
 async function deleteTask(keyString) {
     const info = await getTaskInfo(keyString);
     if (info.status !== "OPEN") {
-        window.alert("You can only delete an 'OPEN' task.")
+        window.alert("You can only delete an 'OPEN' task.");
     } else {
         if (confirm("Are you sure that you want to delete the task?")) {
             const queryURL = "/tasks?key=" + keyString;
@@ -45,7 +45,7 @@ async function editTask(keyString) {
         const id_input = document.getElementById("task-id-input");
         id_input.value = info.keyString;
         document.getElementById("editTaskModalWrapper").style.display = "block";
-        showNeedHelp()
+        showNeedHelp();
     }
 }
 
@@ -275,7 +275,7 @@ async function displayOfferHelpTasks() {
         var abandonBtn = document.createElement("button");
         abandonBtn.className = "abandon-task";
         abandonBtn.addEventListener("click", function () { abandonTask(keyStringCopy) });
-        abandonBtn.innerHTML = (task.status === "IN PROGRESS") ? '<i class="fa fa-times"></i>':'<i class="fa fa-ban"></i>';;
+        abandonBtn.innerHTML = (task.status === "IN PROGRESS") ? '<i class="fa fa-times"></i>':'<i class="fa fa-ban"></i>';
         abandonTd.appendChild(abandonBtn);
         tr.appendChild(completeTd);
         tr.appendChild(abandonTd);

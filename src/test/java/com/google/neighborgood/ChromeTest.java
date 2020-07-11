@@ -13,7 +13,9 @@
 // limitations under the License.
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
+import static org.openqa.selenium.support.ui.ExpectedConditions.urlContains;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import org.junit.After;
@@ -31,7 +33,7 @@ public class ChromeTest {
 
   @Before
   public void setUp() {
-    driver = new HtmlUnitDriver(BrowserVersion.CHROME);
+    driver = new HtmlUnitDriver(BrowserVersion.CHROME, true);
   }
 
   @After
@@ -42,13 +44,42 @@ public class ChromeTest {
   }
 
   @Test
-  public void test() {
-    WebDriverWait wait = new WebDriverWait(driver, 30);
+  public void LoginLinks_AsGuestUser_Login() {
+    WebDriverWait wait = new WebDriverWait(driver, 5);
     driver.get("http://localhost:8080/");
-    By title = By.id("title");
-    wait.until(presenceOfElementLocated(title));
-    WebElement element = driver.findElement(title);
-    String actualElementText = element.getText();
-    assertEquals("NeighborGood", actualElementText);
+    By loginLogoutMessage = By.id("loginLogoutMessage");
+    wait.until(presenceOfElementLocated(loginLogoutMessage));
+    WebElement loginLogoutElement = driver.findElement(loginLogoutMessage);
+    String actualLoginLogouText = loginLogoutElement.getText();
+
+    // Guest user should expect to see login message
+    assertEquals("Login to help out a neighbor!", actualLoginLogouText);
+
+    loginLogoutElement.click();
+    wait.until(urlContains("/_ah/login?continue=%2Faccount.jsp"));
+    By loginButton = By.id("btn-login");
+    wait.until(presenceOfElementLocated(loginButton));
+    WebElement loginButtonElement = driver.findElement(loginButton);
+    loginButtonElement.click();
+    wait.until(urlContains("/user_profile.jsp"));
+
+    // User should now be logged in and redirected to userpage
+    assertTrue(driver.getCurrentUrl().contains("/user_profile.jsp"));
+    assertEquals("My Account", driver.getTitle());
+
+    System.out.println("\n\n\n" + driver.getCurrentUrl() + "\n\n\n");
+
+    // By backToHome = By.id("return-link");
+    // wait.until(presenceOfElementLocated(backToHome));
+    // WebElement backToHomeElement = driver.findElement(backToHome);
+    // backToHomeElement.click();
+    // wait.until(urlContains("/index.jsp"));
+
+    // wait.until(presenceOfElementLocated(loginLogoutMessage));
+    // loginLogoutElement = driver.findElement(loginLogoutMessage);
+    // actualLoginLogouText = loginLogoutElement.getText();
+
+    // Login message should now show option to Logout
+    // assertEquals("Logout", actualLoginLogouText);
   }
 }
