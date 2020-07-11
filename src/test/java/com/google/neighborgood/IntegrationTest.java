@@ -16,7 +16,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
 import static org.openqa.selenium.support.ui.ExpectedConditions.urlContains;
-import static org.openqa.selenium.support.ui.ExpectedConditions.urlMatches;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import java.util.List;
@@ -29,7 +28,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -50,10 +48,7 @@ public class IntegrationTest {
 
   @Before
   public void setupTest() {
-    ChromeOptions options = new ChromeOptions();
-    options.addArguments("--headless");
-    options.addArguments("--disable-gpu");
-    driver = new ChromeDriver(options);
+    driver = new ChromeDriver();
     wait = new WebDriverWait(driver, 10);
 
     // Clears datastore entities for start of test
@@ -113,6 +108,13 @@ public class IntegrationTest {
     // should be missing when user is not logged in
     assertTrue(dashboardIconsElement.isEmpty());
 
+    By taskResultsMessage = By.id("no-tasks-message");
+    wait.until(presenceOfElementLocated(taskResultsMessage));
+    WebElement taskResultsMessageElement = driver.findElement(taskResultsMessage);
+
+    // Message alerting user there are no tasks nearby should be displayed
+    assertTrue(taskResultsMessageElement.isDisplayed());
+
     loginElement.click();
     By emailInput = By.id("email");
     wait.until(presenceOfElementLocated(emailInput));
@@ -155,15 +157,23 @@ public class IntegrationTest {
     assertTrue(driver.getCurrentUrl().contains("/user_profile.jsp"));
     assertEquals("My Account", driver.getTitle());
 
-    driver.get("http://localhost:8080/");
-    wait.until(urlMatches("http://localhost:8080/"));
+    By userpageLogoutMessage = By.id("log-out-link");
+    wait.until(presenceOfElementLocated(userpageLogoutMessage));
+    String actualyUPLogoutM = driver.findElement(userpageLogoutMessage).getText();
+    // Userpage should show a custom logout message with user's nickname
+    assertEquals(USER_NICKNAME + " | Logout", actualyUPLogoutM);
+
+    By backToHome = By.id("backtohome");
+    wait.until(presenceOfElementLocated(backToHome));
+    driver.findElement(backToHome).click();
+    wait.until(urlContains("/index.jsp"));
 
     By logoutMessage = By.id("login-logout");
     wait.until(presenceOfElementLocated(logoutMessage));
     WebElement logoutElement = driver.findElement(logoutMessage);
     String actualLogoutText = logoutElement.getText();
 
-    // Should show a custom logout message with user's nickname
+    // Homepage should show a custom logout message with user's nickname
     assertEquals(USER_NICKNAME + " | Logout", actualLogoutText);
   }
 }
