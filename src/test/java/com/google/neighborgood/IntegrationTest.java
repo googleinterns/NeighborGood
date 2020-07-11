@@ -26,6 +26,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class IntegrationTest {
@@ -60,7 +61,7 @@ public class IntegrationTest {
   public void test() {
     driver.get("http://localhost:8080/");
     By loginMessage = By.id("loginLogoutMessage");
-    wait.until(ExpectedConditions.presenceOfElementLocated(loginMessage));
+    wait.until(presenceOfElementLocated(loginMessage));
     WebElement loginElement = driver.findElement(loginMessage);
     String actualLoginText = loginElement.getText();
 
