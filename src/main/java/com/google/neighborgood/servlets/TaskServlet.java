@@ -188,30 +188,32 @@ public class TaskServlet extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Key userEntityKey = KeyFactory.createKey("UserInfo", userId);
 
+    Entity userEntity;
     try {
-      Entity userEntity = datastore.get(userEntityKey);
-      // Create an Entity that stores the input comment
-      Entity taskEntity = new Entity("Task", userEntity.getKey());
-      taskEntity.setProperty("detail", taskDetail);
-      taskEntity.setProperty("timestamp", creationTime);
-      taskEntity.setProperty("reward", rewardPts);
-      taskEntity.setProperty("status", "OPEN");
-      taskEntity.setProperty("Owner", userId);
-      taskEntity.setProperty("Helper", "N/A");
-      taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
-      taskEntity.setProperty("zipcode", "98033");
-      taskEntity.setProperty("country", "United States");
-      taskEntity.setProperty("category", "misc");
-      datastore.put(taskEntity);
-
-      // Redirect back to the user page.
-      response.sendRedirect("/user_profile.jsp");
+      userEntity = datastore.get(userEntityKey);
     } catch (EntityNotFoundException e) {
       System.err.println("Unable to find the UserInfo entity based on the current user id");
       response.sendError(
           HttpServletResponse.SC_NOT_FOUND, "The requested user info could not be found");
       return;
     }
+
+    // Create an Entity that stores the input comment
+    Entity taskEntity = new Entity("Task", userEntity.getKey());
+    taskEntity.setProperty("detail", taskDetail);
+    taskEntity.setProperty("timestamp", creationTime);
+    taskEntity.setProperty("reward", rewardPts);
+    taskEntity.setProperty("status", "OPEN");
+    taskEntity.setProperty("Owner", userId);
+    taskEntity.setProperty("Helper", "N/A");
+    taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
+    taskEntity.setProperty("zipcode", "98033");
+    taskEntity.setProperty("country", "United States");
+    taskEntity.setProperty("category", "misc");
+    datastore.put(taskEntity);
+
+    // Redirect back to the user page.
+    response.sendRedirect("/user_profile.jsp");
   }
 
   @Override
