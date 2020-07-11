@@ -15,16 +15,17 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class IntegrationTest {
@@ -37,10 +38,15 @@ public class IntegrationTest {
   private final String USER_ADDRESS = "123 Street Name, City, ST";
   private final String USER_PHONE = "1231231234";
 
+  @BeforeClass
+  public static void setupClass() {
+    WebDriverManager.chromedriver().setup();
+  }
+
   @Before
-  public void setUp() {
-    driver = new HtmlUnitDriver(BrowserVersion.CHROME, true);
-    wait = new WebDriverWait(driver, 15);
+  public void setupTest() {
+    driver = new ChromeDriver();
+    wait = new WebDriverWait(driver, 5);
   }
 
   @After
@@ -51,9 +57,10 @@ public class IntegrationTest {
   }
 
   @Test
-  public void Homepage_AsNewGuestUser_LoginSetUserInfo() {
+  public void test() {
     driver.get("http://localhost:8080/");
     By loginMessage = By.id("loginLogoutMessage");
+    wait.until(ExpectedConditions.presenceOfElementLocated(loginMessage));
     WebElement loginElement = driver.findElement(loginMessage);
     String actualLoginText = loginElement.getText();
 
@@ -115,15 +122,6 @@ public class IntegrationTest {
     assertTrue(driver.getCurrentUrl().contains("/user_profile.jsp"));
     assertEquals("My Account", driver.getTitle());
 
-    /**
-     * Note: the terminal is tracking a syntax error when running user_profile_script.js - It says
-     * it's missing ; before line 15 however line 15 is the beginning of the file after the license.
-     * Due to this, the test errors out (doesn't even execute the rest of the tests) unless I go
-     * back to homepage. I suspect HtmlUnitDriver's Javascript interpreter might not support async
-     * (maybe not await either), as the driver is notorious for not being the best at parsing script
-     * files. If we need to test further userpage functionality we might need to rewrite these
-     * functions using the promise.then() syntax.
-     */
     driver.get("http://localhost:8080/");
 
     By logoutMessage = By.id("login-logout");
