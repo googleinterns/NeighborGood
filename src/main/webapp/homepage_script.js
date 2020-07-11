@@ -175,6 +175,7 @@ function getUserNeighborhood() {
 /* Function that returns a promise to get and return the user's location */
 function getUserLocation() {
     return new Promise((resolve, reject) => {
+        resolve(config.LOCAL_DEV_LAT_LNG);
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 var location = {lat: position.coords.latitude, lng: position.coords.longitude};
@@ -192,7 +193,7 @@ function getUserLocation() {
                 } else {
                     reject("User location failed");
                 }
-            });
+            },{timeout:10000});
         } else {
             reject("User location is not supported by this browser");
         }
