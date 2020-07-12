@@ -152,7 +152,7 @@ begins the processes of retrieving the user's neighborhood*/
 function getUserNeighborhood() {
     const script = document.createElement("script");
     script.type = "text/javascript";
-    script.src =  "https://maps.googleapis.com/maps/api/js?key=" + MAPSKEY + "&callback=initialize";
+    script.src =  "https://maps.googleapis.com/maps/api/js?key=" + MAPSKEY + "&callback=initialize&language=en";
     script.defer = true;
     script.async = true;
     document.head.appendChild(script);
