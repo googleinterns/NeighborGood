@@ -20,10 +20,11 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.urlContains;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -31,26 +32,18 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IntegrationTest {
 
-  private WebDriver driver;
-  private WebDriverWait wait;
+  private static WebDriver driver;
+  private static WebDriverWait wait;
 
   private final String USER_NICKNAME = "Mafe";
   private final String USER_EMAIL = "123456@example.com";
   private final String USER_ADDRESS = "123 Street Name, City, ST";
   private final String USER_PHONE = "1231231234";
 
-  @BeforeClass
-  public static void setupClass() {
-    WebDriverManager.chromedriver().setup();
-  }
-
-  @Before
-  public void setupTest() {
-    driver = new ChromeDriver();
-    wait = new WebDriverWait(driver, 10);
-
+  private static void clearAllDatastoreEntities(WebDriver driver) {
     // Clears datastore entities for start of test
     driver.get("http://localhost:8080/_ah/admin");
     By entityKindSelect = By.id("kind_input");
@@ -75,15 +68,23 @@ public class IntegrationTest {
     }
   }
 
-  @After
-  public void teardown() {
+  @BeforeClass
+  public static void setupClass() {
+    WebDriverManager.chromedriver().setup();
+    driver = new ChromeDriver();
+    wait = new WebDriverWait(driver, 10);
+    clearAllDatastoreEntities(driver);
+  }
+
+  @AfterClass
+  public static void teardown() {
     if (driver != null) {
       driver.quit();
     }
   }
 
   @Test
-  public void test() {
+  public void _01_Homepage_AsNewGuestUser_LoginAndInputUserInfo() {
     driver.get("http://localhost:8080/");
     By loginMessage = By.id("loginLogoutMessage");
     wait.until(presenceOfElementLocated(loginMessage));
@@ -115,7 +116,9 @@ public class IntegrationTest {
     WebElement taskResultsMessageElement = driver.findElement(taskResultsMessage);
 
     // Message alerting user there are no tasks nearby should be displayed
-    assertTrue("No tasks in neighborhood messaage", taskResultsMessageElement.isDisplayed());
+    assertTrue(
+        "No tasks in neighborhood message should be displayed",
+        taskResultsMessageElement.isDisplayed());
 
     loginElement.click();
     By emailInput = By.id("email");
@@ -170,6 +173,18 @@ public class IntegrationTest {
     driver.findElement(backToHome).click();
     wait.until(urlContains("/index.jsp"));
 
+    By logoutMessage = By.id("login-logout");
+    wait.until(presenceOfElementLocated(logoutMessage));
+    WebElement logoutElement = driver.findElement(logoutMessage);
+    String actualLogoutText = logoutElement.getText();
+
+    // Homepage should show a custom logout message with user's nickname
+    assertEquals(USER_NICKNAME + " | Logout", actualLogoutText);
+  }
+
+  @Test
+  public void _02_Homepage_AsLoggedUser_AddTask() {
+    driver.get("http://localhost:8080/");
     By logoutMessage = By.id("login-logout");
     wait.until(presenceOfElementLocated(logoutMessage));
     WebElement logoutElement = driver.findElement(logoutMessage);
