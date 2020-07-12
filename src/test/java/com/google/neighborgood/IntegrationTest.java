@@ -98,7 +98,8 @@ public class IntegrationTest {
     List<WebElement> addTaskButtonElement = driver.findElements(addTaskButton);
 
     // Add task button should be missing when user is not logged in
-    assertTrue(addTaskButtonElement.isEmpty());
+    assertTrue(
+        "Add task button must not be present for guest users", addTaskButtonElement.isEmpty());
 
     By dashboardIcon = By.className("dashboard-icon");
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
@@ -106,14 +107,15 @@ public class IntegrationTest {
 
     // Dashboard icon (userpage or admin page) buttons
     // should be missing when user is not logged in
-    assertTrue(dashboardIconsElement.isEmpty());
+    assertTrue(
+        "Dashboard icons must not be present for guest users", dashboardIconsElement.isEmpty());
 
     By taskResultsMessage = By.id("no-tasks-message");
     wait.until(presenceOfElementLocated(taskResultsMessage));
     WebElement taskResultsMessageElement = driver.findElement(taskResultsMessage);
 
     // Message alerting user there are no tasks nearby should be displayed
-    assertTrue(taskResultsMessageElement.isDisplayed());
+    assertTrue("No tasks in neighborhood messaage", taskResultsMessageElement.isDisplayed());
 
     loginElement.click();
     By emailInput = By.id("email");
@@ -154,7 +156,7 @@ public class IntegrationTest {
     submitButtonElement.click();
 
     // After new user fills out user info, they should be redirected to userpage
-    assertTrue(driver.getCurrentUrl().contains("/user_profile.jsp"));
+    assertTrue("User in user profile page", driver.getCurrentUrl().contains("/user_profile.jsp"));
     assertEquals("My Account", driver.getTitle());
 
     By userpageLogoutMessage = By.id("log-out-link");
