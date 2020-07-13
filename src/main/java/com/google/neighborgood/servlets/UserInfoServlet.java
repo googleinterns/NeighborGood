@@ -115,11 +115,15 @@ public class UserInfoServlet extends HttpServlet {
     PreparedQuery results = datastore.prepare(query);
     Entity entity = results.asSingleEntity();
     if (entity == null) {
-      entity = new Entity("UserInfo");
+      entity = new Entity("UserInfo", userId);
       entity.setProperty("nickname", nickname);
       entity.setProperty("address", address);
       entity.setProperty("phone", phone);
       entity.setProperty("email", email);
+      // "userId" now becomes obsolete as the entity
+      // ID/Name is the same value as userId.
+      // I will modify this in all servlets
+      // in a different PR
       entity.setProperty("userId", userId);
       entity.setProperty("country", country);
       entity.setProperty("zipcode", zipcode);

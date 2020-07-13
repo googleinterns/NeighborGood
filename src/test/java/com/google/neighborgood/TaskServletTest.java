@@ -70,7 +70,7 @@ public final class TaskServletTest {
     ds = DatastoreServiceFactory.getDatastoreService();
     request = mock(HttpServletRequest.class);
     response = mock(HttpServletResponse.class);
-    userEntity = new Entity("UserInfo");
+    userEntity = new Entity("UserInfo", "1234567890");
     userEntity.setProperty("nickname", "Leonard");
     userEntity.setProperty("address", "xxx");
     userEntity.setProperty("phone", "xxx");

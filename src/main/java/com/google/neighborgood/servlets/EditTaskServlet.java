@@ -146,6 +146,6 @@ public class EditTaskServlet extends HttpServlet {
     task.setProperty("category", taskCategory);
     datastore.put(task);
 
-    response.sendRedirect("/user_profile.jsp");
+    response.sendRedirect(request.getHeader("Referer"));
   }
 }

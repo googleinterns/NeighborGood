@@ -17,13 +17,11 @@ package com.google.neighborgood.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -31,6 +29,7 @@ import com.google.gson.Gson;
 import com.google.neighborgood.helper.RewardingPoints;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -83,6 +82,10 @@ public class TaskServlet extends HttpServlet {
 
     StringBuilder out = new StringBuilder();
 
+    // Stores task owner's user info to prevent querying multiple
+    // times in datastore for the same user's info
+    HashMap<String, String> usersNicknames = new HashMap<String, String>();
+
     // Builds and stores HTML for each task
     for (Entity entity : results) {
       out.append("<div class='task' data-key='")
@@ -96,9 +99,27 @@ public class TaskServlet extends HttpServlet {
       }
       out.append("<div class='task-container'>");
       out.append("<div class='task-header'>");
-      out.append("<div class='username'>")
-          .append((String) entity.getProperty("Owner"))
-          .append("</div>");
+      out.append("<div class='user-nickname'>");
+
+      // Checks if tasks's user nickname has already been retrieved,
+      // otherwise retrieves it and temporarily stores it
+      String taskOwner = (String) entity.getProperty("Owner");
+      if (usersNicknames.containsKey(taskOwner)) {
+        out.append(usersNicknames.get(taskOwner));
+      } else {
+        Key taskOwnerKey = entity.getParent();
+        try {
+          Entity userEntity = datastore.get(taskOwnerKey);
+          String userNickname = (String) userEntity.getProperty("nickname");
+          usersNicknames.put(taskOwner, userNickname);
+          out.append(userNickname);
+        } catch (EntityNotFoundException e) {
+          System.err.println(
+              "Unable to find the task's owner info to retrieve the owner's nickname. Setting a default nickname.");
+          out.append("Neighbor");
+        }
+      }
+      out.append("</div>");
       if (userLoggedIn) {
         // changes the Help Button div if the current user is the owner of the task
         if (!userId.equals((String) entity.getProperty("userId"))) {
@@ -171,30 +192,26 @@ public class TaskServlet extends HttpServlet {
 
     String userId = userService.getCurrentUser().getUserId();
 
-    // Try to get the user's address, zipcode and country stored in datastore
+    // Creates current user entity key to include as the task's parent
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Key userEntityKey = KeyFactory.createKey("UserInfo", userId);
 
-    Query query =
-        new Query("UserInfo")
-            .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, userId));
-    PreparedQuery results = datastore.prepare(query);
-
-    Entity entity = results.asSingleEntity();
-    if (entity == null) {
-      System.err.println("Unable to find the personal information of the owner of the task");
+    Entity userEntity;
+    try {
+      userEntity = datastore.get(userEntityKey);
+    } catch (EntityNotFoundException e) {
+      System.err.println("Unable to find the UserInfo entity based on the current user id");
       response.sendError(
-          HttpServletResponse.SC_NOT_FOUND,
-          "The owner information of the task could not be found in the database");
+          HttpServletResponse.SC_NOT_FOUND, "The requested user info could not be found");
       return;
     }
 
-    String formattedAddress = (String) entity.getProperty("address");
-    String country = (String) entity.getProperty("country");
-    String zipcode = (String) entity.getProperty("zipcode");
+    String formattedAddress = (String) userEntity.getProperty("address");
+    String country = (String) userEntity.getProperty("country");
+    String zipcode = (String) userEntity.getProperty("zipcode");
 
     // Create an Entity that stores the input comment
-    Entity taskEntity = new Entity("Task");
-    taskEntity.setProperty("userId", userId);
+    Entity taskEntity = new Entity("Task", userEntity.getKey());
     taskEntity.setProperty("detail", taskDetail);
     taskEntity.setProperty("timestamp", creationTime);
     taskEntity.setProperty("reward", rewardPts);
@@ -204,7 +221,6 @@ public class TaskServlet extends HttpServlet {
     taskEntity.setProperty("Address", formattedAddress);
     taskEntity.setProperty("zipcode", zipcode);
     taskEntity.setProperty("country", country);
-    taskEntity.setProperty("category", "misc");
     taskEntity.setProperty("category", taskCategory);
 
     datastore.put(taskEntity);
