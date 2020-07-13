@@ -149,7 +149,7 @@ public final class TaskInfoServletTest {
     // Check whether the datastore has the input dummy task entity at first
     assertEquals(1, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
 
-    // Simulate the situation where the user complete a task from the offer help page
+    // Simulate the situation where the user verify a task from the need help page
     when(request.getParameter("key")).thenReturn(keyString);
     when(request.getParameter("status")).thenReturn("COMPLETE: AWAIT VERIFICATION");
 
@@ -170,5 +170,91 @@ public final class TaskInfoServletTest {
     assertEquals(50, (long) entity.getProperty("reward"));
     assertEquals("1234567890", (String) entity.getProperty("Helper"));
     assertEquals("COMPLETE: AWAIT VERIFICATION", (String) entity.getProperty("status"));
+  }
+
+  @Test
+  public void verifyTaskTest() throws IOException {
+    // Check whether the datastore has the input dummy task entity at first
+    assertEquals(1, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
+
+    // Change the status of the task to COMPLETE: AWAIT VERIFICATION
+    taskEntity.setProperty("status", "COMPLETE: AWAIT VERIFICATION");
+    ds.put(taskEntity);
+
+    // Simulate the situation where the user complete a task from the offer help page
+    when(request.getParameter("key")).thenReturn(keyString);
+    when(request.getParameter("status")).thenReturn("COMPLETE");
+
+    new TaskInfoServlet().doPost(request, response);
+
+    // After sending the POST request, the dummy task entity should be set to COMPLETE status
+    assertEquals(1, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
+    PreparedQuery results = ds.prepare(new Query("Task"));
+    Entity entity = results.asSingleEntity();
+
+    // The entity can't be null
+    assertNotNull(entity);
+
+    // Test the stored task information
+    assertEquals("1234567890", (String) entity.getProperty("Owner"));
+    assertEquals("Test task", (String) entity.getProperty("detail"));
+    assertEquals(50, (long) entity.getProperty("reward"));
+    assertEquals("1234567890", (String) entity.getProperty("Helper"));
+    assertEquals("COMPLETE", (String) entity.getProperty("status"));
+
+    // After the user verified task, the helper's helping point should also be updated
+    results = ds.prepare(new Query("UserInfo"));
+    entity = results.asSingleEntity();
+    assertNotNull(entity);
+
+    // Test whether the stored personal information has been updated
+    assertEquals("Leonard", (String) entity.getProperty("nickname"));
+    assertEquals("xxx", (String) entity.getProperty("address"));
+    assertEquals("xxx", (String) entity.getProperty("phone"));
+    assertEquals("15213", (String) entity.getProperty("zipcode"));
+    assertEquals("US", (String) entity.getProperty("country"));
+    assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
+    assertEquals("1234567890", (String) entity.getProperty("userId"));
+    assertEquals(50, (long) entity.getProperty("points"));
+  }
+
+  @Test
+  public void disapproveTaskTest() throws IOException {
+    // Check whether the datastore has the input dummy task entity at first
+    assertEquals(1, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
+
+    // Change the status of the task to COMPLETE: AWAIT VERIFICATION
+    taskEntity.setProperty("status", "COMPLETE: AWAIT VERIFICATION");
+    ds.put(taskEntity);
+
+    // Simulate the situation where the user disapprove a task from the offer help page
+    when(request.getParameter("key")).thenReturn(keyString);
+    when(request.getParameter("status")).thenReturn("IN PROGRESS");
+
+    new TaskInfoServlet().doPost(request, response);
+
+    // After sending the POST request, the dummy task entity should be set to IN PROGRESS status
+    assertEquals(1, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
+    PreparedQuery results = ds.prepare(new Query("Task"));
+    Entity entity = results.asSingleEntity();
+
+    // The entity can't be null
+    assertNotNull(entity);
+
+    // Test the stored task information
+    assertEquals("1234567890", (String) entity.getProperty("Owner"));
+    assertEquals("Test task", (String) entity.getProperty("detail"));
+    assertEquals(50, (long) entity.getProperty("reward"));
+    assertEquals("1234567890", (String) entity.getProperty("Helper"));
+    assertEquals("IN PROGRESS", (String) entity.getProperty("status"));
+
+    // After the user disapproved task, the helper's helping point should still be 0
+    results = ds.prepare(new Query("UserInfo"));
+    entity = results.asSingleEntity();
+    assertNotNull(entity);
+
+    // Test whether the stored personal information has been updated
+    assertEquals("1234567890", (String) entity.getProperty("userId"));
+    assertEquals(0, (long) entity.getProperty("points"));
   }
 }
