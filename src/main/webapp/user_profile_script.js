@@ -40,6 +40,7 @@ async function editTask(keyString) {
         window.alert("You can only edit an 'OPEN' task.")
     } else {
         document.getElementById("edit-detail-input").value = info.detail;
+        document.getElementById("edit-category-input").value = info.category;
         document.getElementById("edit-point-input").value = info.reward.toString();
         const id_input = document.getElementById("task-id-input");
         id_input.value = info.keyString;

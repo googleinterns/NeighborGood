@@ -152,7 +152,7 @@ begins the processes of retrieving the user's neighborhood*/
 function getUserNeighborhood() {
     const script = document.createElement("script");
     script.type = "text/javascript";
-    script.src =  "https://maps.googleapis.com/maps/api/js?key=" + MAPSKEY + "&callback=initialize";
+    script.src =  "https://maps.googleapis.com/maps/api/js?key=" + MAPSKEY + "&callback=initialize&language=en";
     script.defer = true;
     script.async = true;
     document.head.appendChild(script);
@@ -179,8 +179,19 @@ function getUserLocation() {
             navigator.geolocation.getCurrentPosition(function(position) {
                 var location = {lat: position.coords.latitude, lng: position.coords.longitude};
                 resolve(location);
-            }, function() {
-                reject("User location failed");
+            }, function(err) {
+                // Check to see if this failed because we're in an insecure
+                // context, such as a local dev environment that isn't
+                // http://localhost (https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts).
+                if (err.code === 1 && !window.isSecureContext) {
+                    if (config.LOCAL_DEV_LAT_LNG) {
+                        resolve(config.LOCAL_DEV_LAT_LNG);
+                    } else {
+                        reject("User location failed");
+                    }
+                } else {
+                    reject("User location failed");
+                }
             });
         } else {
             reject("User location is not supported by this browser");
