@@ -119,7 +119,7 @@ async function disapproveTask(keyString) {
 
 function showNeedHelp() {
     document.getElementById("need-help").style.display = "table";
-    document.getElementById("create").style.display = "block";
+    document.getElementById("create-task-button").style.display = "block";
     document.getElementById("offer-help").style.display = "none";
     document.getElementById("await-verif").style.display = "table";
     document.getElementById("complete-task").style.display = "none";
@@ -131,7 +131,7 @@ function showNeedHelp() {
 
 function showOfferHelp() {
     document.getElementById("need-help").style.display = "none";
-    document.getElementById("create").style.display = "none";
+    document.getElementById("create-task-button").style.display = "none";
     document.getElementById("offer-help").style.display = "table";
     document.getElementById("await-verif").style.display = "none";
     document.getElementById("complete-task").style.display = "table";

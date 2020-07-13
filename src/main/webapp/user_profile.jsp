@@ -41,7 +41,7 @@
         <div id="container">
             <button class="help-button" id="need-help-button" onclick="showNeedHelp()">Need help</button>
             <button class="help-button" id="offer-help-button" onclick="showOfferHelp()">Offer help</button>
-            <i class="fa fa-plus-circle fa-3x" id="create" onclick="showModal()"></i>
+            <i class="fa fa-plus-circle fa-3x" id="create-task-button" onclick="showModal()"></i>
         </div>
     </div>
     <br/>
@@ -117,7 +117,7 @@
                   <option value="misc">Misc</option>
                 </select>
                 <br/><br/>
-                <input type="submit" />
+                <input type="submit" id="submit-create-task"/>
             </form>
         </div>
     </div>

@@ -136,7 +136,7 @@ section {
   overflow: hidden;
 }
 
-#addtaskbutton {
+#create-task-button {
   font-size: 3.5em;
 }
 
@@ -305,7 +305,7 @@ section {
     padding-right: 0.5em;
   }
 
-  #addtaskbutton {
+  #create-task-button {
     font-size: 2.5em;
   }
 

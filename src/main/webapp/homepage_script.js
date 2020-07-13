@@ -46,8 +46,8 @@ if (document.readyState === 'loading') {
 /* Function adds all the necessary UI 'click' event listeners*/
 function addUIClickHandlers() {
     // adds showModal and closeModal click events for the add task button
-    if ((document.getElementById("addtaskbutton") !== null)) {
-        document.getElementById("addtaskbutton").addEventListener("click", showModal);
+    if ((document.getElementById("create-task-button") !== null)) {
+        document.getElementById("create-task-button").addEventListener("click", showModal);
     	document.getElementById("close-button").addEventListener("click", closeModal);
     }
 

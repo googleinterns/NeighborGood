@@ -32,7 +32,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -48,6 +47,11 @@ public class IntegrationTest {
   private final String USER_ADDRESS = "123 Street Name, City, ST";
   private final String USER_PHONE = "1231231234";
   private final String TASK_DETAIL = "Help!";
+  private final int GARDEN_CATEGORY = 0;
+  private final int SHOPPING_CATEGORY = 1;
+  private final int PETS_CATEGORY = 2;
+  private final int MISC_CATEGORY = 3;
+  private final int NUM_OF_CATEGORIES = 4;
 
   private int taskCount = 0;
 
@@ -62,7 +66,8 @@ public class IntegrationTest {
     By listButton;
     By allKeys;
     By deleteButton;
-    for (int i = 0; i < allEntityKinds.size() - 1; i++) {
+    System.out.println("\n\n" + allEntityKinds.size() + "\n\n");
+    for (int i = 1; i < allEntityKinds.size(); i++) {
       listButton = By.id("list_button");
       wait.until(presenceOfElementLocated(listButton));
       driver.findElement(listButton).click();
@@ -76,14 +81,70 @@ public class IntegrationTest {
     }
   }
 
+  private void addTask(String details, String points, int categoryIndex) {
+
+    By addTaskButton = By.id("create-task-button");
+    wait.until(presenceOfElementLocated((addTaskButton)));
+    WebElement addTaskButtonElement = driver.findElement(addTaskButton);
+    addTaskButtonElement.click();
+
+    By createTaskModal = By.id("createTaskModal");
+    wait.until(presenceOfElementLocated(createTaskModal));
+    WebElement createTaskModalElement = driver.findElement(createTaskModal);
+
+    // After clicking on the add task button, the modal should be displayed
+    // assertTrue("Create task modal should be displayed", createTaskModalElement.isDisplayed());
+
+    By taskDetailInput = By.id("task-detail-input");
+    wait.until(presenceOfElementLocated(taskDetailInput));
+    WebElement taskDetailInputElement = driver.findElement(taskDetailInput);
+    taskDetailInputElement.sendKeys(details);
+
+    // Input task reward pts
+    By rewardPointInput = By.id("rewarding-point-input");
+    wait.until(presenceOfElementLocated(rewardPointInput));
+    WebElement rewardPointInputElement = driver.findElement(rewardPointInput);
+    rewardPointInputElement.clear();
+    rewardPointInputElement.sendKeys(points);
+
+    // Input task category
+    By categoryInput = By.id("category-input");
+    wait.until(presenceOfElementLocated(categoryInput));
+    Select categoryInputElement = new Select(driver.findElement(categoryInput));
+    categoryInputElement.selectByIndex(categoryIndex);
+
+    By submitButton = By.id("submit-create-task");
+    wait.until(presenceOfElementLocated(submitButton));
+    driver.findElement(submitButton).click();
+  }
+
+  private void verifyNewTaskUserPage(String expectedDetails) {
+    // Verify that inputted task info is correctly displayed in need help table
+    String taskRowXPath = "//table[@id='need-help']/tbody/tr[1]";
+    By rowTaskDetails = By.xpath(taskRowXPath + "/td[1]");
+    wait.until(presenceOfElementLocated(rowTaskDetails));
+    String rowDetailsActual = driver.findElement(rowTaskDetails).getText();
+    assertEquals(expectedDetails, rowDetailsActual);
+
+    By rowTaskHelper = By.xpath(taskRowXPath + "/td[2]");
+    wait.until(presenceOfElementLocated(rowTaskHelper));
+    String rowHelperActual = driver.findElement(rowTaskHelper).getText();
+    assertEquals("N/A", rowHelperActual);
+
+    By rowTaskStatus = By.xpath(taskRowXPath + "/td[3]");
+    wait.until(presenceOfElementLocated(rowTaskStatus));
+    String rowStatusActual = driver.findElement(rowTaskStatus).getText();
+    assertEquals("OPEN", rowStatusActual);
+  }
+
   @BeforeClass
   public static void setupClass() {
     WebDriverManager.chromedriver().setup();
-    // driver = new ChromeDriver();
-    ChromeOptions options = new ChromeOptions();
-    options.addArguments("--headless");
-    options.addArguments("--disable-gpu");
-    driver = new ChromeDriver(options);
+    driver = new ChromeDriver();
+    // ChromeOptions options = new ChromeOptions();
+    // options.addArguments("--headless");
+    // options.addArguments("--disable-gpu");
+    // driver = new ChromeDriver(options);
     wait = new WebDriverWait(driver, 30);
     clearAllDatastoreEntities(driver);
   }
@@ -207,45 +268,14 @@ public class IntegrationTest {
 
     // Confirm that the user is still logged in
     assertEquals(USER_NICKNAME + " | Logout", actualLogoutText);
-    By addTaskButton = By.id("addtaskbutton");
-    wait.until(presenceOfElementLocated((addTaskButton)));
-    WebElement addTaskButtonElement = driver.findElement(addTaskButton);
-    addTaskButtonElement.click();
-
-    By createTaskModal = By.id("createTaskModal");
-    wait.until(presenceOfElementLocated(createTaskModal));
-    WebElement createTaskModalElement = driver.findElement(createTaskModal);
-
-    // After clicking on the add task button, the modal should be displayed
-    // assertTrue("Create task modal should be displayed", createTaskModalElement.isDisplayed());
 
     Random random = new Random();
 
-    // Input task details
-    By taskDetailInput = By.id("task-detail-input");
-    wait.until(presenceOfElementLocated(taskDetailInput));
-    WebElement taskDetailInputElement = driver.findElement(taskDetailInput);
-    String taskDetailInputString = TASK_DETAIL + random.nextInt(1000);
-    taskDetailInputElement.sendKeys(taskDetailInputString);
-
-    // Input task reward pts
-    By rewardPointInput = By.id("rewarding-point-input");
-    wait.until(presenceOfElementLocated(rewardPointInput));
-    WebElement rewardPointInputElement = driver.findElement(rewardPointInput);
+    String taskDetail = TASK_DETAIL + random.nextInt(1000);
     String rewardPoints = Integer.toString(random.nextInt(201));
-    rewardPointInputElement.clear();
-    rewardPointInputElement.sendKeys(rewardPoints);
+    int categoryOptionIndex = random.nextInt(NUM_OF_CATEGORIES);
 
-    // Input task category
-    By categoryInput = By.id("category-input");
-    wait.until(presenceOfElementLocated(categoryInput));
-    Select categoryInputElement = new Select(driver.findElement(categoryInput));
-    int categoryOptionIndex = random.nextInt(categoryInputElement.getOptions().size());
-    categoryInputElement.selectByIndex(categoryOptionIndex);
-
-    By submitButton = By.id("submit-create-task");
-    wait.until(presenceOfElementLocated(submitButton));
-    driver.findElement(submitButton).click();
+    addTask(taskDetail, rewardPoints, categoryOptionIndex);
 
     // User should be redirected to user profile page after adding a task
     assertTrue(
@@ -253,22 +283,31 @@ public class IntegrationTest {
         driver.getCurrentUrl().contains("/user_profile.jsp"));
     taskCount++;
 
-    // Verify that inputted task info is correctly displayed in need help table
-    String taskRowXPath = "//table[@id='need-help']/tbody/tr[1]";
-    By rowTaskDetails = By.xpath(taskRowXPath + "/td[1]");
-    wait.until(presenceOfElementLocated(rowTaskDetails));
-    String rowDetailsActual = driver.findElement(rowTaskDetails).getText();
-    assertEquals(taskDetailInputString, rowDetailsActual);
+    verifyNewTaskUserPage(taskDetail);
 
-    By rowTaskHelper = By.xpath(taskRowXPath + "/td[2]");
-    wait.until(presenceOfElementLocated(rowTaskHelper));
-    String rowHelperActual = driver.findElement(rowTaskHelper).getText();
-    assertEquals("N/A", rowHelperActual);
+    // TODO: After merging leonard's map branch, include test that shows
+    // task in homepage as well.
+  }
 
-    By rowTaskStatus = By.xpath(taskRowXPath + "/td[3]");
-    wait.until(presenceOfElementLocated(rowTaskStatus));
-    String rowStatusActual = driver.findElement(rowTaskStatus).getText();
-    assertEquals("OPEN", rowStatusActual);
+  @Test
+  public void _03_UserPage_AsLoggedUser_AddTask() {
+    driver.get("http://localhost:8080/user_profile.jsp");
+
+    Random random = new Random();
+
+    String taskDetail = TASK_DETAIL + random.nextInt(1000);
+    String rewardPoints = Integer.toString(random.nextInt(201));
+    int categoryOptionIndex = random.nextInt(NUM_OF_CATEGORIES);
+
+    addTask(taskDetail, rewardPoints, categoryOptionIndex);
+
+    // User should be redirected to user profile page after adding a task
+    assertTrue(
+        "User should be in user profile page",
+        driver.getCurrentUrl().contains("/user_profile.jsp"));
+    taskCount++;
+
+    verifyNewTaskUserPage(taskDetail);
 
     // TODO: After merging leonard's map branch, include test that shows
     // task in homepage as well.

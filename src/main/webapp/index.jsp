@@ -84,7 +84,7 @@
                   if (userLoggedIn) {
                   %>
                   <div id="add-task">
-                      <i class="fas fa-plus-circle" aria-hidden="true" id="addtaskbutton" title="Add Task"></i>
+                      <i class="fas fa-plus-circle" aria-hidden="true" id="create-task-button" title="Add Task"></i>
                   </div>
                   <% 
                   }
