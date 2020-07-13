@@ -106,11 +106,12 @@
                     <label for="task-detail-input">Task Detail:</label>
                     <br/>
                 </div>
-                <textarea name="task-detail-input" id="task-detail-input" required="true" placeholder="Describe your task here:"></textarea>
                 <br/>
+                <textarea name="task-detail-input" id="task-detail-input" required="true" placeholder="Describe your task here:"></textarea>
+                <br/><br/>
                 <label for="rewarding-point-input">Rewarding Points:</label>
                 <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50" required="true">
-                <br/>
+                <br/><br/>
                 <label for="category-input">Task Category:</label>
                 <select name="category-input" id="category-input" form="new-task-form">
                   <option value="garden">Garden</option>
@@ -132,12 +133,13 @@
                     <label for="edit-detail-input">Task Detail:</label>
                     <br/>
                 </div>
-                <textarea name="task-detail-input" id="edit-detail-input" required="true"></textarea>
                 <br/>
+                <textarea name="task-detail-input" id="edit-detail-input" required="true"></textarea>
+                <br/><br/>
                 <label for="edit-point-input">Rewarding Points: </label>
                 <input type="number" id="edit-point-input" name="reward-input" min="0" max="200" required="true">
                 <input type="hidden" name="task-id" id="task-id-input">
-                <br/>
+                <br/><br/>
                 <label for="edit-category-input">Task Category:</label>
                 <select name="edit-category-input" id="edit-category-input" form="edit-task-form">
                   <option value="garden">Garden</option>
