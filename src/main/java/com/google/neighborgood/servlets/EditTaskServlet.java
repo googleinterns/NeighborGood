@@ -124,10 +124,29 @@ public class EditTaskServlet extends HttpServlet {
       return;
     }
 
-    // Set the details and rewards to the newly input value
+    // Get task category from the form input
+    String taskCategory = request.getParameter("category-input");
+    if (taskCategory == null || taskCategory.isEmpty()) {
+      System.err.println("The task must have a category");
+      response.sendRedirect("/400.html");
+      return;
+    }
+
+    Key taskKey = KeyFactory.stringToKey(keyString);
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Entity task;
+    try {
+      task = datastore.get(taskKey);
+    } catch (EntityNotFoundException e) {
+      System.err.println("Unable to find the entity based on the input key");
+      response.sendError(HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
+      return;
+    }
+
+    // Set the details, category,and rewards to the newly input value
     task.setProperty("detail", taskDetail);
     task.setProperty("reward", rewardPts);
-
+    task.setProperty("category", taskCategory);
     datastore.put(task);
 
     response.sendRedirect("/user_profile.jsp");
