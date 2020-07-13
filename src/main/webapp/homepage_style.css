@@ -109,24 +109,26 @@ section {
 }
 
 #all {
-  background-color: #222;
-  color: white;
-  font-weight: bold;
+  background-color: rgb(62, 142, 65);
 }
 
 .categories {
-  border: solid #222;
-  margin-right: -3px;
+  border: solid 1px green;
+  margin-right: -1px;
+  margin-bottom: -1px;
   cursor: pointer;
   text-align: center;
   width: 20%;
   min-width: 0;
   overflow: hidden;
-  line-height: 3em;
+  line-height: 3.2em;
+  background-color: rgb(76, 175, 80);
+  color: white;
+  font-weight: bold;
 }
 
 .categories:hover {
-  background-color: lightgray;
+  background-color: rgb(62, 142, 65);
 }
 
 #add-task {
