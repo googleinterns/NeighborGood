@@ -109,7 +109,13 @@
 			<h2>Edit Task</h2>
 			<form action="/tasks/edit" method="POST">
                 Task Details: <input type="text" id="task-detail-input" name="task-detail-input">
-				Reward: <input type="text" id="reward-input" name="reward-input" min="0" max="200">
+                Reward: <input type="text" id="reward-input" name="reward-input" min="0" max="200">
+				<select name="edit-category-input" id="edit-category-input" form="edit-task-form">
+                  <option value="garden">Garden</option>
+                  <option value="shopping">Shopping</option>
+                  <option value="pets">Pets</option>
+                  <option value="misc">Misc</option>
+                </select>
 				<input type="submit" value="Submit">
                 <input type="hidden" name="task-id" id="task-id-input">
 			</form>
