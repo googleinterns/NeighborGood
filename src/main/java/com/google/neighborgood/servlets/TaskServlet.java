@@ -26,6 +26,7 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
+import com.google.neighborgood.helper.RetrieveUserInfo;
 import com.google.neighborgood.helper.RewardingPoints;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -155,6 +156,16 @@ public class TaskServlet extends HttpServlet {
       return;
     }
 
+    // I will work on a different implementation for this after the MVP since
+    // this implementation forces users to re-input their task details
+    // if they haven't ever inputted their user info and are automatically
+    // logged in when opening the page.
+    List<String> userInfo = RetrieveUserInfo.getInfo(userService);
+    if (userInfo == null) {
+      response.sendRedirect("account.jsp");
+      return;
+    }
+
     // Get the rewarding points from the form
     int rewardPts;
     try {
@@ -217,7 +228,7 @@ public class TaskServlet extends HttpServlet {
     taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
     taskEntity.setProperty("zipcode", "98033");
     taskEntity.setProperty("country", "United States");
-    taskEntity.setProperty("category", "misc");
+    taskEntity.setProperty("category", taskCategory);
 
     datastore.put(taskEntity);
 
