@@ -257,4 +257,13 @@ public final class TaskInfoServletTest {
     assertEquals("1234567890", (String) entity.getProperty("userId"));
     assertEquals(0, (long) entity.getProperty("points"));
   }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void invalidKeyStringTest() throws IOException {
+    // Simulate the situation where the input key string is invalid
+    when(request.getParameter("key")).thenReturn("SOME INVALID KEY STRING");
+    when(request.getParameter("status")).thenReturn("IN PROGRESS");
+
+    new TaskInfoServlet().doPost(request, response);
+  }
 }
