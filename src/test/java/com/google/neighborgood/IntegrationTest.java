@@ -19,19 +19,24 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.urlContains;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+@RunWith(JUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IntegrationTest {
 
@@ -42,6 +47,9 @@ public class IntegrationTest {
   private final String USER_EMAIL = "123456@example.com";
   private final String USER_ADDRESS = "123 Street Name, City, ST";
   private final String USER_PHONE = "1231231234";
+  private final String TASK_DETAIL = "Help!";
+
+  private int taskCount = 0;
 
   private static void clearAllDatastoreEntities(WebDriver driver) {
     // Clears datastore entities for start of test
@@ -54,7 +62,7 @@ public class IntegrationTest {
     By listButton;
     By allKeys;
     By deleteButton;
-    for (int i = 0; i < allEntityKinds.size(); i++) {
+    for (int i = 0; i < allEntityKinds.size() - 1; i++) {
       listButton = By.id("list_button");
       wait.until(presenceOfElementLocated(listButton));
       driver.findElement(listButton).click();
@@ -71,8 +79,12 @@ public class IntegrationTest {
   @BeforeClass
   public static void setupClass() {
     WebDriverManager.chromedriver().setup();
-    driver = new ChromeDriver();
-    wait = new WebDriverWait(driver, 10);
+    // driver = new ChromeDriver();
+    ChromeOptions options = new ChromeOptions();
+    options.addArguments("--headless");
+    options.addArguments("--disable-gpu");
+    driver = new ChromeDriver(options);
+    wait = new WebDriverWait(driver, 30);
     clearAllDatastoreEntities(driver);
   }
 
@@ -92,7 +104,8 @@ public class IntegrationTest {
     String actualLoginText = loginElement.getText();
 
     // Guest user should expect to see login message
-    assertEquals("Login to help out a neighbor!", actualLoginText);
+    assertEquals(
+        "Homepage login message as guest user", "Login to help out a neighbor!", actualLoginText);
 
     By addTaskButton = By.id("addtaskbutton");
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
@@ -103,7 +116,7 @@ public class IntegrationTest {
         "Add task button must not be present for guest users", addTaskButtonElement.isEmpty());
 
     By dashboardIcon = By.className("dashboard-icon");
-    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
     List<WebElement> dashboardIconsElement = driver.findElements(dashboardIcon);
 
     // Dashboard icon (userpage or admin page) buttons
@@ -116,9 +129,9 @@ public class IntegrationTest {
     WebElement taskResultsMessageElement = driver.findElement(taskResultsMessage);
 
     // Message alerting user there are no tasks nearby should be displayed
-    assertTrue(
-        "No tasks in neighborhood message should be displayed",
-        taskResultsMessageElement.isDisplayed());
+    // assertTrue(
+    //    "No tasks in neighborhood message should be displayed",
+    //    taskResultsMessageElement.isDisplayed());
 
     loginElement.click();
     By emailInput = By.id("email");
@@ -166,7 +179,8 @@ public class IntegrationTest {
     wait.until(presenceOfElementLocated(userpageLogoutMessage));
     String actualyUPLogoutM = driver.findElement(userpageLogoutMessage).getText();
     // Userpage should show a custom logout message with user's nickname
-    assertEquals(USER_NICKNAME + " | Logout", actualyUPLogoutM);
+    assertEquals(
+        "Userpage login message as logged user", USER_NICKNAME + " | Logout", actualyUPLogoutM);
 
     By backToHome = By.id("backtohome");
     wait.until(presenceOfElementLocated(backToHome));
@@ -179,7 +193,8 @@ public class IntegrationTest {
     String actualLogoutText = logoutElement.getText();
 
     // Homepage should show a custom logout message with user's nickname
-    assertEquals(USER_NICKNAME + " | Logout", actualLogoutText);
+    assertEquals(
+        "Homepage login message as logged user", USER_NICKNAME + " | Logout", actualLogoutText);
   }
 
   @Test
@@ -190,7 +205,72 @@ public class IntegrationTest {
     WebElement logoutElement = driver.findElement(logoutMessage);
     String actualLogoutText = logoutElement.getText();
 
-    // Homepage should show a custom logout message with user's nickname
+    // Confirm that the user is still logged in
     assertEquals(USER_NICKNAME + " | Logout", actualLogoutText);
+    By addTaskButton = By.id("addtaskbutton");
+    wait.until(presenceOfElementLocated((addTaskButton)));
+    WebElement addTaskButtonElement = driver.findElement(addTaskButton);
+    addTaskButtonElement.click();
+
+    By createTaskModal = By.id("createTaskModal");
+    wait.until(presenceOfElementLocated(createTaskModal));
+    WebElement createTaskModalElement = driver.findElement(createTaskModal);
+
+    // After clicking on the add task button, the modal should be displayed
+    // assertTrue("Create task modal should be displayed", createTaskModalElement.isDisplayed());
+
+    Random random = new Random();
+
+    // Input task details
+    By taskDetailInput = By.id("task-detail-input");
+    wait.until(presenceOfElementLocated(taskDetailInput));
+    WebElement taskDetailInputElement = driver.findElement(taskDetailInput);
+    String taskDetailInputString = TASK_DETAIL + random.nextInt(1000);
+    taskDetailInputElement.sendKeys(taskDetailInputString);
+
+    // Input task reward pts
+    By rewardPointInput = By.id("rewarding-point-input");
+    wait.until(presenceOfElementLocated(rewardPointInput));
+    WebElement rewardPointInputElement = driver.findElement(rewardPointInput);
+    String rewardPoints = Integer.toString(random.nextInt(201));
+    rewardPointInputElement.clear();
+    rewardPointInputElement.sendKeys(rewardPoints);
+
+    // Input task category
+    By categoryInput = By.id("category-input");
+    wait.until(presenceOfElementLocated(categoryInput));
+    Select categoryInputElement = new Select(driver.findElement(categoryInput));
+    int categoryOptionIndex = random.nextInt(categoryInputElement.getOptions().size());
+    categoryInputElement.selectByIndex(categoryOptionIndex);
+
+    By submitButton = By.id("submit-create-task");
+    wait.until(presenceOfElementLocated(submitButton));
+    driver.findElement(submitButton).click();
+
+    // User should be redirected to user profile page after adding a task
+    assertTrue(
+        "User should be in user profile page",
+        driver.getCurrentUrl().contains("/user_profile.jsp"));
+    taskCount++;
+
+    // Verify that inputted task info is correctly displayed in need help table
+    String taskRowXPath = "//table[@id='need-help']/tbody/tr[1]";
+    By rowTaskDetails = By.xpath(taskRowXPath + "/td[1]");
+    wait.until(presenceOfElementLocated(rowTaskDetails));
+    String rowDetailsActual = driver.findElement(rowTaskDetails).getText();
+    assertEquals(taskDetailInputString, rowDetailsActual);
+
+    By rowTaskHelper = By.xpath(taskRowXPath + "/td[2]");
+    wait.until(presenceOfElementLocated(rowTaskHelper));
+    String rowHelperActual = driver.findElement(rowTaskHelper).getText();
+    assertEquals("N/A", rowHelperActual);
+
+    By rowTaskStatus = By.xpath(taskRowXPath + "/td[3]");
+    wait.until(presenceOfElementLocated(rowTaskStatus));
+    String rowStatusActual = driver.findElement(rowTaskStatus).getText();
+    assertEquals("OPEN", rowStatusActual);
+
+    // TODO: After merging leonard's map branch, include test that shows
+    // task in homepage as well.
   }
 }

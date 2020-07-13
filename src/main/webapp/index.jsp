@@ -126,7 +126,7 @@
                   <option value="misc">Misc</option>
                 </select>
                 <br/><br/>
-                <input type="submit" />
+                <input type="submit" id="submit-create-task"/>
             </form>
         </div>
     </div>
