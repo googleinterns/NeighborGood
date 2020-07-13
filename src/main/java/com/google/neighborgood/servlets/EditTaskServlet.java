@@ -125,7 +125,7 @@ public class EditTaskServlet extends HttpServlet {
     }
 
     // Get task category from the form input
-    String taskCategory = request.getParameter("category-input");
+    String taskCategory = request.getParameter("edit-category-input");
     if (taskCategory == null || taskCategory.isEmpty()) {
       System.err.println("The task must have a category");
       response.sendRedirect("/400.html");
