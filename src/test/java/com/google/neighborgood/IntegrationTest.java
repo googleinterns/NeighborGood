@@ -52,8 +52,7 @@ public class IntegrationTest {
   private final String USER_PHONE = "1231231234";
   private final String TASK_DETAIL = "Help!";
   private final String[] TASK_CATEGORIES = {"garden", "shopping", "pets", "misc"};
-
-  private int taskCount = 0;
+  private int homepageTaskCount = 0;
 
   @BeforeClass
   public static void setupClass() {
@@ -63,7 +62,7 @@ public class IntegrationTest {
     // options.addArguments("--headless");
     // options.addArguments("--disable-gpu");
     // driver = new ChromeDriver(options);
-    wait = new WebDriverWait(driver, 15);
+    wait = new WebDriverWait(driver, 20);
     js = (JavascriptExecutor) driver;
     clearAllDatastoreEntities(driver);
   }
@@ -121,42 +120,19 @@ public class IntegrationTest {
     assertTrue("User in user profile page", driver.getCurrentUrl().contains("/user_profile.jsp"));
     assertEquals("My Account", driver.getTitle());
 
-    By userpageLogoutMessage = By.id("log-out-link");
-    wait.until(presenceOfElementLocated(userpageLogoutMessage));
-    String actualyUPLogoutM = driver.findElement(userpageLogoutMessage).getText();
-    // Userpage should show a custom logout message with user's nickname
-    assertEquals(
-        "Userpage login message as logged user", USER_NICKNAME + " | Logout", actualyUPLogoutM);
-
-    By backToHome = By.id("backtohome");
-    wait.until(presenceOfElementLocated(backToHome));
-    WebElement backToHomeElement = driver.findElement(backToHome);
-    js.executeScript("arguments[0].click();", backToHomeElement);
-    wait.until(urlContains("/index.jsp"));
-
-    By logoutMessage = By.id("login-logout");
-    wait.until(presenceOfElementLocated(logoutMessage));
-    WebElement logoutElement = driver.findElement(logoutMessage);
-    String actualLogoutText = logoutElement.getText();
-
-    // Homepage should show a custom logout message with user's nickname
-    assertEquals(
-        "Homepage login message as logged user", USER_NICKNAME + " | Logout", actualLogoutText);
+    verifyLoggedUserUserPage(USER_NICKNAME);
+    backToHome();
+    verifyLoggedUserHomePage(USER_NICKNAME);
   }
 
   @Test
   public void _02_Homepage_AsLoggedUser_AddTask() {
     driver.get("http://localhost:8080/");
-    By logoutMessage = By.id("login-logout");
-    wait.until(presenceOfElementLocated(logoutMessage));
-    WebElement logoutElement = driver.findElement(logoutMessage);
-    String actualLogoutText = logoutElement.getText();
 
     // Confirm that the user is still logged in
-    assertEquals(USER_NICKNAME + " | Logout", actualLogoutText);
+    verifyLoggedUserHomePage(USER_NICKNAME);
 
     Random random = new Random();
-
     String taskDetail = TASK_DETAIL + random.nextInt(1000);
     String rewardPoints = Integer.toString(random.nextInt(201));
     int categoryOptionIndex = random.nextInt(TASK_CATEGORIES.length);
@@ -168,15 +144,9 @@ public class IntegrationTest {
     assertTrue(
         "User should be in user profile page",
         driver.getCurrentUrl().contains("/user_profile.jsp"));
-    taskCount++;
 
     verifyNewTaskUserPage(taskDetail);
-
-    By backToHome = By.id("backtohome");
-    WebElement backToHomeElement = driver.findElement(backToHome);
-    js.executeScript("arguments[0].click();", backToHomeElement);
-    wait.until(urlContains("/index.jsp"));
-
+    backToHome();
     verifyNewTaskHomepage(taskDetail, taskCategory);
   }
 
@@ -185,7 +155,6 @@ public class IntegrationTest {
     driver.get("http://localhost:8080/user_profile.jsp");
 
     Random random = new Random();
-
     String taskDetail = TASK_DETAIL + random.nextInt(1000);
     String rewardPoints = Integer.toString(random.nextInt(201));
     int categoryOptionIndex = random.nextInt(TASK_CATEGORIES.length);
@@ -197,15 +166,9 @@ public class IntegrationTest {
     assertTrue(
         "User should be in user profile page",
         driver.getCurrentUrl().contains("/user_profile.jsp"));
-    taskCount++;
 
     verifyNewTaskUserPage(taskDetail);
-
-    By backToHome = By.id("backtohome");
-    WebElement backToHomeElement = driver.findElement(backToHome);
-    js.executeScript("arguments[0].click();", backToHomeElement);
-    wait.until(urlContains("/index.jsp"));
-
+    backToHome();
     verifyNewTaskHomepage(taskDetail, taskCategory);
   }
 
@@ -225,11 +188,17 @@ public class IntegrationTest {
   public void _05_Homepage_AsLoggedHelper_HelpOut() {
     loginNewUser(USER_EMAIL_HELPER, USER_NICKNAME_HELPER, USER_ADDRESS, USER_PHONE);
     wait.until(urlContains("/user_profile.jsp"));
-    By logoutMessage = By.id("log-out-link");
-    wait.until(presenceOfElementLocated(logoutMessage));
-    String logoutActualMessage = driver.findElement(logoutMessage).getText();
-    // Userpage should show a custom logout message with user's nickname
-    assertEquals(USER_NICKNAME_HELPER + " | Logout", logoutActualMessage);
+    verifyLoggedUserUserPage(USER_NICKNAME_HELPER);
+    backToHome();
+    verifyLoggedUserHomePage(USER_NICKNAME_HELPER);
+
+    String[] expectedNicknameAndDetails = helpOut();
+
+    // TODO: check that number of rows matches number of homepage tasks count
+
+    goToUserPage();
+    goToOfferHelp();
+    verifyOfferHelpTask(expectedNicknameAndDetails);
   }
 
   private static void clearAllDatastoreEntities(WebDriver driver) {
@@ -285,6 +254,8 @@ public class IntegrationTest {
     wait.until(presenceOfElementLocated(submitButton));
     WebElement submitButtonElement = driver.findElement(submitButton);
     js.executeScript("arguments[0].click();", submitButtonElement);
+
+    homepageTaskCount++;
   }
 
   private void verifyNewTaskUserPage(String expectedDetails) {
@@ -354,5 +325,87 @@ public class IntegrationTest {
     wait.until(presenceOfElementLocated(submitButton));
     WebElement submitButtonElement = driver.findElement(submitButton);
     js.executeScript("arguments[0].click();", submitButtonElement);
+  }
+
+  private void verifyLoggedUserUserPage(String nickname) {
+    By logoutMessage = By.id("log-out-link");
+    wait.until(presenceOfElementLocated(logoutMessage));
+    String logoutActualMessage = driver.findElement(logoutMessage).getText();
+    // Userpage should show a custom logout message with user's nickname
+    assertEquals(nickname + " | Logout", logoutActualMessage);
+  }
+
+  private void backToHome() {
+    By backToHome = By.id("backtohome");
+    WebElement backToHomeElement = driver.findElement(backToHome);
+    js.executeScript("arguments[0].click();", backToHomeElement);
+    wait.until(urlContains("/index.jsp"));
+  }
+
+  private void goToUserPage() {
+    By goToUserPage = By.xpath("//div[@id='dashboard-icon-container']/a");
+    wait.until(presenceOfElementLocated(goToUserPage));
+    WebElement goToUserPageElement = driver.findElement(goToUserPage);
+    js.executeScript("arguments[0].click();", goToUserPageElement);
+    wait.until(urlContains("/user_profile.jsp"));
+  }
+
+  private void goToOfferHelp() {
+    By offerHelpButton = By.id("offer-help-button");
+    wait.until(presenceOfElementLocated(offerHelpButton));
+    WebElement offerHelpElement = driver.findElement(offerHelpButton);
+    js.executeScript("arguments[0].click();", offerHelpElement);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+  }
+
+  private void verifyLoggedUserHomePage(String nickname) {
+    By logoutMessage = By.id("login-logout");
+    wait.until(presenceOfElementLocated(logoutMessage));
+    String actualLogoutText = driver.findElement(logoutMessage).getText();
+
+    // Homepage should show a custom logout message with user's nickname
+    assertEquals(nickname + " | Logout", actualLogoutText);
+  }
+
+  private String[] helpOut() {
+
+    String[] expectedNicknameAndDetails = new String[2];
+
+    String taskXPath = "//div[@id='tasks-list']/div[1]";
+
+    By taskNeighborNickname = By.xpath(taskXPath + "/div[2]/div[1]/div[1]");
+    wait.until(presenceOfElementLocated(taskNeighborNickname));
+    expectedNicknameAndDetails[0] = driver.findElement(taskNeighborNickname).getText();
+
+    By neighborTaskDetails = By.xpath(taskXPath + "/div[2]/div[2]");
+    wait.until(presenceOfElementLocated(neighborTaskDetails));
+    expectedNicknameAndDetails[1] = driver.findElement(neighborTaskDetails).getText();
+
+    By helpOutButton = By.xpath(taskXPath + "/div[2]/div[1]/div[2]");
+    wait.until(presenceOfElementLocated(helpOutButton));
+    WebElement helpOutElement = driver.findElement(helpOutButton);
+    js.executeScript("arguments[0].click();", helpOutElement);
+
+    By confirmHelp = By.xpath(taskXPath + "/div[1]/a");
+    wait.until(presenceOfElementLocated(confirmHelp));
+    WebElement confirmHelpElement = driver.findElement(confirmHelp);
+    js.executeScript("arguments[0].click();", confirmHelpElement);
+    homepageTaskCount--;
+
+    return expectedNicknameAndDetails;
+  }
+
+  private void verifyOfferHelpTask(String[] expectedNicknameAndDetails) {
+    String offerHelpRowXPath = "//tbody[@id='offer-help-body']/tr[1]";
+
+    By taskDetails = By.xpath(offerHelpRowXPath + "/td[1]");
+    wait.until(presenceOfElementLocated(taskDetails));
+    assertEquals(expectedNicknameAndDetails[1], driver.findElement(taskDetails).getText());
+    By taskStatus = By.xpath(offerHelpRowXPath + "/td[2]");
+    wait.until(presenceOfElementLocated(taskStatus));
+    assertEquals("IN PROGRESS", driver.findElement(taskStatus).getText());
+    By taskNeighbor = By.xpath(offerHelpRowXPath + "/td[3]");
+    wait.until(presenceOfElementLocated(taskNeighbor));
+    assertEquals(expectedNicknameAndDetails[0], driver.findElement(taskNeighbor).getText());
   }
 }
