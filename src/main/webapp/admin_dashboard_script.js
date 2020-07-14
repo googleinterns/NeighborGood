@@ -200,7 +200,7 @@ function getUserTasks() {
 
 function addTask(task) {
 	let string = `<a href="#popup-overlay"><li class="admin-user-task"  onclick="openWithPopup('${task.keyString}')"><span><h3> ${task.category} </h3>`;
-	string += `<h4> ${task.owner} </h4></span> <span id="delete-btn" onclick=deleteTask('${task.keyString}')><i class="fas fa-trash fa-2x"></i></span></li></a>`;
+	string += `<h4> ${task.owner} </h4></span> <a href="#"><span id="delete-btn" onclick=deleteTask('${task.keyString}')><i class="fas fa-trash fa-2x"></i></span></a></li></a>`;
 	return string;
 }
 
@@ -225,5 +225,7 @@ async function deleteTask(keyString) {
 		const queryURL = "/tasks?key=" + keyString;
 		const request = new Request(queryURL, {method: "DELETE"});
 		await fetch(request);
+        location.reload();
+        return false;
 	}
 }
