@@ -32,7 +32,6 @@ public final class Task {
   private final String owner;
   private final String helper;
   private final String address;
-  private final String userId;
   private final String zipcode;
   private final String country;
   private final String category;
@@ -46,7 +45,6 @@ public final class Task {
       String owner,
       String helper,
       String address,
-      String userId,
       String zipcode,
       String country,
       String category) {
@@ -58,7 +56,6 @@ public final class Task {
     this.owner = owner;
     this.helper = helper;
     this.address = address;
-    this.userId = userId;
     this.zipcode = zipcode;
     this.country = country;
     this.category = category;
@@ -71,7 +68,6 @@ public final class Task {
     this.reward = (long) entity.getProperty("reward");
     this.status = (String) entity.getProperty("status");
     this.address = (String) entity.getProperty("Address");
-    this.userId = (String) entity.getProperty("userId");
     this.zipcode = (String) entity.getProperty("zipcode");
     this.country = (String) entity.getProperty("country");
     this.category = (String) entity.getProperty("category");
