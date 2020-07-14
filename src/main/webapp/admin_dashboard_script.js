@@ -173,7 +173,7 @@ function getUserTasks() {
 
 function addTask(task) {
 	let string = `<a href="#popup-overlay"><li class="user-task"  onclick="openWithPopup('${task.keyString}')"><span><h3> ${task.category} </h3>`;
-	string += `<h4> ${task.owner} </h4></span><span><i class="fas fa-edit fa-2x"></i><i class="fas fa-trash fa-2x"></i></span></li></a>`;
+	string += `<h4> ${task.owner} </h4></span> <span id="delete-btn" onclick=deleteTask('${task.keyString}')><i class="fas fa-trash fa-2x"></i></span></li></a>`;
 	return string;
 }
 
@@ -191,14 +191,12 @@ async function openWithPopup(id){
 	document.getElementById("reward-input").value = task.reward;
 	document.getElementById("task-id-input").value = task.keyString;
 	document.getElementById("edit-category-input").value = task.category;
-	console.log("id: " + id);
-	console.log("Keystring: " + task.keyString);
 }
 
 async function deleteTask(keyString) {
 	if (confirm("Are you sure that you want to delete the task?")) {
 		const queryURL = "/tasks?key=" + keyString;
 		const request = new Request(queryURL, {method: "DELETE"});
-		const response = await fetch(request);
+		await fetch(request);
 	}
 }

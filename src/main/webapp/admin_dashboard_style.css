@@ -130,14 +130,16 @@ main h1 {
 }
 
 #card-div ul li h3 {
-  font-size: 15px;
+  font-size: 18px;
+  text-transform: uppercase;
   font-weight: 400;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
+
 }
 
 #card-div ul li h4 {
-  font-size: 11px;
-  text-transform: uppercase;
+  font-size: 14px;
+  text-transform: capitalize;
   letter-spacing: 0.5px;
 }
 
