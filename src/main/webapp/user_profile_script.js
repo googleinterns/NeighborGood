@@ -549,6 +549,16 @@ function displayMarker(position) {
 
     google.maps.event.addListener(marker, "dblclick", function(event) {
         deleteMarker(lat, lng);
+
+        // Clear the address, zipcode and country input
+        document.getElementById("edit-address-input").value = "";
+        document.getElementById("edit-zipcode-input").value = "";
+        document.getElementById("edit-country-input").value = "";
+
+        // Add a placeholder to remind the user to fill out the blank
+        document.getElementById("edit-address-input").placeholder = "Don't forget to input your address";
+        document.getElementById("edit-zipcode-input").placeholder = "Don't forget to input your zipcode";
+        document.getElementById("edit-country-input").placeholder = "Don't forget to input your country";
     })
     
     // There is at most one marker displayed on the map

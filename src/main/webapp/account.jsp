@@ -45,21 +45,21 @@
                     <br/>
                 </div>
                 <br/>
-                <textarea name="zipcode-input" id="edit-zipcode-input" required="true" placeholder="Input your zipcode here:"></textarea>
+                <input type="text" name="zipcode-input" id="edit-zipcode-input" required="true" placeholder="Input your zipcode here:">
                 <br/><br/>
                 <div>
                     <label for="edit-country-input">Your Country:</label>
                     <br/>
                 </div>
                 <br/>
-                <textarea name="country-input" id="edit-country-input" required="true" placeholder="Input your country here:"></textarea>
+                <input type="text" name="country-input" id="edit-country-input" required="true" placeholder="Input your country here:">
                 <br/><br/>
                 <div>
                     <label for="phone-input">Your Phone Number:</label>
                     <br/>
                 </div>
                 <br/>
-                <textarea name="phone-input" id="phone-input" required="true" placeholder="Input your phone number here:"></textarea>
+                <input type="text" name="phone-input" id="phone-input" required="true" placeholder="Input your phone number here:">
                 <br/><br/>
                 <button type="submit" id="submit-button"/>GET STARTED</button>
                 <br/><br/>
