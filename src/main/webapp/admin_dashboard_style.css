@@ -20,6 +20,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  text-decoration: none;
 }
 
 html,
@@ -30,6 +31,21 @@ body {
 body {
   font: 15px 'Roboto', sans-serif;
   color: #222;
+}
+
+a:visited { 
+  text-decoration: none;
+  color:inherit;
+}
+
+a:hover { 
+  text-decoration: none;
+  color:inherit;
+}
+
+a:focus { 
+  text-decoration: none;
+  color:inherit;
 }
 
 .fa,
