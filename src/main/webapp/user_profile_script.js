@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var markers = [];
+var map;
+const GOOGLE_KIRKLAND_LAT = 47.669846;
+const GOOGLE_KIRKLAND_LNG = -122.1996099;
+const MAPSKEY = config.MAPS_KEY;
+
 async function getTaskInfo(keyString) {
     const queryURL = "/tasks/info?key=" + keyString;
     const request = new Request(queryURL, {method: "GET"});
@@ -37,7 +43,7 @@ async function deleteTask(keyString) {
 async function editTask(keyString) {
     const info = await getTaskInfo(keyString);
     if (info.status !== "OPEN") {
-        window.alert("You can only edit an 'OPEN' task.")
+        window.alert("You can only edit an 'OPEN' task.");
     } else {
         document.getElementById("edit-detail-input").value = info.detail;
         document.getElementById("edit-category-input").value = info.category;
@@ -45,7 +51,7 @@ async function editTask(keyString) {
         const id_input = document.getElementById("task-id-input");
         id_input.value = info.keyString;
         document.getElementById("editTaskModalWrapper").style.display = "block";
-        showNeedHelp()
+        showNeedHelp();
     }
 }
 
@@ -56,6 +62,8 @@ async function editInfo() {
     document.getElementById("edit-nickname-input").value = userInfo[0];
     document.getElementById("edit-address-input").value = userInfo[1];
     document.getElementById("edit-phone-number-input").value = userInfo[2];
+    document.getElementById("edit-zipcode-input").value = userInfo[3];
+    document.getElementById("edit-country-input").value = userInfo[4];
     showInfoModal();
 }
 
@@ -118,6 +126,7 @@ async function disapproveTask(keyString) {
 }
 
 function showNeedHelp() {
+    if (document.getElementById("need-help") == null) return;
     document.getElementById("need-help").style.display = "table";
     document.getElementById("create").style.display = "block";
     document.getElementById("offer-help").style.display = "none";
@@ -301,4 +310,304 @@ async function displayOfferHelpCompleteTasks() {
         }
         completeTaskBody.appendChild(tr);
     }
+}
+
+/* Calls showNeedHelp and initMap once page has loaded */
+if (document.readyState === 'loading') {
+    // adds on load event listeners if document hasn't yet loaded
+    document.addEventListener('DOMContentLoaded', initMap);
+    document.addEventListener('DOMContentLoaded', showNeedHelp)
+} else {
+    // if DOMContentLoaded has already fired, it simply calls the functions
+    initMap();
+    showNeedHelp();
+}
+
+/**
+ * Initialize a map on the page
+ */
+async function initMap() {
+    console.log("Start loading");
+    const script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "https://maps.googleapis.com/maps/api/js?key=" + 
+                    MAPSKEY + "&callback=initialize&libraries=places&language=en";
+    document.head.appendChild(script);
+
+    // After the Google Maps API script has been loaded, start initializing the map
+    window.initialize = async function() {
+        markers = [];
+        console.log("Draw map");
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: {lat: GOOGLE_KIRKLAND_LAT, lng: GOOGLE_KIRKLAND_LNG},
+            zoom: 18,
+            styles: [
+                {
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#ebe3cd"}]
+                },
+                {
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#523735"}]
+                },
+                {
+                    "elementType": "labels.text.stroke",
+                    "stylers": [{"color": "#f5f1e6"}]
+                },
+                {
+                    "featureType": "administrative",
+                    "elementType": "geometry.stroke",
+                    "stylers": [{"color": "#c9b2a6"}]
+                },
+                {
+                    "featureType": "administrative.land_parcel",
+                    "elementType": "geometry.stroke",
+                    "stylers": [{"color": "#dcd2be"}]
+                },
+                {
+                    "featureType": "administrative.land_parcel",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#ae9e90"}]
+                },
+                {
+                    "featureType": "landscape.man_made",
+                    "elementType": "geometry.stroke",
+                    "stylers": [{"color": "#36aff9"}]
+                },
+                {
+                    "featureType": "landscape.natural",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#dfd2ae"}]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#dfd2ae"}]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#93817c"}]
+                },
+                {
+                    "featureType": "poi.park",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#a5b076"}]
+                },
+                {
+                    "featureType": "poi.park",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#28c4fa"}, {"lightness": -5}, {"weight": 2}]
+                },
+                {
+                    "featureType": "poi.park",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [{"color": "#f9fcc7"}]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#f5f1e6"}]
+                },
+                {
+                    "featureType": "road.arterial",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#fdfcf8"}]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#f8c967"}]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry.stroke",
+                    "stylers": [{"color": "#f2756a"}]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#f98357"}]
+                },
+                {
+                    "featureType": "road.highway.controlled_access",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#e98d58"}]
+                },
+                {
+                    "featureType": "road.highway.controlled_access",
+                    "elementType": "geometry.stroke",
+                    "stylers": [{"color": "#db8555"}]
+                },
+                {
+                    "featureType": "road.local",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#806b63"}]
+                },
+                {
+                    "featureType": "transit.line",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#dfd2ae"}]
+                },
+                {
+                    "featureType": "transit.line",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#8f7d77"}]
+                },
+                {
+                    "featureType": "transit.line",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [{"color": "#ebe3cd"}]
+                },
+                {
+                    "featureType": "transit.station",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#dfd2ae"}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#65d3f9"}, {"saturation": -10},  {"lightness": 10}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#92998d"}]
+                }
+            ],
+        });
+        map.setTilt(45);
+
+        var geocoder = new google.maps.Geocoder();
+        var infowindow = new google.maps.InfoWindow();
+
+        // When the map is clicked, display a marker and fill out the address info
+        map.addListener("click", function(event) {
+            var marker = displayMarker(event.latLng);
+            geocodeLatLng(geocoder, map, infowindow, event.latLng, marker);
+        });
+
+        var input = document.getElementById("place-input");
+        var searchBox = new google.maps.places.SearchBox(input);
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+        // Restrict the search result near to the current viewport
+        map.addListener("bounds_changed", function() {
+            searchBox.setBounds(map.getBounds());
+        });
+
+        // Place a new marker on the place that the user searches
+        searchBox.addListener("places_changed", function() {
+            var places = searchBox.getPlaces();
+            if (places.length === 0) {
+                return;
+            }
+
+            var bounds = new google.maps.LatLngBounds();
+            places.forEach(function(place) {
+                if (!place.geometry) {
+                    return;
+                }
+                if (place.geometry.viewport) {
+                    bounds.union(place.geometry.viewport);
+                } else {
+                    bounds.extend(place.geometry.location);
+                }
+            });
+            map.fitBounds(bounds);
+        });
+
+        function onError() {
+            console.log("Unable to resolve the user's current location");
+        }
+
+        function onSuccess(geo) {
+            const position = {
+                lat: geo.coords.latitude,
+                lng: geo.coords.longitude
+            };
+
+            // Set the center to the user's current location
+            map.setCenter(position);
+        }
+
+        if (!navigator.geolocation) {
+            onError();
+        } else {
+            await navigator.geolocation.getCurrentPosition(onSuccess, onError);
+        }
+    }
+}
+
+function displayMarker(position) {
+    var lat = position.lat();
+    var lng = position.lng();
+    let marker = new google.maps.Marker({
+        position: {lat: lat, lng: lng},
+        map: map
+    });
+
+    google.maps.event.addListener(marker, "dblclick", function(event) {
+        deleteMarker(lat, lng);
+
+        // Clear the address, zipcode and country input
+        document.getElementById("edit-address-input").value = "";
+        document.getElementById("edit-zipcode-input").value = "";
+        document.getElementById("edit-country-input").value = "";
+
+        // Add a placeholder to remind the user to fill out the blank
+        document.getElementById("edit-address-input").placeholder = "Don't forget to input your address";
+        document.getElementById("edit-zipcode-input").placeholder = "Don't forget to input your zipcode";
+        document.getElementById("edit-country-input").placeholder = "Don't forget to input your country";
+    })
+    
+    // There is at most one marker displayed on the map
+    if (markers.length > 0) {
+        markers[0].setMap(null);
+    }
+    markers = [];
+    markers.push(marker);
+    return marker;
+}
+
+function deleteMarker(latitude, longitude) {
+    markers = markers.filter(function(marker) { 
+        if (marker.getPosition().lat() !== latitude 
+         || marker.getPosition().lng() !== longitude) {
+             return true;
+        } else {
+            marker.setMap(null);
+            return false;
+        }
+    });
+}
+
+function geocodeLatLng(geocoder, map, infowindow, position, marker) {
+    geocoder.geocode({ location: position }, function(results, status) {
+        if (status === "OK") {
+            if (results[0]) {
+                map.setZoom(19);
+                infowindow.setContent(results[0].formatted_address);
+                infowindow.open(map, marker);
+
+                // Set the input address field to the formatted address
+                document.getElementById("edit-address-input").value = results[0].formatted_address;
+                
+                // Get the zipcode and country from the Geocoding response
+                // Since the postal code and country are often at the end of address_components, we loop from back to front
+                for (var i = results[0].address_components.length - 1; i >= 0; i--) {
+                    if (results[0].address_components[i].types[0] === "country") {
+                        document.getElementById("edit-country-input").value = results[0].address_components[i].long_name;
+                    }
+                    if (results[0].address_components[i].types[0] === "postal_code") {
+                        document.getElementById("edit-zipcode-input").value = results[0].address_components[i].long_name;
+                    }
+                }
+            } else {
+                window.alert("No results found");
+            }
+        } else {
+            window.alert("Geocoder failed due to: " + status);
+        }
+    });
 }

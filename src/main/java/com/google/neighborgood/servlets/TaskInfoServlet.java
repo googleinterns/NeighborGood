@@ -104,6 +104,6 @@ public class TaskInfoServlet extends HttpServlet {
     entity.setProperty("status", newStatus);
     datastore.put(entity);
 
-    response.sendRedirect("/user_profile.html");
+    response.sendRedirect("/user_profile.jsp");
   }
 }
