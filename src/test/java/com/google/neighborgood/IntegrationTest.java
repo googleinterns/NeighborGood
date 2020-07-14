@@ -29,13 +29,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-// import org.openqa.selenium.chrome.ChromeOptions;
 
 @RunWith(JUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -64,16 +63,20 @@ public class IntegrationTest {
     By listButton;
     By allKeys;
     By deleteButton;
+    JavascriptExecutor js = (JavascriptExecutor) driver;
     for (int i = 1; i < allEntityKinds.size(); i++) {
       listButton = By.id("list_button");
       wait.until(presenceOfElementLocated(listButton));
-      driver.findElement(listButton).click();
+      WebElement listButtonElement = driver.findElement(listButton);
+      js.executeScript("arguments[0].click();", listButtonElement);
       allKeys = By.id("allkeys");
       wait.until(presenceOfElementLocated(allKeys));
-      driver.findElement(allKeys).click();
+      WebElement allKeysElement = driver.findElement(allKeys);
+      js.executeScript("arguments[0].click();", allKeysElement);
       deleteButton = By.id("delete_button");
       wait.until(presenceOfElementLocated(deleteButton));
-      driver.findElement(deleteButton).click();
+      WebElement deleteButtonElement = driver.findElement(deleteButton);
+      js.executeScript("arguments[0].click();", deleteButtonElement);
       driver.switchTo().alert().accept();
     }
   }
@@ -92,27 +95,18 @@ public class IntegrationTest {
     // After clicking on the add task button, the modal should be displayed
     // assertTrue("Create task modal should be displayed", createTaskModalElement.isDisplayed());
 
-    By taskDetailInput = By.id("task-detail-input");
-    wait.until(presenceOfElementLocated(taskDetailInput));
-    WebElement taskDetailInputElement = driver.findElement(taskDetailInput);
-    taskDetailInputElement.sendKeys(details);
-
-    // Input task reward pts
-    By rewardPointInput = By.id("rewarding-point-input");
-    wait.until(presenceOfElementLocated(rewardPointInput));
-    WebElement rewardPointInputElement = driver.findElement(rewardPointInput);
-    rewardPointInputElement.clear();
-    rewardPointInputElement.sendKeys(points);
-
-    // Input task category
-    By categoryInput = By.id("category-input");
-    wait.until(presenceOfElementLocated(categoryInput));
-    Select categoryInputElement = new Select(driver.findElement(categoryInput));
-    categoryInputElement.selectByIndex(categoryIndex);
+    JavascriptExecutor js = (JavascriptExecutor) driver;
+    js.executeScript("document.getElementById('task-detail-input').value='" + details + "';");
+    js.executeScript("document.getElementById('rewarding-point-input').value='" + points + "';");
+    js.executeScript(
+        "document.getElementById('category-input').value='"
+            + TASK_CATEGORIES[categoryIndex]
+            + "';");
 
     By submitButton = By.id("submit-create-task");
     wait.until(presenceOfElementLocated(submitButton));
-    driver.findElement(submitButton).click();
+    WebElement submitButtonElement = driver.findElement(submitButton);
+    js.executeScript("arguments[0].click();", submitButtonElement);
   }
 
   private void verifyNewTaskUserPage(String expectedDetails) {
@@ -161,7 +155,7 @@ public class IntegrationTest {
     // options.addArguments("--headless");
     // options.addArguments("--disable-gpu");
     // driver = new ChromeDriver(options);
-    wait = new WebDriverWait(driver, 30);
+    wait = new WebDriverWait(driver, 15);
     clearAllDatastoreEntities(driver);
   }
 
@@ -193,7 +187,7 @@ public class IntegrationTest {
         "Add task button must not be present for guest users", addTaskButtonElement.isEmpty());
 
     By dashboardIcon = By.className("dashboard-icon");
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     List<WebElement> dashboardIconsElement = driver.findElements(dashboardIcon);
 
     // Dashboard icon (userpage or admin page) buttons
@@ -210,17 +204,16 @@ public class IntegrationTest {
     //    "No tasks in neighborhood message should be displayed",
     //    taskResultsMessageElement.isDisplayed());
 
-    loginElement.click();
-    By emailInput = By.id("email");
-    wait.until(presenceOfElementLocated(emailInput));
-    WebElement emailInputElement = driver.findElement(emailInput);
+    JavascriptExecutor js = (JavascriptExecutor) driver;
+    js.executeScript("arguments[0].click();", loginElement);
 
-    emailInputElement.clear();
-    emailInputElement.sendKeys(USER_EMAIL);
+    wait.until(urlContains("_ah/login?continue=%2Faccount.jsp"));
+    js.executeScript("document.getElementById('email').value='" + USER_EMAIL + "';");
+
     By loginButton = By.id("btn-login");
     wait.until(presenceOfElementLocated(loginButton));
     WebElement loginButtonElement = driver.findElement(loginButton);
-    loginButtonElement.click();
+    js.executeScript("arguments[0].click();", loginButtonElement);
     wait.until(urlContains("/account.jsp"));
 
     // User should now be logged in and redirected to the
@@ -228,25 +221,16 @@ public class IntegrationTest {
     assertTrue(driver.getCurrentUrl().contains("/account.jsp"));
     assertEquals("My Personal Info", driver.getTitle());
 
-    By nicknameInput = By.id("nickname-input");
-    wait.until(presenceOfElementLocated(nicknameInput));
-    WebElement nicknameInputElement = driver.findElement(nicknameInput);
-    nicknameInputElement.sendKeys(USER_NICKNAME);
-
-    By addressInput = By.id("address-input");
-    wait.until(presenceOfElementLocated(addressInput));
-    WebElement addressInputElement = driver.findElement(addressInput);
-    addressInputElement.sendKeys(USER_ADDRESS);
-
-    By phoneInput = By.id("phone-input");
-    wait.until(presenceOfElementLocated(phoneInput));
-    WebElement phoneInputElement = driver.findElement(phoneInput);
-    phoneInputElement.sendKeys(USER_PHONE);
+    js.executeScript("document.getElementById('nickname-input').value='" + USER_NICKNAME + "';");
+    js.executeScript("document.getElementById('address-input').value='" + USER_ADDRESS + "';");
+    js.executeScript("document.getElementById('phone-input').value='" + USER_PHONE + "';");
 
     By submitButton = By.id("submit-button");
     wait.until(presenceOfElementLocated(submitButton));
     WebElement submitButtonElement = driver.findElement(submitButton);
-    submitButtonElement.click();
+    js.executeScript("arguments[0].click();", submitButtonElement);
+
+    wait.until(urlContains("/user_profile.jsp"));
 
     // After new user fills out user info, they should be redirected to userpage
     assertTrue("User in user profile page", driver.getCurrentUrl().contains("/user_profile.jsp"));
@@ -261,7 +245,8 @@ public class IntegrationTest {
 
     By backToHome = By.id("backtohome");
     wait.until(presenceOfElementLocated(backToHome));
-    driver.findElement(backToHome).click();
+    WebElement backToHomeElement = driver.findElement(backToHome);
+    js.executeScript("arguments[0].click();", backToHomeElement);
     wait.until(urlContains("/index.jsp"));
 
     By logoutMessage = By.id("login-logout");
@@ -302,9 +287,11 @@ public class IntegrationTest {
 
     verifyNewTaskUserPage(taskDetail);
 
+    JavascriptExecutor js = (JavascriptExecutor) driver;
+
     By backToHome = By.id("backtohome");
-    wait.until(presenceOfElementLocated(backToHome));
-    driver.findElement(backToHome).click();
+    WebElement backToHomeElement = driver.findElement(backToHome);
+    js.executeScript("arguments[0].click();", backToHomeElement);
     wait.until(urlContains("/index.jsp"));
 
     verifyNewTaskHomepage(taskDetail, taskCategory);
@@ -331,9 +318,11 @@ public class IntegrationTest {
 
     verifyNewTaskUserPage(taskDetail);
 
+    JavascriptExecutor js = (JavascriptExecutor) driver;
+
     By backToHome = By.id("backtohome");
-    wait.until(presenceOfElementLocated(backToHome));
-    driver.findElement(backToHome).click();
+    WebElement backToHomeElement = driver.findElement(backToHome);
+    js.executeScript("arguments[0].click();", backToHomeElement);
     wait.until(urlContains("/index.jsp"));
 
     verifyNewTaskHomepage(taskDetail, taskCategory);
