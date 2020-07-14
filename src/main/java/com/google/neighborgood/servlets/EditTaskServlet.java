@@ -44,9 +44,11 @@ public class EditTaskServlet extends HttpServlet {
     UserService userService = UserServiceFactory.getUserService();
     if (!userService.isUserLoggedIn()) {
       System.err.println("User must be logged in to edit a task");
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       response.sendError(
           HttpServletResponse.SC_UNAUTHORIZED,
           "You must be logged in to perform this action on a task");
+      return;
     }
 
     // Edits tasks that have been claimed by setting the "helper" property to the userId
