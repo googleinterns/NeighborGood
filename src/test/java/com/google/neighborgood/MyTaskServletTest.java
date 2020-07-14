@@ -16,6 +16,7 @@ package com.google.neighborgood.servlets;
 
 import static com.google.appengine.api.datastore.FetchOptions.Builder.withLimit;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -80,8 +81,8 @@ public final class MyTaskServletTest {
     ds.put(userEntity);
 
     // Add 3 dummy task entities to datastore
-    String[] status_array = {"IN PROGRESS", "COMPLETE: AWAIT VERIFICATION", "COMPLETE"};
-    for (int i = 0; i < 3; i++) {
+    String[] status_array = {"OPEN", "IN PROGRESS", "COMPLETE: AWAIT VERIFICATION", "COMPLETE"};
+    for (int i = 0; i < 4; i++) {
       String status = status_array[i];
       Entity taskEntity = new Entity("Task", userEntity.getKey());
       taskEntity.setProperty("detail", "Test task");
@@ -89,7 +90,12 @@ public final class MyTaskServletTest {
       taskEntity.setProperty("reward", 50);
       taskEntity.setProperty("status", status);
       taskEntity.setProperty("Owner", "1234567890");
-      taskEntity.setProperty("Helper", "1234567890");
+      // If the status is OPEN, there is no helper for the task
+      if (i == 0) {
+        taskEntity.setProperty("Helper", "N/A");
+      } else {
+        taskEntity.setProperty("Helper", "1234567890");
+      }
       taskEntity.setProperty("Address", "xxx");
       taskEntity.setProperty("zipcode", "15213");
       taskEntity.setProperty("country", "US");
@@ -111,13 +117,14 @@ public final class MyTaskServletTest {
     assertTrue(userService.isUserLoggedIn());
 
     // Test the DataStore feature
-    assertEquals(3, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
+    assertEquals(4, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
     assertEquals(1, ds.prepare(new Query("UserInfo")).countEntities(withLimit(10)));
   }
 
   @Test
   public void needHelpDoGetTest() throws IOException {
     when(request.getParameter("keyword")).thenReturn("Owner");
+    // First test getting the COMPLETE and COMPLETE: AWAIT VERIFICATION tasks
     when(request.getParameter("complete")).thenReturn("True");
 
     StringWriter stringWriter = new StringWriter();
@@ -127,13 +134,112 @@ public final class MyTaskServletTest {
     new MyTaskServlet().doGet(request, response);
 
     // After sending the GET request, the doGet function should output the json string
+    // that contains a task with status COMPLETE and a task with status COMPLETE: AWAIT VERIFICATION
     writer.flush();
     assertTrue(
         stringWriter
             .toString()
             .contains("\"status\":\"COMPLETE: AWAIT VERIFICATION\",\"reward\":50"));
+    assertTrue(stringWriter.toString().contains("\"status\":\"COMPLETE\",\"reward\":50"));
+
+    // But the task with status "IN PROGRESS" and "OPEN" should not be included
+    // since complete attribute is set to True
+    assertFalse(stringWriter.toString().contains("\"status\":\"IN PROGRESS\",\"reward\":50"));
+    assertFalse(stringWriter.toString().contains("\"status\":\"OPEN\",\"reward\":50"));
 
     // Finally, ensure that the servlet file has set the content type to json
     verify(response).setContentType("application/json;");
+
+    // Now test getting the OPEN and IN PROGRESS tasks
+    when(request.getParameter("complete")).thenReturn("False");
+
+    // Clear string writer
+    stringWriter.getBuffer().setLength(0);
+
+    new MyTaskServlet().doGet(request, response);
+
+    // After sending the GET request, the doGet function should output the json string
+    // that contains a task with status OPEN and a task with status IN PROGRESS
+    writer.flush();
+    assertTrue(stringWriter.toString().contains("\"status\":\"IN PROGRESS\",\"reward\":50"));
+    assertTrue(stringWriter.toString().contains("\"status\":\"OPEN\",\"reward\":50"));
+
+    // But the task with status "IN PROGRESS" and "OPEN" should not be included
+    // since complete attribute is set to True
+    assertFalse(
+        stringWriter
+            .toString()
+            .contains("\"status\":\"COMPLETE: AWAIT VERIFICATION\",\"reward\":50"));
+    assertFalse(stringWriter.toString().contains("\"status\":\"COMPLETE\",\"reward\":50"));
+  }
+
+  @Test
+  public void offerHelpDoGetTest() throws IOException {
+    when(request.getParameter("keyword")).thenReturn("Helper");
+    // First test getting the COMPLETE and COMPLETE: AWAIT VERIFICATION tasks
+    when(request.getParameter("complete")).thenReturn("True");
+
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    new MyTaskServlet().doGet(request, response);
+
+    // The result should be the same as needHelpDoGetTest()
+    writer.flush();
+    assertTrue(
+        stringWriter
+            .toString()
+            .contains("\"status\":\"COMPLETE: AWAIT VERIFICATION\",\"reward\":50"));
+    assertTrue(stringWriter.toString().contains("\"status\":\"COMPLETE\",\"reward\":50"));
+    assertFalse(stringWriter.toString().contains("\"status\":\"IN PROGRESS\",\"reward\":50"));
+    assertFalse(stringWriter.toString().contains("\"status\":\"OPEN\",\"reward\":50"));
+
+    // Ensure that the servlet file has set the content type to json
+    verify(response).setContentType("application/json;");
+
+    // Now test getting the OPEN and IN PROGRESS tasks
+    when(request.getParameter("complete")).thenReturn("False");
+    stringWriter.getBuffer().setLength(0);
+    new MyTaskServlet().doGet(request, response);
+
+    writer.flush();
+    // For offer help tasks, the status cannot be OPEN since OPEN tasks have no helper
+    // So we should only got one single task with status IN PROGRESS
+    assertTrue(stringWriter.toString().contains("\"status\":\"IN PROGRESS\",\"reward\":50"));
+    assertFalse(stringWriter.toString().contains("\"status\":\"OPEN\",\"reward\":50"));
+    assertFalse(
+        stringWriter
+            .toString()
+            .contains("\"status\":\"COMPLETE: AWAIT VERIFICATION\",\"reward\":50"));
+    assertFalse(stringWriter.toString().contains("\"status\":\"COMPLETE\",\"reward\":50"));
+  }
+
+  @Test
+  public void notLoggedInEdgeCaseTest() throws IOException {
+    // Simulate the situation that the user has not logged into the account
+    helper =
+        new LocalServiceTestHelper(
+                new LocalDatastoreServiceTestConfig(), new LocalUserServiceTestConfig())
+            .setEnvIsAdmin(false)
+            .setEnvIsLoggedIn(false);
+    helper.setUp();
+
+    // Ensure that the user has not logged in yet
+    assertFalse(userService.isUserLoggedIn());
+
+    when(request.getParameter("keyword")).thenReturn("Owner");
+    when(request.getParameter("complete")).thenReturn("True");
+
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    new MyTaskServlet().doGet(request, response);
+
+    // After sending the GET request, the doGet function should enter the clause that the
+    // user is not logged. The user will be directed to account.jsp and return nothing
+    writer.flush();
+    assertEquals("", stringWriter.toString());
   }
 }
