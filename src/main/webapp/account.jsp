@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>My Personal Info</title>
     <link rel="stylesheet" href="account_style.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&libraries=places&language=en;"></script>
+    <script type='text/javascript' src='config.js'></script>
     <script src="user_profile_script.js"></script>
   </head>
   <%@ page import = "com.google.appengine.api.users.UserService" %>
@@ -14,7 +14,7 @@
   if (!userService.isUserLoggedIn()) {
        response.sendRedirect(userService.createLoginURL("/account.jsp"));
   } else if (RetrieveUserInfo.getInfo(userService) == null) { %>
-  <body onload="initMap()">
+  <body>
     <div id="container">
         <div id="header">
             <h1 id="title">Please input your personal information</h1>
