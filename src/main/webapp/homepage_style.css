@@ -151,14 +151,14 @@ section {
 
 #tasks-list {
   display: none;
-  border-top: solid;
-  border-right: solid;
-  border-left: solid;
+  border-top: solid 2px;
+  border-right: solid 2px;
+  border-left: solid 2px;
   transition: 0.5s;
 }
 
 .task {
-  border-bottom: solid;
+  border-bottom: solid 2px;
   position: relative;
 }
 
