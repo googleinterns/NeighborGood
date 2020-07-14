@@ -123,7 +123,7 @@ public class TaskServlet extends HttpServlet {
       out.append("</div>");
       if (userLoggedIn) {
         // changes the Help Button div if the current user is the owner of the task
-        if (!userId.equals((String) entity.getProperty("userId"))) {
+        if (!userId.equals(taskOwner)) {
           out.append("<div class='help-out'>HELP OUT</div>");
         } else {
           out.append(
