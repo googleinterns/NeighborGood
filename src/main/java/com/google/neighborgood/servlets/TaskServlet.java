@@ -26,6 +26,7 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
+import com.google.neighborgood.helper.RetrieveUserInfo;
 import com.google.neighborgood.helper.RewardingPoints;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -122,7 +123,7 @@ public class TaskServlet extends HttpServlet {
       out.append("</div>");
       if (userLoggedIn) {
         // changes the Help Button div if the current user is the owner of the task
-        if (!userId.equals((String) entity.getProperty("userId"))) {
+        if (!userId.equals(taskOwner)) {
           out.append("<div class='help-out'>HELP OUT</div>");
         } else {
           out.append(
@@ -152,6 +153,16 @@ public class TaskServlet extends HttpServlet {
 
     if (!userService.isUserLoggedIn()) {
       response.sendRedirect(userService.createLoginURL("/"));
+      return;
+    }
+
+    // I will work on a different implementation for this after the MVP since
+    // this implementation forces users to re-input their task details
+    // if they haven't ever inputted their user info and are automatically
+    // logged in when opening the page.
+    List<String> userInfo = RetrieveUserInfo.getInfo(userService);
+    if (userInfo == null) {
+      response.sendRedirect("account.jsp");
       return;
     }
 
