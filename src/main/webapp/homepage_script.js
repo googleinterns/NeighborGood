@@ -77,24 +77,20 @@ function filterTasksBy(category) {
     for (let i = 0; i < categoryButtons.length; i++){
         let button = categoryButtons[i];
         if (document.getElementById(category) != button) {
-            button.style.backgroundColor = "transparent";
-    		button.style.color = "#222";
-        	button.style.fontWeight = "normal";
+            button.style.backgroundColor = "rgb(76, 175, 80)";
         	button.addEventListener("mouseover", function() {
-                button.style.backgroundColor = "lightgray";
+                button.style.backgroundColor = "rgb(62, 142, 65)";
             });
             button.addEventListener("mouseout", function() {
-                button.style.backgroundColor = "transparent"
+                button.style.backgroundColor = "rgb(76, 175, 80)"
             });
         } else {
-            button.style.backgroundColor = "#222";
-        	button.style.color = "white";
-        	button.style.fontWeight = "bold";
+            button.style.backgroundColor = "rgb(62, 142, 65)";
             button.addEventListener("mouseover", function() {
-                button.style.backgroundColor = "#222";
+                button.style.backgroundColor = "rgb(62, 142, 65)";
             });
             button.addEventListener("mouseout", function() {
-                button.style.backgroundColor = "#222"
+                button.style.backgroundColor = "rgb(62, 142, 65)"
             });
         }
     }
