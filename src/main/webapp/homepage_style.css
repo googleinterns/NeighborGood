@@ -88,7 +88,7 @@ section {
 #control-bar-message-wrapper {
   width: 100%;
   max-width: 55em;
-  z-index: 1;
+  z-index: 2;
   background-image: linear-gradient(to bottom, white 90%, transparent);
   padding-bottom: 1em;
   padding-top: 1em;
@@ -198,7 +198,7 @@ section {
 
 .help-overlay {
   position: absolute;
-  z-index: 99;
+  z-index: 1;
   display: none;
   background: rgba(236, 236, 240, 0.85);
   backdrop-filter: blur(4px);
@@ -228,7 +228,7 @@ section {
 .modalWrapper {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
+  z-index: 3; /* Sit on top */
   padding-top: 100px; /* Location of the box */
   left: 0;
   top: 0;
