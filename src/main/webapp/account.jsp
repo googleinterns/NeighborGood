@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>My Personal Info</title>
     <link rel="stylesheet" href="account_style.css">
+    <script type='text/javascript' src='config.js'></script>
+    <script src="user_profile_script.js"></script>
   </head>
   <%@ page import = "com.google.appengine.api.users.UserService" %>
   <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
@@ -33,14 +35,31 @@
                     <br/>
                 </div>
                 <br/>
-                <textarea name="address-input" id="address-input" required="true" placeholder="Input your address here:"></textarea>
+                <textarea name="address-input" id="edit-address-input" required="true" placeholder="Input your address here:"></textarea>
+                <p id="rest-map">Click to mark your personal address on the map!</p>
+                <input id="place-input" class="controls" type="text" placeholder="Search Box">
+                <div id="map"></div>
+                <br/><br/>
+                <div>
+                    <label for="edit-zipcode-input">Your Zip Code:</label>
+                    <br/>
+                </div>
+                <br/>
+                <input type="text" name="zipcode-input" id="edit-zipcode-input" required="true" placeholder="Input your zipcode here:">
+                <br/><br/>
+                <div>
+                    <label for="edit-country-input">Your Country:</label>
+                    <br/>
+                </div>
+                <br/>
+                <input type="text" name="country-input" id="edit-country-input" required="true" placeholder="Input your country here:">
                 <br/><br/>
                 <div>
                     <label for="phone-input">Your Phone Number:</label>
                     <br/>
                 </div>
                 <br/>
-                <textarea name="phone-input" id="phone-input" required="true" placeholder="Input your phone number here:"></textarea>
+                <input type="text" name="phone-input" id="phone-input" required="true" placeholder="Input your phone number here:">
                 <br/><br/>
                 <button type="submit" id="submit-button"/>GET STARTED</button>
                 <br/><br/>

@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,19 +45,22 @@ if (document.readyState === 'loading') {
 
 /* Function adds all the necessary UI 'click' event listeners*/
 function addUIClickHandlers() {
-    // adds showModal and closeModal click events for the add task button
+    // adds showCreateTaskModal and closeCreateTaskModal click events for the add task button
     if (document.body.contains(document.getElementById("addtaskbutton"))) {
-        document.getElementById("addtaskbutton").addEventListener("click", showModal);
-    	document.getElementById("close-button").addEventListener("click", closeModal);
+        document.getElementById("addtaskbutton").addEventListener("click", showCreateTaskModal);
+    	document.getElementById("close-addtask-button").addEventListener("click", closeCreateTaskModal);
     }
 
-	// adds filterTasksBy click event listener to category buttons
-	const categoryButtons = document.getElementsByClassName("categories");
+    // adds filterTasksBy click event listener to category buttons
+    const categoryButtons = document.getElementsByClassName("categories");
     for (let i = 0; i < categoryButtons.length; i++) {
         categoryButtons[i].addEventListener("click", function(e) {
             filterTasksBy(e.target.id);
         });
     }
+    // adds showTopScoresModal click event 
+    document.getElementById("topscore-button").addEventListener("click", showTopScoresModal);
+    document.getElementById("close-topscore-button").addEventListener("click", closeTopScoresModal);
 }
 
 /* Function filters tasks by categories and styles selected categories */
@@ -127,19 +130,66 @@ function exitHelp(element) {
 }
 
 /* Leonard's implementation of the Add Task modal */
-function showModal() {
+function showCreateTaskModal() {
     var modal = document.getElementById("createTaskModalWrapper");
     modal.style.display = "block";
 }
-function closeModal() {
+function closeCreateTaskModal() {
     var modal = document.getElementById("createTaskModalWrapper");
     modal.style.display = "none";
 }
-// If the user clicks outside of the modal, closes the modal directly
+
+/* Function that calls the loadTopScorersBy functions
+   and then shows the top scores modal */
+function showTopScoresModal() {
+    loadTopScorersBy("world");
+    if (userNeighborhoodIsKnown()){
+      loadTopScorersBy("neighborhood");
+    }
+    document.getElementById("topScoresModalWrapper").style.display = "block";
+}
+
+/* Function closes the top scores modal */
+function closeTopScoresModal() {
+    document.getElementById("topScoresModalWrapper").style.display = "none";
+}
+
+/* Function loads the data for the top scorers table */
+function loadTopScorersBy(location) {
+    let url = "/account?action=topscorers";
+    if (location === "neighborhood") {
+      url += "&zipcode=" + neighborhood[0] + "&country=" + neighborhood[1];
+    }
+    fetch(url)
+      .then(response => response.json())
+      .then(users => {
+        // Inserts Nickname and Points for every top scorer
+        for (let i = 0; i < users.length; i++) {
+          let points = users[i].points;
+          let nickname = users[i].nickname;
+          let rowId = location + (i + 1);
+          let row = document.getElementById(rowId);
+          let rowNickname = row.getElementsByClassName("topscore-nickname")[0];
+          let rowScore = row.getElementsByClassName("topscore-score")[0];
+          rowNickname.innerText = nickname;
+          rowScore.innerText = points;
+          // Adds different styling if row includes current user
+          if (users[i].isCurrentUser) {
+            row.style.fontWeight = "bold";
+            row.setAttribute("title", "Congratulations, you made it to the Top Scorers Board!");
+          }
+        }
+    });
+}
+// If the user clicks outside of the modals, closes the modals directly
 window.onclick = function(event) {
-    var modal = document.getElementById("createTaskModalWrapper");
-    if (event.target == modal) {
-        modal.style.display = "none";
+    var createTaskModal = document.getElementById("createTaskModalWrapper");
+    if (event.target == createTaskModal) {
+        createTaskModal.style.display = "none";
+    }
+    var topScoresModal = document.getElementById("topScoresModalWrapper");
+    if (event.target == topScoresModal) {
+        topScoresModal.style.display = "none";
     }
 }
 
@@ -279,6 +329,7 @@ function addTasksClickHandlers() {
         }
 }
 
+/* Helper function that determines if the current user's neighborhood is known */
 function userNeighborhoodIsKnown() {
   return (neighborhood[0] !== null && neighborhood[1] !== null);
 }
