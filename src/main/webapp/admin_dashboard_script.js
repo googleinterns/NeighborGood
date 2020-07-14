@@ -186,7 +186,7 @@ function load(file) {
 }
 
 function getUserTasks() {
-	fetch("/user-tasks")
+	fetch("/admin-user-tasks")
 		.then((response) => response.json())
 		.then((tasks) => {
 			console.log(tasks);
@@ -199,7 +199,7 @@ function getUserTasks() {
 }
 
 function addTask(task) {
-	let string = `<a href="#popup-overlay"><li class="user-task"  onclick="openWithPopup('${task.keyString}')"><span><h3> ${task.category} </h3>`;
+	let string = `<a href="#popup-overlay"><li class="admin-user-task"  onclick="openWithPopup('${task.keyString}')"><span><h3> ${task.category} </h3>`;
 	string += `<h4> ${task.owner} </h4></span> <span id="delete-btn" onclick=deleteTask('${task.keyString}')><i class="fas fa-trash fa-2x"></i></span></li></a>`;
 	return string;
 }

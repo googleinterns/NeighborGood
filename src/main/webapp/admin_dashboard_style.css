@@ -154,7 +154,7 @@ main h1 {
   margin: 0;
 }
 
-.user-task {
+.admin-user-task {
   display: flex;
   justify-content: space-between;
 }
