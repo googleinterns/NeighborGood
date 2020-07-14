@@ -32,9 +32,10 @@ body {
   color: #222;
 }
 
-.fa, .fas {
-    font-weight: 900;
-    padding: 4px;
+.fa,
+.fas {
+  font-weight: 900;
+  padding: 4px;
 }
 
 a {
@@ -95,7 +96,7 @@ main h1 {
 }
 
 .add {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .card-container {
@@ -134,7 +135,6 @@ main h1 {
   text-transform: uppercase;
   font-weight: 400;
   margin-bottom: 8px;
-
 }
 
 #card-div ul li h4 {
