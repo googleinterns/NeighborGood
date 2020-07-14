@@ -20,6 +20,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  text-decoration: none;
 }
 
 html,
@@ -30,6 +31,27 @@ body {
 body {
   font: 15px 'Roboto', sans-serif;
   color: #222;
+}
+
+a:visited { 
+  text-decoration: none;
+  color:inherit;
+}
+
+a:hover { 
+  text-decoration: none;
+  color:inherit;
+}
+
+a:focus { 
+  text-decoration: none;
+  color:inherit;
+}
+
+.fa,
+.fas {
+  font-weight: 900;
+  padding: 4px;
 }
 
 a {
@@ -77,7 +99,7 @@ main h1 {
 }
 
 .flex-grid h2 {
-  padding: 12px 15px;
+  padding: 15px 15px 5px 15px;
   font-size: 20px;
   font-weight: 400;
   border-bottom: 1px solid #eee;
@@ -85,9 +107,15 @@ main h1 {
   background: #222;
   line-height: 30px;
   border-radius: inherit;
+  display: flex;
+  justify-content: space-between;
 }
 
-#card-container {
+.add {
+  cursor: pointer;
+}
+
+.card-container {
   max-height: 600px;
   max-width: 500px;
   min-width: 500px;
@@ -119,14 +147,15 @@ main h1 {
 }
 
 #card-div ul li h3 {
-  font-size: 15px;
+  font-size: 18px;
+  text-transform: uppercase;
   font-weight: 400;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
 }
 
 #card-div ul li h4 {
-  font-size: 11px;
-  text-transform: uppercase;
+  font-size: 14px;
+  text-transform: capitalize;
   letter-spacing: 0.5px;
 }
 
@@ -139,6 +168,11 @@ main h1 {
 #card-div ul li .admin-task-infos p {
   font-size: 13px;
   margin: 0;
+}
+
+.admin-user-task {
+  display: flex;
+  justify-content: space-between;
 }
 
 #chart-container,
@@ -182,7 +216,7 @@ main h1 {
   opacity: 1;
 }
 
-.popup {
+#popup {
   position: relative;
   z-index: 1;
   top: 50%;
@@ -197,11 +231,11 @@ main h1 {
   font-size: 16px;
 }
 
-.popup h2 {
+#popup h2 {
   padding: 16px 0;
 }
 
-.popup .popup-close {
+#popup-close {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -211,7 +245,7 @@ main h1 {
   text-decoration: none;
 }
 
-.popup form input {
+#popup form input {
   display: block;
   padding: 20px;
   outline: none;
@@ -219,11 +253,11 @@ main h1 {
   margin: 20px;
 }
 
-.popup form input[type=text] {
+#popup form input[type=text] {
   width: 40%;
 }
 
-.popup form input[type=submit] {
+#popup form input[type=submit] {
   background: #1d1d1b;
   color: #c7c7c7;
 }
@@ -247,7 +281,7 @@ main h1 {
     margin-left: 0;
   }
 
-  #card-container {
+  .card-container {
     max-width: none;
     width: 100vw;
     min-width: 500px;

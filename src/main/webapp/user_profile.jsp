@@ -179,21 +179,21 @@
                     <br/>
                 </div>
                 <br/>
-                <textarea name="zipcode-input" id="edit-zipcode-input" required="true"></textarea>
+                <input type="text" name="zipcode-input" id="edit-zipcode-input" required="true">
                 <br/><br/>
                 <div>
                     <label for="edit-country-input">New Country:</label>
                     <br/>
                 </div>
                 <br/>
-                <textarea name="country-input" id="edit-country-input" required="true"></textarea>
+                <input type="text" name="country-input" id="edit-country-input" required="true">
                 <br/><br/>
                 <div>
                     <label for="edit-phone-number-input">New phone number:</label>
                     <br/>
                 </div>
                 <br/>
-                <textarea name="phone-input" id="edit-phone-number-input" required="true"></textarea>
+                <input type="text" name="phone-input" id="edit-phone-number-input" required="true">
                 <br/>
                 <br/>
                 <input type="submit" />

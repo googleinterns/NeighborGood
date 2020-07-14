@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//     https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,13 +17,16 @@ package com.google.neighborgood.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
+import com.google.neighborgood.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,14 +39,26 @@ import javax.servlet.http.HttpServletResponse;
 public class UserInfoServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     UserService userService = UserServiceFactory.getUserService();
+
+    // Retrieves user accounts for the topscorers board
+    if (request.getParameterMap().containsKey("action")
+        && request.getParameter("action").equals("topscorers")) {
+
+      List<User> users = retrieveTopTenUsers(request, userService, datastore);
+      Gson gson = new Gson();
+      response.setContentType("application/json;");
+      response.getWriter().println(gson.toJson(users));
+      return;
+    }
 
     if (!userService.isUserLoggedIn()) {
       response.sendRedirect(userService.createLoginURL("/account.jsp"));
       return;
     }
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Query query =
         new Query("UserInfo")
             .setFilter(
@@ -118,6 +133,8 @@ public class UserInfoServlet extends HttpServlet {
       entity = new Entity("UserInfo", userId);
       entity.setProperty("nickname", nickname);
       entity.setProperty("address", address);
+      entity.setProperty("zipcode", "59715");
+      entity.setProperty("country", "United States");
       entity.setProperty("phone", phone);
       entity.setProperty("email", email);
       // "userId" now becomes obsolete as the entity
@@ -138,5 +155,38 @@ public class UserInfoServlet extends HttpServlet {
     datastore.put(entity);
 
     response.sendRedirect("/user_profile.jsp");
+  }
+
+  private List<User> retrieveTopTenUsers(
+      HttpServletRequest request, UserService userService, DatastoreService datastore) {
+
+    Query query = new Query("UserInfo").addSort("points", SortDirection.DESCENDING);
+
+    // Adds additional filters for the nearby neighbors board
+    if (request.getParameterMap().containsKey("zipcode")
+        && request.getParameterMap().containsKey("country")) {
+      String zipcode = request.getParameter("zipcode");
+      String country = request.getParameter("country");
+      List<Query.Filter> filters = new ArrayList<Query.Filter>();
+      filters.add(new Query.FilterPredicate("zipcode", Query.FilterOperator.EQUAL, zipcode));
+      filters.add(new Query.FilterPredicate("country", Query.FilterOperator.EQUAL, country));
+      query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, filters));
+    }
+
+    // Gathers the top 10 results
+    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(10));
+
+    List<User> users = new ArrayList<>();
+
+    for (Entity entity : results) {
+      User user = new User(entity);
+
+      if (userService.isUserLoggedIn()
+          && user.getUserId().equals(userService.getCurrentUser().getUserId())) {
+        user.setCurrentUser();
+      }
+      users.add(user);
+    }
+    return users;
   }
 }
