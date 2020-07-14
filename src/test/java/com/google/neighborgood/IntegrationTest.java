@@ -35,6 +35,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+// import org.openqa.selenium.chrome.ChromeOptions;
+
 @RunWith(JUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IntegrationTest {
@@ -47,11 +49,7 @@ public class IntegrationTest {
   private final String USER_ADDRESS = "123 Street Name, City, ST";
   private final String USER_PHONE = "1231231234";
   private final String TASK_DETAIL = "Help!";
-  private final int GARDEN_CATEGORY = 0;
-  private final int SHOPPING_CATEGORY = 1;
-  private final int PETS_CATEGORY = 2;
-  private final int MISC_CATEGORY = 3;
-  private final int NUM_OF_CATEGORIES = 4;
+  private final String[] TASK_CATEGORIES = {"garden", "shopping", "pets", "misc"};
 
   private int taskCount = 0;
 
@@ -66,7 +64,6 @@ public class IntegrationTest {
     By listButton;
     By allKeys;
     By deleteButton;
-    System.out.println("\n\n" + allEntityKinds.size() + "\n\n");
     for (int i = 1; i < allEntityKinds.size(); i++) {
       listButton = By.id("list_button");
       wait.until(presenceOfElementLocated(listButton));
@@ -135,6 +132,25 @@ public class IntegrationTest {
     wait.until(presenceOfElementLocated(rowTaskStatus));
     String rowStatusActual = driver.findElement(rowTaskStatus).getText();
     assertEquals("OPEN", rowStatusActual);
+  }
+
+  private void verifyNewTaskHomepage(String expectedDetails, String expectedCategory) {
+    String taskXPath = "//div[@id='tasks-list']/div[1]/div[2]";
+
+    By taskDetails = By.xpath(taskXPath + "/div[2]");
+    wait.until(presenceOfElementLocated(taskDetails));
+    String taskDetailsActual = driver.findElement(taskDetails).getText();
+    assertEquals(expectedDetails, taskDetailsActual);
+
+    By taskNickname = By.xpath(taskXPath + "/div[1]/div[1]");
+    wait.until(presenceOfElementLocated(taskNickname));
+    String taskNicknameActual = driver.findElement(taskNickname).getText();
+    assertEquals(USER_NICKNAME, taskNicknameActual);
+
+    By taskCategory = By.xpath(taskXPath + "/div[3]/div[1]");
+    wait.until(presenceOfElementLocated(taskCategory));
+    String taskCategoryActual = driver.findElement(taskCategory).getText();
+    assertEquals("#" + expectedCategory, taskCategoryActual);
   }
 
   @BeforeClass
@@ -273,7 +289,8 @@ public class IntegrationTest {
 
     String taskDetail = TASK_DETAIL + random.nextInt(1000);
     String rewardPoints = Integer.toString(random.nextInt(201));
-    int categoryOptionIndex = random.nextInt(NUM_OF_CATEGORIES);
+    int categoryOptionIndex = random.nextInt(TASK_CATEGORIES.length);
+    String taskCategory = TASK_CATEGORIES[categoryOptionIndex];
 
     addTask(taskDetail, rewardPoints, categoryOptionIndex);
 
@@ -285,8 +302,12 @@ public class IntegrationTest {
 
     verifyNewTaskUserPage(taskDetail);
 
-    // TODO: After merging leonard's map branch, include test that shows
-    // task in homepage as well.
+    By backToHome = By.id("backtohome");
+    wait.until(presenceOfElementLocated(backToHome));
+    driver.findElement(backToHome).click();
+    wait.until(urlContains("/index.jsp"));
+
+    verifyNewTaskHomepage(taskDetail, taskCategory);
   }
 
   @Test
@@ -297,7 +318,8 @@ public class IntegrationTest {
 
     String taskDetail = TASK_DETAIL + random.nextInt(1000);
     String rewardPoints = Integer.toString(random.nextInt(201));
-    int categoryOptionIndex = random.nextInt(NUM_OF_CATEGORIES);
+    int categoryOptionIndex = random.nextInt(TASK_CATEGORIES.length);
+    String taskCategory = TASK_CATEGORIES[categoryOptionIndex];
 
     addTask(taskDetail, rewardPoints, categoryOptionIndex);
 
@@ -309,7 +331,11 @@ public class IntegrationTest {
 
     verifyNewTaskUserPage(taskDetail);
 
-    // TODO: After merging leonard's map branch, include test that shows
-    // task in homepage as well.
+    By backToHome = By.id("backtohome");
+    wait.until(presenceOfElementLocated(backToHome));
+    driver.findElement(backToHome).click();
+    wait.until(urlContains("/index.jsp"));
+
+    verifyNewTaskHomepage(taskDetail, taskCategory);
   }
 }
