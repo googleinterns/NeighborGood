@@ -30,6 +30,7 @@ nav {
   position: fixed;
   width: 100%;
   top: 0;
+  padding-bottom: 1em;
 }
 
 #dashboard-icon-container {
@@ -38,7 +39,9 @@ nav {
 }
 
 #login-logout {
-  padding: 0 1em;
+  padding-right: 1em;
+  padding-top: 0.8em;
+  text-align: right;
 }
 
 a {
@@ -69,6 +72,12 @@ i:hover {
   text-align: center;
   margin-top: 1em;
   margin-bottom: 0.4em;
+  padding-top: 0.5em;
+}
+
+.login-messages {
+  margin-top: 0;
+  margin-bottom: 0.5em;
 }
 
 /* Main Content Styling */
@@ -222,7 +231,7 @@ section {
   padding-top: 1em;
 }
 
-/* Add task modal styling */
+/* Add modal styling */
 .modalWrapper {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
@@ -279,9 +288,53 @@ section {
   cursor: pointer;
 }
 
+/* Top Scores modal specific styling */
+#topScoresModalWrapper {
+  padding-top: 200px;
+}
+
+#topScoresModal {
+  width: 70%;
+  text-align: center;
+  overflow: auto;
+}
+
+.topScoresTable {
+  width: 100%;
+}
+
+.topScoresDiv {
+  width: 50%;
+  padding: 0 1em;
+  text-align: center;
+}
+
+tr:nth-child(even) {
+  background-color: #eee;
+}
+
+tr:nth-child(odd) {
+  background-color: #fff;
+}
+
+td {
+  text-align: center;
+}
+
+.topscores {
+  width: 33.3%;
+}
+
+#topScoresTablesWrapper {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 2em;
+}
+
 @media only screen and (max-width: 600px) {
   #title {
     font-size: 2.5em;
+    padding-top: 1.5em;
   }
 
   #control-bar {
@@ -311,5 +364,17 @@ section {
 
   .fa-3x {
     font-size: 2.5em;
+  }
+
+  h2 {
+    font-size: 1em;
+  }
+
+  .topScoresDiv {
+    padding: 0 0.5em;
+  }
+
+  #topScoresTitle {
+    font-size: 1.5em;
   }
 }
