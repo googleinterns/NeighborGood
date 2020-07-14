@@ -206,6 +206,10 @@ public class TaskServlet extends HttpServlet {
       return;
     }
 
+    String formattedAddress = (String) userEntity.getProperty("address");
+    String country = (String) userEntity.getProperty("country");
+    String zipcode = (String) userEntity.getProperty("zipcode");
+
     // Create an Entity that stores the input comment
     Entity taskEntity = new Entity("Task", userEntity.getKey());
     taskEntity.setProperty("detail", taskDetail);
@@ -214,10 +218,10 @@ public class TaskServlet extends HttpServlet {
     taskEntity.setProperty("status", "OPEN");
     taskEntity.setProperty("Owner", userId);
     taskEntity.setProperty("Helper", "N/A");
-    taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
-    taskEntity.setProperty("zipcode", "98033");
-    taskEntity.setProperty("country", "United States");
-    taskEntity.setProperty("category", "misc");
+    taskEntity.setProperty("Address", formattedAddress);
+    taskEntity.setProperty("zipcode", zipcode);
+    taskEntity.setProperty("country", country);
+    taskEntity.setProperty("category", taskCategory);
 
     datastore.put(taskEntity);
 
