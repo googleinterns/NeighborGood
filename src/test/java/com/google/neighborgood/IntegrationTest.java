@@ -52,7 +52,6 @@ public class IntegrationTest {
   private final String USER_PHONE = "1231231234";
   private final String TASK_DETAIL = "Help!";
   private final String[] TASK_CATEGORIES = {"garden", "shopping", "pets", "misc"};
-  private int homepageTaskCount = 0;
 
   @BeforeClass
   public static void setupClass() {
@@ -194,8 +193,6 @@ public class IntegrationTest {
 
     String[] expectedNicknameAndDetails = helpOut();
 
-    // TODO: check that number of rows matches number of homepage tasks count
-
     goToUserPage();
     goToOfferHelp();
     verifyOfferHelpTask(expectedNicknameAndDetails);
@@ -254,8 +251,6 @@ public class IntegrationTest {
     wait.until(presenceOfElementLocated(submitButton));
     WebElement submitButtonElement = driver.findElement(submitButton);
     js.executeScript("arguments[0].click();", submitButtonElement);
-
-    homepageTaskCount++;
   }
 
   private void verifyNewTaskUserPage(String expectedDetails) {
@@ -390,7 +385,6 @@ public class IntegrationTest {
     wait.until(presenceOfElementLocated(confirmHelp));
     WebElement confirmHelpElement = driver.findElement(confirmHelp);
     js.executeScript("arguments[0].click();", confirmHelpElement);
-    homepageTaskCount--;
 
     return expectedNicknameAndDetails;
   }
