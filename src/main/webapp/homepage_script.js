@@ -23,7 +23,7 @@ function stickyControlBar() {
     let controlBarWrapper = document.getElementById("control-bar-message-wrapper");
     let taskListDiv = document.getElementById("tasks-list");
 
-    if (window.innerWidth > 1200) {
+    if (window.innerWidth > 1203) {
         const OFFSET = 190;    
         if (window.pageYOffset >= OFFSET || document.body.scrollTop >= OFFSET || document.documentElement.scrollTop >= OFFSET) {
             controlBarWrapper.style.position = "fixed";
