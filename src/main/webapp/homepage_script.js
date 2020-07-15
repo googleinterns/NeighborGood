@@ -147,7 +147,7 @@ window.onclick = function(event) {
     }
 
     var infoModal = document.getElementById("taskInfoModalWrapper");
-    if (event.target == modal) {
+    if (event.target == infoModal) {
         infoModal.style.display = "none";
     }
 }
