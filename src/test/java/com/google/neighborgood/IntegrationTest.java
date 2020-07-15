@@ -278,7 +278,6 @@ public class IntegrationTest {
     assertEquals("COMPLETE", driver.findElement(taskStatus).getText());
 
     helperPoints += Integer.parseInt(recentTask.get("points"));
-    System.out.println("\n\nend test 7, helpperpoints: " + helperPoints + "\n\n");
   }
 
   @Test
@@ -288,7 +287,6 @@ public class IntegrationTest {
     fluentWait.until(urlContains("/user_profile.jsp"));
     By points = By.id("points");
     fluentWait.until(presenceOfElementLocated(points));
-    System.out.println("\n\ntest8, helpperpoints: " + helperPoints + "\n\n");
     assertEquals(
         "My current points: " + Integer.toString(helperPoints) + "pts",
         driver.findElement(points).getText());
