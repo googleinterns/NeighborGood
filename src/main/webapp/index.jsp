@@ -32,9 +32,7 @@
   <% UserService userService = UserServiceFactory.getUserService(); 
   boolean userLoggedIn = userService.isUserLoggedIn();
   String categoriesClass = userLoggedIn ? "notFullWidth" : "fullWidth";
-  if (userLoggedIn) 
   %>
-
   <body>
       <!--Site Header-->
       <header>
