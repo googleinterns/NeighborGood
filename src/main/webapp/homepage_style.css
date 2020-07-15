@@ -42,6 +42,7 @@ nav {
   padding-right: 1em;
   padding-top: 0.8em;
   text-align: right;
+  width: 10vw;
 }
 
 a {
@@ -237,7 +238,7 @@ section {
 .modalWrapper {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
-  z-index: 3; /* Sit on top */
+  z-index: 4; /* Sit on top */
   padding-top: 100px; /* Location of the box */
   left: 0;
   top: 0;
@@ -334,13 +335,28 @@ td {
 }
 
 @media only screen and (max-width: 600px) {
+  header {
+    position: fixed;
+    z-index: 3;
+    width: 100%;
+    background-color: white;
+    top: 0;
+  }
+
   #title {
     font-size: 2.5em;
-    padding-top: 1.5em;
+    padding-top: 0.8em;
+  }
+
+  #login-logout {
+    width: auto;
   }
 
   #control-bar {
     display: block;
+    width: 95%;
+    margin: auto;
+    padding-bottom: 0.7em;
   }
 
   #categories {
@@ -348,6 +364,13 @@ td {
     flex-wrap: wrap;
     justify-content: center;
     width: 100%;
+  }
+  
+  #control-bar-message-wrapper {
+    position: fixed;
+    top: 7.5em;
+    left: 0;
+    background-color: white;
   }
 
   .categories {
@@ -358,10 +381,20 @@ td {
   #add-task {
     text-align: right;
     padding-right: 0.5em;
+    margin-top: -1em;
   }
 
   #addtaskbutton {
     font-size: 2.5em;
+  }
+
+  #tasks-list {
+    margin-top: 18.8em;
+  }
+
+  .results-message {
+    width: 95%;
+    margin: auto;
   }
 
   .fa-3x {
@@ -376,7 +409,59 @@ td {
     padding: 0 0.5em;
   }
 
+  #topScoresModal {
+    width: 80%;
+  }
+
   #topScoresTitle {
     font-size: 1.5em;
+  }
+  
+  nav {
+    padding-bottom: 0;
+  }
+}
+
+@media only screen and (min-width: 600px) and (max-width: 1203px) {
+  #title {
+    padding-top: 0;
+    margin-bottom: 0;
+    margin-top: -3.4em;
+    z-index: 9;
+    position: fixed;
+    width: 100%;
+    background-color: white;
+  }
+
+  header {
+    position: fixed;
+    background-color: white;
+    z-index: 4;
+    width: 100%;
+  }
+
+  nav {
+    background-color: white;
+  }
+
+  #control-bar-message-wrapper {
+    position: fixed;
+    z-index: 4;
+    top: 9.0em;
+  }
+
+  #tasks-list {
+    margin-top: 18em;
+    width: 99%;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  #login-logout {
+      width: auto;
+  }
+
+  #control-bar {
+    max-width: 95vw;
   }
 }

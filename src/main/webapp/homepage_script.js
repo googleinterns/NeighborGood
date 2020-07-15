@@ -22,13 +22,16 @@ window.onscroll = stickyControlBar;
 function stickyControlBar() {
     let controlBarWrapper = document.getElementById("control-bar-message-wrapper");
     let taskListDiv = document.getElementById("tasks-list");
-    const OFFSET = 165;
-    if (window.pageYOffset >= OFFSET || document.body.scrollTop >= OFFSET || document.documentElement.scrollTop >= OFFSET) {
-        controlBarWrapper.style.position = "fixed";
-        taskListDiv.style.marginTop = "165px";
-    } else {
-        controlBarWrapper.style.position = "static";
-        taskListDiv.style.marginTop = "auto";
+
+    if (window.innerWidth > 1200) {
+        const OFFSET = 190;    
+        if (window.pageYOffset >= OFFSET || document.body.scrollTop >= OFFSET || document.documentElement.scrollTop >= OFFSET) {
+            controlBarWrapper.style.position = "fixed";
+            taskListDiv.style.marginTop = "165px";
+        } else {
+            controlBarWrapper.style.position = "relative";
+            taskListDiv.style.marginTop = "auto";
+        }
     }
 }
 
