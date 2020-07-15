@@ -214,7 +214,6 @@ function getUserNeighborhood() {
             .catch(() => {
                 console.error("User location and/or neighborhood could not be retrieved");
                 document.getElementById("location-missing-message").style.display = "block";
-                fetch("/tasks");
             });
 	}
 }
