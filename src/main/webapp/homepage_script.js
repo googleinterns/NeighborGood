@@ -221,29 +221,40 @@ function getUserNeighborhood() {
 /* Function that returns a promise to get and return the user's location */
 function getUserLocation() {
     return new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            var location = {lat: position.coords.latitude, lng: position.coords.longitude};
-            resolve(location);
-        }, function(err) {
-            let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
-            const request = new Request(url, {method: "POST"});
-            fetch(request).then(response => response.json()).then(jsonresponse => {
-                resolve(jsonresponse["location"]);
-            }).catch(() => {
-                // Check to see if this failed because we're in an insecure
-                // context, such as a local dev environment that isn't
-                // http://localhost (https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts).
-                if (err.code === 1 && !window.isSecureContext) {
-                    if (config.LOCAL_DEV_LAT_LNG) {
-                        resolve(config.LOCAL_DEV_LAT_LNG);
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var location = {lat: position.coords.latitude, lng: position.coords.longitude};
+                resolve(location);
+            }, function(err) {
+                let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
+                const request = new Request(url, {method: "POST"});
+                fetch(request).then(response => {
+                    if (response.status == 400 || response.status == 403 || response.status == 404) {
+                        // Check to see if this failed because we're in an insecure
+                        // context, such as a local dev environment that isn't
+                        // http://localhost (https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts).
+                        if (err.code === 1 && !window.isSecureContext) {
+                            if (config.LOCAL_DEV_LAT_LNG) {
+                                resolve(config.LOCAL_DEV_LAT_LNG);
+                            } else {
+                                reject("User location failed");
+                            }
+                        } else {
+                            reject("User location failed");
+                        }
                     } else {
-                        reject("User location failed");
+                        response.json().then(jsonresponse => {
+                            resolve(jsonresponse["location"]);
+                        });
                     }
-                } else reject("User location failed");
+                });
             });
-        });
+        } else {
+            reject("User location is not supported by this browser");
+        }
     });
 }
+       
 
 /* Function that returns a promise to return a neighborhood
 array that includes the postal code and country */
