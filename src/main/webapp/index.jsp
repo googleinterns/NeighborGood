@@ -60,7 +60,7 @@
           	    <%
             	  if (userLoggedIn) {
                   List<String> userInfo = RetrieveUserInfo.getInfo(userService);
-                  String urlToRedirectToAfterUserLogsOut = "/";
+                  String urlToRedirectToAfterUserLogsOut = "/index.jsp";
                   String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
                   String nickname = (userInfo == null) ? userService.getCurrentUser().getEmail() : userInfo.get(0);
                 %>

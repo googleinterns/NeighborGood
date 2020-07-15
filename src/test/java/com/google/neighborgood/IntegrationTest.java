@@ -182,13 +182,10 @@ public class IntegrationTest {
   @Test
   public void _04_Homepage_AsLoggedUser_LogOut() {
     // Logs out first from previous user session
+    logOut("loginLogoutMessage");
     By loginMessage = By.id("loginLogoutMessage");
     fluentWait.until(presenceOfElementLocated(loginMessage));
     WebElement loginMessageElement = driver.findElement(loginMessage);
-    js.executeScript("arguments[0].click();", loginMessageElement);
-    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-    fluentWait.until(presenceOfElementLocated(loginMessage));
-    loginMessageElement = driver.findElement(loginMessage);
     assertEquals("Login to help out a neighbor!", loginMessageElement.getText());
   }
 
@@ -247,7 +244,7 @@ public class IntegrationTest {
 
   @Test
   public void _07_Userpage_AsLoggedUser_VerifyCompletedTask() {
-    logOut();
+    logOut("logout-href");
     loginUser(USER_EMAIL);
     fluentWait.until(urlContains("/user_profile.jsp"));
 
@@ -286,7 +283,7 @@ public class IntegrationTest {
 
   @Test
   public void _08_Userpage_AsHelper_CompletedTask() {
-    logOut();
+    logOut("logout-href");
     loginUser(USER_EMAIL_HELPER);
     fluentWait.until(urlContains("/user_profile.jsp"));
     By points = By.id("points");
@@ -533,8 +530,8 @@ public class IntegrationTest {
     assertEquals(recentTask.get("nickname"), driver.findElement(taskNeighbor).getText());
   }
 
-  private void logOut() {
-    By logoutLink = By.id("logout-href");
+  private void logOut(String logoutId) {
+    By logoutLink = By.id(logoutId);
     fluentWait.until(presenceOfElementLocated(logoutLink));
     WebElement logoutLinkElem = driver.findElement(logoutLink);
     js.executeScript("arguments[0].click();", logoutLinkElem);
