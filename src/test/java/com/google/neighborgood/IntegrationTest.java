@@ -55,6 +55,7 @@ public class IntegrationTest {
   private final String TASK_DETAIL = "Help!";
   private final String[] TASK_CATEGORIES = {"garden", "shopping", "pets", "misc"};
   private static HashMap<String, String> recentTask = new HashMap<String, String>();
+  private static int helperPoints = 0;
 
   @BeforeClass
   public static void setupClass() {
@@ -246,11 +247,7 @@ public class IntegrationTest {
 
   @Test
   public void _07_Userpage_AsLoggedUser_VerifyCompletedTask() {
-    By logoutLink = By.id("logout-href");
-    fluentWait.until(presenceOfElementLocated(logoutLink));
-    WebElement logoutLinkElem = driver.findElement(logoutLink);
-    js.executeScript("arguments[0].click();", logoutLinkElem);
-    fluentWait.until(urlContains("/index.jsp"));
+    logOut();
     loginUser(USER_EMAIL);
     fluentWait.until(urlContains("/user_profile.jsp"));
 
@@ -282,6 +279,26 @@ public class IntegrationTest {
     }
     fluentWait.until(presenceOfElementLocated(taskStatus));
     assertEquals("COMPLETE", driver.findElement(taskStatus).getText());
+
+    helperPoints += Integer.parseInt(recentTask.get("points"));
+    System.out.println("\n\nend test 7, helpperpoints: " + helperPoints + "\n\n");
+  }
+
+  @Test
+  public void _08_Userpage_AsHelper_CompletedTask() {
+    logOut();
+    loginUser(USER_EMAIL_HELPER);
+    fluentWait.until(urlContains("/user_profile.jsp"));
+    By points = By.id("points");
+    fluentWait.until(presenceOfElementLocated(points));
+    System.out.println("\n\ntest8, helpperpoints: " + helperPoints + "\n\n");
+    assertEquals(
+        "My current points: " + Integer.toString(helperPoints) + "pts",
+        driver.findElement(points).getText());
+    goToOfferHelp();
+    By completedTaskStatus = By.xpath("//tbody[@id='complete-task-body']/tr[1]/td[2]");
+    fluentWait.until(presenceOfElementLocated(completedTaskStatus));
+    assertEquals("COMPLETE", driver.findElement(completedTaskStatus).getText());
   }
 
   private static void clearAllDatastoreEntities(WebDriver driver) {
@@ -296,7 +313,7 @@ public class IntegrationTest {
     By listButton;
     By allKeys;
     By deleteButton;
-    for (int i = 1; i < allEntityKinds.size(); i++) {
+    for (int j = 1; j < allEntityKinds.size(); j++) {
       listButton = By.id("list_button");
       fluentWait.until(presenceOfElementLocated(listButton));
       WebElement listButtonElement = driver.findElement(listButton);
@@ -310,7 +327,14 @@ public class IntegrationTest {
       fluentWait.until(presenceOfElementLocated(deleteButton));
       WebElement deleteButtonElement = driver.findElement(deleteButton);
       js.executeScript("arguments[0].click();", deleteButtonElement);
-      driver.switchTo().alert().accept();
+      for (int i = 0; i < 60; i++) {
+        try {
+          driver.switchTo().alert().accept();
+          break;
+        } catch (NoAlertPresentException e) {
+          driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+        }
+      }
     }
   }
 
@@ -507,5 +531,13 @@ public class IntegrationTest {
     By taskNeighbor = By.xpath(offerHelpRowXPath + "/td[3]");
     fluentWait.until(presenceOfElementLocated(taskNeighbor));
     assertEquals(recentTask.get("nickname"), driver.findElement(taskNeighbor).getText());
+  }
+
+  private void logOut() {
+    By logoutLink = By.id("logout-href");
+    fluentWait.until(presenceOfElementLocated(logoutLink));
+    WebElement logoutLinkElem = driver.findElement(logoutLink);
+    js.executeScript("arguments[0].click();", logoutLinkElem);
+    fluentWait.until(urlContains("/index.jsp"));
   }
 }
