@@ -14,7 +14,9 @@
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.openqa.selenium.support.ui.ExpectedConditions.*;
+import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
+import static org.openqa.selenium.support.ui.ExpectedConditions.urlContains;
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import java.util.HashMap;
@@ -24,24 +26,27 @@ import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.junit.runners.MethodSorters;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+@Ignore
 @RunWith(JUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IntegrationTest {
 
   private static WebDriver driver;
-  private static WebDriverWait wait;
-  private static Wait<WebDriver> fluentWait;
+  private static WebDriverWait fluentWait;
+  // private static FluentWait<WebDriver> fluentwait;
   private static JavascriptExecutor js;
 
   private final String USER_NICKNAME = "Mafe";
@@ -65,12 +70,15 @@ public class IntegrationTest {
     // options.addArguments("--headless");
     // options.addArguments("--disable-gpu");
     // driver = new ChromeDriver(options);
-    wait = new WebDriverWait(driver, 20);
     fluentWait =
-        new FluentWait<WebDriver>(driver)
+        new WebDriverWait(driver, 20)
             .withTimeout(30, TimeUnit.SECONDS)
             .pollingEvery(1, TimeUnit.SECONDS)
             .ignoring(Exception.class);
+    /**
+     * fluentwait = new FluentWait<WebDriver>(driver) .withTimeout(30, TimeUnit.SECONDS)
+     * .pollingEvery(1, TimeUnit.SECONDS) .ignoring(Exception.class);
+     */
     js = (JavascriptExecutor) driver;
     clearAllDatastoreEntities(driver);
   }
