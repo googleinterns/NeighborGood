@@ -371,6 +371,7 @@ td {
     top: 7.5em;
     left: 0;
     background-color: white;
+    background-image: none;
   }
 
   .categories {
