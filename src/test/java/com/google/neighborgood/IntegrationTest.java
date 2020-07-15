@@ -28,10 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.junit.runners.MethodSorters;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
@@ -219,8 +216,14 @@ public class IntegrationTest {
     fluentWait.until(presenceOfElementLocated(markComplete));
     WebElement markCompleteElement = driver.findElement(markComplete);
     js.executeScript("arguments[0].click();", markCompleteElement);
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-    driver.switchTo().alert().accept();
+    for (int i = 0; i < 60; i++) {
+      try {
+        driver.switchTo().alert().accept();
+        break;
+      } catch (NoAlertPresentException e) {
+        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+      }
+    }
 
     String taskCompletedXPath = "//tbody[@id='complete-task-body']/tr[1]";
 
@@ -239,6 +242,46 @@ public class IntegrationTest {
     By taskPoints = By.xpath(taskCompletedXPath + "/td[4]");
     fluentWait.until(presenceOfElementLocated(taskPoints));
     assertEquals(recentTask.get("points"), driver.findElement(taskPoints).getText());
+  }
+
+  @Test
+  public void _07_Userpage_AsLoggedUser_VerifyCompletedTask() {
+    By logoutLink = By.id("logout-href");
+    fluentWait.until(presenceOfElementLocated(logoutLink));
+    WebElement logoutLinkElem = driver.findElement(logoutLink);
+    js.executeScript("arguments[0].click();", logoutLinkElem);
+    fluentWait.until(urlContains("/index.jsp"));
+    loginUser(USER_EMAIL);
+    fluentWait.until(urlContains("/user_profile.jsp"));
+
+    String awaitVerifTaskXPath = "//tbody[@id='await-verif-body']/tr[1]";
+
+    By taskDetail = By.xpath(awaitVerifTaskXPath + "/td[1]");
+    fluentWait.until(presenceOfElementLocated(taskDetail));
+    assertEquals(recentTask.get("detail"), driver.findElement(taskDetail).getText());
+
+    By taskHelper = By.xpath(awaitVerifTaskXPath + "/td[2]");
+    fluentWait.until(presenceOfElementLocated(taskHelper));
+    assertEquals(recentTask.get("helper"), driver.findElement(taskHelper).getText());
+
+    By taskStatus = By.xpath(awaitVerifTaskXPath + "/td[3]");
+    fluentWait.until(presenceOfElementLocated(taskStatus));
+    assertEquals("COMPLETE: AWAIT VERIFICATION", driver.findElement(taskStatus).getText());
+
+    By verifyComplete = By.xpath(awaitVerifTaskXPath + "/td[4]/button");
+    fluentWait.until(presenceOfElementLocated(verifyComplete));
+    WebElement verifyCompleteElem = driver.findElement(verifyComplete);
+    js.executeScript("arguments[0].click();", verifyCompleteElem);
+    for (int i = 0; i < 60; i++) {
+      try {
+        driver.switchTo().alert().accept();
+        break;
+      } catch (NoAlertPresentException e) {
+        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+      }
+    }
+    fluentWait.until(presenceOfElementLocated(taskStatus));
+    assertEquals("COMPLETE", driver.findElement(taskStatus).getText());
   }
 
   private static void clearAllDatastoreEntities(WebDriver driver) {
@@ -345,19 +388,7 @@ public class IntegrationTest {
 
   private void loginNewUser(
       String email, String nickname, String address, String phone, String zipcode, String country) {
-    By loginMessage = By.id("loginLogoutMessage");
-    fluentWait.until(presenceOfElementLocated(loginMessage));
-    WebElement loginElement = driver.findElement(loginMessage);
-
-    js.executeScript("arguments[0].click();", loginElement);
-
-    fluentWait.until(urlContains("_ah/login?continue=%2Faccount.jsp"));
-    js.executeScript("document.getElementById('email').value='" + email + "';");
-
-    By loginButton = By.id("btn-login");
-    fluentWait.until(presenceOfElementLocated(loginButton));
-    WebElement loginButtonElement = driver.findElement(loginButton);
-    js.executeScript("arguments[0].click();", loginButtonElement);
+    loginUser(email);
     fluentWait.until(urlContains("/account.jsp"));
 
     // User should now be logged in and redirected to the
@@ -376,6 +407,22 @@ public class IntegrationTest {
     WebElement submitButtonElement = driver.findElement(submitButton);
     js.executeScript("arguments[0].click();", submitButtonElement);
     fluentWait.until(urlContains("/user_profile.jsp"));
+  }
+
+  private void loginUser(String email) {
+    By loginMessage = By.id("loginLogoutMessage");
+    fluentWait.until(presenceOfElementLocated(loginMessage));
+    WebElement loginElement = driver.findElement(loginMessage);
+
+    js.executeScript("arguments[0].click();", loginElement);
+
+    fluentWait.until(urlContains("_ah/login?continue=%2Faccount.jsp"));
+    js.executeScript("document.getElementById('email').value='" + email + "';");
+
+    By loginButton = By.id("btn-login");
+    fluentWait.until(presenceOfElementLocated(loginButton));
+    WebElement loginButtonElement = driver.findElement(loginButton);
+    js.executeScript("arguments[0].click();", loginButtonElement);
   }
 
   private void verifyLoggedUserUserPage(String nickname) {
@@ -444,6 +491,8 @@ public class IntegrationTest {
     WebElement confirmHelpElement = driver.findElement(confirmHelp);
     js.executeScript("arguments[0].click();", confirmHelpElement);
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+
+    recentTask.put("helper", USER_NICKNAME_HELPER);
   }
 
   private void verifyOfferHelpTask() {

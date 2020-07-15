@@ -13,7 +13,7 @@
   <%@ page import = "com.google.neighborgood.helper.RetrieveUserInfo" %>
   <%@ page import = "java.util.List" %>
   <% UserService userService = UserServiceFactory.getUserService();
-  if (!userService.isUserLoggedIn()) { 
+  if (!userService.isUserLoggedIn()) {
       response.sendRedirect(userService.createLoginURL("/account.jsp"));
   } else {
     List<String> userInfo = RetrieveUserInfo.getInfo(userService);
@@ -29,7 +29,7 @@
     <div id="nav-bar">
         <p id="return-link"><a href="index.jsp" id="backtohome">BACK TO HOME</a> |    </p>
         <i class="fa fa-cog fa-2x" id="info-setting" onclick="editInfo()"></i>
-        <p id="log-out-link"><%=nickname%> |  <a href="<%=logoutURL%>">Logout</a></p>
+        <p id="log-out-link"><%=nickname%> |  <a href="<%=logoutURL%>" id="logout-href">Logout</a></p>
     </div>
     <div class="empty"></div>
     <div id="header">
