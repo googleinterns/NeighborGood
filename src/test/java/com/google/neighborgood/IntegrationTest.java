@@ -150,14 +150,14 @@ public class IntegrationTest {
         "User should be in user profile page",
         driver.getCurrentUrl().contains("/user_profile.jsp"));
 
-    verifyNewTaskUserPage(taskDetail);
+    verifyNewTaskUserPage();
     backToHome();
-    verifyNewTaskHomepage(taskDetail, taskCategory);
+    verifyNewTaskHomepage();
   }
 
   @Test
   public void _03_UserPage_AsLoggedUser_AddTask() {
-    driver.get("http://localhost:8080/user_profile.jsp");
+    goToUserPage();
 
     Random random = new Random();
     String taskDetail = TASK_DETAIL + random.nextInt(1000);
@@ -172,9 +172,9 @@ public class IntegrationTest {
         "User should be in user profile page",
         driver.getCurrentUrl().contains("/user_profile.jsp"));
 
-    verifyNewTaskUserPage(taskDetail);
+    verifyNewTaskUserPage();
     backToHome();
-    verifyNewTaskHomepage(taskDetail, taskCategory);
+    verifyNewTaskHomepage();
   }
 
   @Test
@@ -325,6 +325,30 @@ public class IntegrationTest {
     assertEquals(recentTask.get("helper"), driver.findElement(taskHelper).getText());
   }
 
+  @Test
+  public void _10_UserPage_AsHelper_AbandonTask() {
+    logOut("logout-href");
+    loginUser(USER_EMAIL_HELPER);
+    wait.until(urlContains("user_profile.jsp"));
+    goToOfferHelp();
+    By abandonTask = By.xpath("//tbody[@id='offer-help-body']/tr/td[6]/button");
+    wait.until(presenceOfElementLocated(abandonTask));
+    WebElement abandonTaskElem = driver.findElement(abandonTask);
+    js.executeScript("arguments[0].click();", abandonTaskElem);
+    for (int i = 0; i < 60; i++) {
+      try {
+        driver.switchTo().alert().accept();
+        break;
+      } catch (NoAlertPresentException e) {
+        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+      }
+    }
+    recentTask.put("status", "OPEN");
+    backToHome();
+    wait.until(urlContains("/index.jsp"));
+    verifyNewTaskHomepage();
+  }
+
   private static void clearAllDatastoreEntities(WebDriver driver) {
     // Clears datastore entities for start of test
     driver.get("http://localhost:8080/_ah/admin");
@@ -368,6 +392,7 @@ public class IntegrationTest {
     recentTask.put("category", TASK_CATEGORIES[categoryIndex]);
     recentTask.put("nickname", USER_NICKNAME);
     recentTask.put("status", "OPEN");
+    recentTask.put("helper", "N/A");
 
     By addTaskButton = By.id("create-task-button");
     wait.until(presenceOfElementLocated((addTaskButton)));
@@ -397,42 +422,42 @@ public class IntegrationTest {
     wait.until(urlContains("/user_profile.jsp"));
   }
 
-  private void verifyNewTaskUserPage(String expectedDetails) {
+  private void verifyNewTaskUserPage() {
     // Verify that inputted task info is correctly displayed in need help table
     String taskRowXPath = "//table[@id='need-help']/tbody/tr[1]";
     By rowTaskDetails = By.xpath(taskRowXPath + "/td[1]");
     wait.until(presenceOfElementLocated(rowTaskDetails));
     String rowDetailsActual = driver.findElement(rowTaskDetails).getText();
-    assertEquals(expectedDetails, rowDetailsActual);
+    assertEquals(recentTask.get("detail"), rowDetailsActual);
 
     By rowTaskHelper = By.xpath(taskRowXPath + "/td[2]");
     wait.until(presenceOfElementLocated(rowTaskHelper));
     String rowHelperActual = driver.findElement(rowTaskHelper).getText();
-    assertEquals("N/A", rowHelperActual);
+    assertEquals(recentTask.get("helper"), rowHelperActual);
 
     By rowTaskStatus = By.xpath(taskRowXPath + "/td[3]");
     wait.until(presenceOfElementLocated(rowTaskStatus));
     String rowStatusActual = driver.findElement(rowTaskStatus).getText();
-    assertEquals("OPEN", rowStatusActual);
+    assertEquals(recentTask.get("status"), rowStatusActual);
   }
 
-  private void verifyNewTaskHomepage(String expectedDetails, String expectedCategory) {
+  private void verifyNewTaskHomepage() {
     String taskXPath = "//div[@id='tasks-list']/div[1]/div[2]";
 
     By taskDetails = By.xpath(taskXPath + "/div[2]");
     wait.until(presenceOfElementLocated(taskDetails));
     String taskDetailsActual = driver.findElement(taskDetails).getText();
-    assertEquals(expectedDetails, taskDetailsActual);
+    assertEquals(recentTask.get("detail"), taskDetailsActual);
 
     By taskNickname = By.xpath(taskXPath + "/div[1]/div[1]");
     wait.until(presenceOfElementLocated(taskNickname));
     String taskNicknameActual = driver.findElement(taskNickname).getText();
-    assertEquals(USER_NICKNAME, taskNicknameActual);
+    assertEquals(recentTask.get("nickname"), taskNicknameActual);
 
     By taskCategory = By.xpath(taskXPath + "/div[3]/div[1]");
     wait.until(presenceOfElementLocated(taskCategory));
     String taskCategoryActual = driver.findElement(taskCategory).getText();
-    assertEquals("#" + expectedCategory, taskCategoryActual);
+    assertEquals("#" + recentTask.get("category"), taskCategoryActual);
   }
 
   private void loginNewUser(
@@ -465,7 +490,7 @@ public class IntegrationTest {
 
     js.executeScript("arguments[0].click();", loginElement);
 
-    wait.until(urlContains("_ah/login?continue=%2Faccount.jsp"));
+    wait.until(urlContains("_ah/login"));
     js.executeScript("document.getElementById('email').value='" + email + "';");
 
     By loginButton = By.id("btn-login");
@@ -580,13 +605,13 @@ public class IntegrationTest {
 
     By taskCategory = By.xpath(taskXPath + "/div[3]/div[1]");
     wait.until(presenceOfElementLocated(taskCategory));
-    recentTask.put("category", driver.findElement(taskCategory).getText());
+    recentTask.put("category", driver.findElement(taskCategory).getText().substring(1));
 
     recentTask.put("status", "OPEN");
   }
 
   private void completeTaskAsHelper() {
-    String taskMarkCompleteXPath = "//tbody[@id='offer-help-body']/tr[1]/td[4]/button";
+    String taskMarkCompleteXPath = "//tbody[@id='offer-help-body']/tr[1]/td[5]/button";
     By markComplete = By.xpath(taskMarkCompleteXPath);
     wait.until(presenceOfElementLocated(markComplete));
     WebElement markCompleteElement = driver.findElement(markComplete);
