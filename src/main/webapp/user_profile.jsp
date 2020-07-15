@@ -5,6 +5,7 @@
     <title>My Account</title>
     <link rel="stylesheet" href="user_profile_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type='text/javascript' src='config.js'></script>
     <script src="user_profile_script.js"></script>
   </head>
   <%@ page import = "com.google.appengine.api.users.UserService" %>
@@ -24,7 +25,7 @@
         String logoutURL = userService.createLogoutURL(urlToRedirectAfterUserLogsOut);
         String nickname = userInfo.get(0);
         String points = userInfo.get(3); %>
-  <body onload="showNeedHelp()">
+  <body>
     <div id="nav-bar">
         <p id="return-link"><a href="index.jsp" id="backtohome">BACK TO HOME</a> |    </p>
         <i class="fa fa-cog fa-2x" id="info-setting" onclick="editInfo()"></i>
@@ -104,11 +105,12 @@
                     <label for="task-detail-input">Task Detail:</label>
                     <br/>
                 </div>
-                <textarea name="task-detail-input" id="task-detail-input" required="true" placeholder="Describe your task here:"></textarea>
                 <br/>
+                <textarea name="task-detail-input" id="task-detail-input" required="true" placeholder="Describe your task here:"></textarea>
+                <br/><br/>
                 <label for="rewarding-point-input">Rewarding Points:</label>
                 <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50" required="true">
-                <br/>
+                <br/><br/>
                 <label for="category-input">Task Category:</label>
                 <select name="category-input" id="category-input" form="new-task-form">
                   <option value="garden">Garden</option>
@@ -130,12 +132,13 @@
                     <label for="edit-detail-input">Task Detail:</label>
                     <br/>
                 </div>
-                <textarea name="task-detail-input" id="edit-detail-input" required="true"></textarea>
                 <br/>
+                <textarea name="task-detail-input" id="edit-detail-input" required="true"></textarea>
+                <br/><br/>
                 <label for="edit-point-input">Rewarding Points: </label>
                 <input type="number" id="edit-point-input" name="reward-input" min="0" max="200" required="true">
                 <input type="hidden" name="task-id" id="task-id-input">
-                <br/>
+                <br/><br/>
                 <label for="edit-category-input">Task Category:</label>
                 <select name="edit-category-input" id="edit-category-input" form="edit-task-form">
                   <option value="garden">Garden</option>
@@ -158,19 +161,39 @@
                     <label for="edit-nickname-input">New nickname:</label>
                     <br/>
                 </div>
-                <textarea name="nickname-input" id="edit-nickname-input" required="true"></textarea>
                 <br/>
+                <textarea name="nickname-input" id="edit-nickname-input" required="true"></textarea>
+                <br/><br/>
                 <div>
                     <label for="edit-address-input">New address:</label>
                     <br/>
                 </div>
-                <textarea name="address-input" id="edit-address-input" required="true"></textarea>
                 <br/>
+                <textarea name="address-input" id="edit-address-input" required="true"></textarea>
+                <p id="rest-map">Click to mark your personal address on the map!</p>
+                <input id="place-input" class="controls" type="text" placeholder="Search Box">
+                <div id="map"></div>
+                <br/><br/>
+                <div>
+                    <label for="edit-zipcode-input">New Zip Code:</label>
+                    <br/>
+                </div>
+                <br/>
+                <input type="text" name="zipcode-input" id="edit-zipcode-input" required="true">
+                <br/><br/>
+                <div>
+                    <label for="edit-country-input">New Country:</label>
+                    <br/>
+                </div>
+                <br/>
+                <input type="text" name="country-input" id="edit-country-input" required="true">
+                <br/><br/>
                 <div>
                     <label for="edit-phone-number-input">New phone number:</label>
                     <br/>
                 </div>
-                <textarea name="phone-input" id="edit-phone-number-input" required="true"></textarea>
+                <br/>
+                <input type="text" name="phone-input" id="edit-phone-number-input" required="true">
                 <br/>
                 <br/>
                 <input type="submit" />

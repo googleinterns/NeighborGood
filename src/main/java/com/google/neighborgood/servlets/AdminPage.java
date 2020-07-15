@@ -20,20 +20,41 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.Transaction;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.gson.Gson;
 import com.google.neighborgood.helper.RewardingPoints;
+import com.google.neighborgood.task.Task;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that handles the request for editing tasks. */
-@WebServlet("/tasks/edit")
-public class EditTaskServlet extends HttpServlet {
+/** Servlet that returns some example content. TODO: modify this file to handle comments data */
+@WebServlet("/admin-user-tasks")
+public class AdminPage extends HttpServlet {
   @Override
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    Query query = new Query("Task").addSort("timestamp", SortDirection.DESCENDING);
+
+    PreparedQuery results = datastore.prepare(query);
+
+    List<Task> myTasks = new ArrayList<>();
+    for (Entity entity : results.asIterable()) {
+      myTasks.add(new Task(entity));
+    }
+
+    Gson gson = new Gson();
+    response.setContentType("application/json;");
+    response.getWriter().println(gson.toJson(myTasks));
+  }
+
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
     String keyString = request.getParameter("task-id");
@@ -41,55 +62,8 @@ public class EditTaskServlet extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity task;
 
-    UserService userService = UserServiceFactory.getUserService();
-    if (!userService.isUserLoggedIn()) {
-      System.err.println("User must be logged in to edit a task");
-      response.sendError(
-          HttpServletResponse.SC_UNAUTHORIZED,
-          "You must be logged in to perform this action on a task");
-    }
-
     // Edits tasks that have been claimed by setting the "helper" property to the userId
     // of the helper and changing the task's status to "IN PROGRESS"
-    if (request.getParameterMap().containsKey("action")
-        && request.getParameter("action").equals("helpout")) {
-
-      // Makes use of Transactions to prevent race condition
-      Transaction transaction = datastore.beginTransaction();
-
-      try {
-        task = datastore.get(taskKey);
-
-        if (!task.getProperty("status").equals("OPEN")) {
-          transaction.rollback();
-          System.err.println("Task must be open to be claimed by a helper");
-          response.sendError(
-              HttpServletResponse.SC_CONFLICT, "Task has already been claimed by another helper");
-        }
-
-        String userId = userService.getCurrentUser().getUserId();
-        task.setProperty("Helper", userId);
-        task.setProperty("status", "IN PROGRESS");
-        datastore.put(transaction, task);
-        transaction.commit();
-
-      } catch (EntityNotFoundException e) {
-        transaction.rollback();
-        System.err.println("Unable to find the entity based on the input key");
-        response.sendError(
-            HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
-
-      } finally {
-        if (transaction.isActive()) {
-          transaction.rollback();
-          System.err.println("Task must be open to be claimed by a helper");
-          response.sendError(
-              HttpServletResponse.SC_CONFLICT, "Task has already been claimed by another helper");
-        }
-      }
-      return;
-    }
-
     try {
       task = datastore.get(taskKey);
     } catch (EntityNotFoundException e) {

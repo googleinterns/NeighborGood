@@ -19,6 +19,7 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
+import com.google.neighborgood.helper.RetrieveUserInfo;
 import com.google.neighborgood.helper.RewardingPoints;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -148,6 +149,16 @@ public class TaskServlet extends HttpServlet {
       return;
     }
 
+    // I will work on a different implementation for this after the MVP since
+    // this implementation forces users to re-input their task details
+    // if they haven't ever inputted their user info and are automatically
+    // logged in when opening the page.
+    List<String> userInfo = RetrieveUserInfo.getInfo(userService);
+    if (userInfo == null) {
+      response.sendRedirect("account.jsp");
+      return;
+    }
+
     // Get the rewarding points from the form
     int rewardPts;
     try {
@@ -199,6 +210,10 @@ public class TaskServlet extends HttpServlet {
       return;
     }
 
+    String formattedAddress = (String) userEntity.getProperty("address");
+    String country = (String) userEntity.getProperty("country");
+    String zipcode = (String) userEntity.getProperty("zipcode");
+
     // Create an Entity that stores the input comment
     Entity taskEntity = new Entity("Task", userEntity.getKey());
     taskEntity.setProperty("detail", taskDetail);
@@ -207,9 +222,9 @@ public class TaskServlet extends HttpServlet {
     taskEntity.setProperty("status", "OPEN");
     taskEntity.setProperty("Owner", userId);
     taskEntity.setProperty("Helper", "N/A");
-    taskEntity.setProperty("Address", "4xxx Cxxxxx Avenue, Pittsburgh, PA 15xxx");
-    taskEntity.setProperty("zipcode", "59715");
-    taskEntity.setProperty("country", "United States");
+    taskEntity.setProperty("Address", formattedAddress);
+    taskEntity.setProperty("zipcode", zipcode);
+    taskEntity.setProperty("country", country);
     taskEntity.setProperty("category", taskCategory);
 
     datastore.put(taskEntity);

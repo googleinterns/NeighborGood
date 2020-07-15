@@ -172,12 +172,14 @@ table button:hover i {
 }
 
 .edit-task:hover,
-.complete-task:hover {
+.complete-task:hover,
+.verify-task:hover {
   background-color: #4caf50;
 }
 
 .delete-task:hover,
-.abandon-task:hover {
+.abandon-task:hover,
+.disapprove-task:hover {
   background-color: red;
 }
 
@@ -201,6 +203,8 @@ table button:hover i {
   padding: 20px;
   border: 1px solid #888;
   width: 50%;
+  max-height: 80%;
+  overflow-y: auto;
 }
 
 .modal textarea {
@@ -247,4 +251,23 @@ table button:hover i {
 #info-setting:focus {
   color: gray;
   text-decoration: none;
+}
+
+#map {
+  border: thin solid black;
+  height: 400px;
+  max-width: 100%;
+}
+
+#place-input {
+  margin-top: 16px;
+  background-color: white;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  width: 500px;
+  text-overflow: ellipsis;
+}
+
+#place-input:focus {
+  border-color: skyblue;
 }

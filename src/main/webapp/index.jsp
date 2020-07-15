@@ -1,4 +1,20 @@
 <!DOCTYPE html>
+<!--
+ Copyright 2020 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
 <html>
   <head>
     <meta charset="UTF-8">
@@ -7,25 +23,23 @@
     <link rel="stylesheet" href="homepage_style.css">
     <script type='text/javascript' src='config.js'></script>
     <script src="homepage_script.js"></script>
-    <script src="https://kit.fontawesome.com/71105f4105.js" crossorigin="anonymous"></script> 
+    <script src="https://kit.fontawesome.com/71105f4105.js" crossorigin="anonymous"></script>
   </head>
   <%@ page import = "com.google.appengine.api.users.UserService" %>
   <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
   <%@ page import = "com.google.neighborgood.helper.RetrieveUserInfo" %>
   <%@ page import = "java.util.List" %>
-  <% UserService userService = UserServiceFactory.getUserService(); 
+  <% UserService userService = UserServiceFactory.getUserService();
   boolean userLoggedIn = userService.isUserLoggedIn();
   String categoriesClass = userLoggedIn ? "notFullWidth" : "fullWidth";
-  if (userLoggedIn) 
   %>
-
   <body>
       <!--Site Header-->
       <header>
           <nav>
               <div id="dashboard-icon-container">
               <%
-              if (userLoggedIn){ 
+              if (userLoggedIn){
               %>
                   <a href="user_profile.jsp" class="dashboard-icon">
                       <i class="fas fa-user-circle fa-3x" title="Go to User Page"></i>
@@ -57,9 +71,10 @@
                       String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
                 %>
                   <p class="login-messages"><a href="<%=loginUrl%>" id="loginLogoutMessage">Login to help out a neighbor!</a></p>
-                <%
-                }
-                %>
+                  <%
+                    }
+                  %>
+                  <p class="login-messages"><a id="topscore-button">NeighborGood's Top Scorers</a></p>
               </div>
           </nav>
           <h1 id="title">
@@ -86,11 +101,12 @@
                   <div id="add-task">
                       <i class="fas fa-plus-circle" aria-hidden="true" id="create-task-button" title="Add Task"></i>
                   </div>
-                  <% 
+                  <%
                   }
                   %>
               </div>
-              
+
+              <!--Results Messages-->
               <div id="location-missing-message" class="results-message">
                   We could not retrieve your location to display your neighborhood tasks.
               </div>
@@ -104,20 +120,22 @@
           <!--Listed Tasks Container-->
           <div id="tasks-list"></div>
       </section>
+      <!--Create Tasks Modal-->
       <div class="modalWrapper" id="createTaskModalWrapper">
         <div class="modal" id="createTaskModal">
-            <span class="close-button" id="close-button">&times;</span>
+            <span class="close-button" id="close-addtask-button">&times;</span>
             <form id="new-task-form" action="/tasks" method="POST">
                 <h1>CREATE A NEW TASK: </h1>
                 <div>
                     <label for="task-detail-input">Task Detail:</label>
                     <br/>
                 </div>
-                <textarea name="task-detail-input" id="task-detail-input" placeholder="Describe your task here:"></textarea>
                 <br/>
+                <textarea name="task-detail-input" id="task-detail-input" placeholder="Describe your task here:"></textarea>
+                <br/><br/>
                 <label for="rewarding-point-input">Rewarding Points:</label>
                 <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50">
-                <br/>
+                <br/><br/>
                 <label for="category-input">Task Category:</label>
                 <select name="category-input" id="category-input" form="new-task-form">
                   <option value="garden">Garden</option>
@@ -128,6 +146,53 @@
                 <br/><br/>
                 <input type="submit" id="submit-create-task"/>
             </form>
+        </div>
+      </div>
+      <!--Top Scorers Modal-->
+      <div class="modalWrapper" id="topScoresModalWrapper">
+        <div class="modal" id="topScoresModal">
+            <span class="close-button" id="close-topscore-button">&times;</span>
+            <h1 id="topScoresTitle">Top Scorers</h1>
+            <div id="topScoresTitlesWrapper">
+            </div>
+            <div id="topScoresTablesWrapper">
+              <!--World Top Scorers-->
+              <div id="world-topscores" class="topScoresDiv">
+                <h2>World Wide</h2>
+                <table class="topScoresTable">
+                <%
+                for (int rank = 1; rank <= 10; rank++) {
+                  String rowId = "world" + rank;
+                %>
+                  <tr id="<%=rowId%>">
+                    <td class="topscore-rank topscores"><%=rank%>.</td>
+                    <td class="topscore-nickname topscores">-</td>
+                    <td class="topscore-score topscores">-</td>
+                  </tr>
+                <%
+                }
+                %>
+                </table>
+              </div>
+              <!--Neighborhood Top Scorers-->
+              <div id="neighborhood-topscore" class="topScoresDiv">
+                <h2>Nearby Neighbors</h2>
+                <table class="topScoresTable">
+                <%
+                for (int rank = 1; rank <= 10; rank++) {
+                  String rowId = "neighborhood" + rank;
+                %>
+                  <tr id="<%=rowId%>">
+                    <td class="topscore-rank topscores"><%=rank%>.</td>
+                    <td class="topscore-nickname topscores">-</td>
+                    <td class="topscore-score topscores">-</td>
+                  </tr>
+                <%
+                }
+                %>
+                </table>
+              </div>
+            </div>
         </div>
     </div>
   </body>
