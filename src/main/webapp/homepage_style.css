@@ -365,7 +365,7 @@ td {
     justify-content: center;
     width: 100%;
   }
-  
+
   #control-bar-message-wrapper {
     position: fixed;
     top: 7.5em;
@@ -417,7 +417,7 @@ td {
   #topScoresTitle {
     font-size: 1.5em;
   }
-  
+
   nav {
     padding-bottom: 0;
   }
@@ -448,7 +448,7 @@ td {
   #control-bar-message-wrapper {
     position: fixed;
     z-index: 4;
-    top: 9.0em;
+    top: 9em;
   }
 
   #tasks-list {
@@ -459,7 +459,7 @@ td {
   }
 
   #login-logout {
-      width: auto;
+    width: auto;
   }
 
   #control-bar {
