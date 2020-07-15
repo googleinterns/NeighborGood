@@ -313,3 +313,16 @@ section {
     font-size: 2.5em;
   }
 }
+
+#task-detail-container {
+  margin-bottom: 20px;
+}
+
+.task-content {
+  cursor: pointer;
+}
+
+.task-content:hover {
+  color: blue;
+  text-decoration: underline;
+}

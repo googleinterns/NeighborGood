@@ -46,6 +46,7 @@ async function editTask(keyString) {
         window.alert("You can only edit an 'OPEN' task.");
     } else {
         document.getElementById("edit-detail-input").value = info.detail;
+        document.getElementById("edit-overview-input").value = info.overview;
         document.getElementById("edit-category-input").value = info.category;
         document.getElementById("edit-point-input").value = info.reward.toString();
         const id_input = document.getElementById("task-id-input");
@@ -210,7 +211,7 @@ async function displayNeedHelpTasks() {
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
-        var data = [task.detail, task.helper, task.status];
+        var data = [task.overview, task.helper, task.status];
         const keyStringCopy = task.keyString.slice();
         for (var i = 0; i < data.length; i++) {
             var td = document.createElement("td");
@@ -249,7 +250,7 @@ async function displayNeedHelpCompleteTasks() {
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
-        var data = [task.detail, task.helper, task.status];
+        var data = [task.overview, task.helper, task.status];
         const keyStringCopy = task.keyString.slice();
         for (var i = 0; i < data.length; i++) {
             var td = document.createElement("td");
@@ -288,7 +289,7 @@ async function displayOfferHelpTasks() {
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
-        var data = [task.detail, task.status, task.owner, task.address];
+        var data = [task.overview, task.status, task.owner, task.address];
         const keyStringCopy = task.keyString.slice();
         for (var i = 0; i < data.length; i++) {
             var td = document.createElement("td");
@@ -327,7 +328,7 @@ async function displayOfferHelpCompleteTasks() {
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
-        var data = [task.detail, task.status, task.owner, task.reward.toString()];
+        var data = [task.overview, task.status, task.owner, task.reward.toString()];
         const keyStringCopy = task.keyString.slice();
         for (var i = 0; i < data.length; i++) {
             var td = document.createElement("td");

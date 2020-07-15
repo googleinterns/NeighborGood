@@ -108,6 +108,7 @@ public final class TaskServletTest {
     when(request.getParameter("reward-input")).thenReturn("50");
     when(request.getParameter("task-detail-input")).thenReturn("Help me please");
     when(request.getParameter("category-input")).thenReturn("misc");
+    when(request.getParameter("task-overview-input")).thenReturn("Task Overview");
 
     new TaskServlet().doPost(request, response);
 
@@ -122,6 +123,7 @@ public final class TaskServletTest {
     // Test the stored task information
     assertEquals("1234567890", (String) entity.getProperty("Owner"));
     assertEquals("Help me please", (String) entity.getProperty("detail"));
+    assertEquals("Task Overview", (String) entity.getProperty("overview"));
     assertEquals(50, (long) entity.getProperty("reward"));
   }
 
@@ -138,6 +140,7 @@ public final class TaskServletTest {
       when(request.getParameter("reward-input")).thenReturn(rewardPts);
       when(request.getParameter("task-detail-input")).thenReturn(taskContent);
       when(request.getParameter("category-input")).thenReturn("misc");
+      when(request.getParameter("task-overview-input")).thenReturn("Task Overview");
 
       // Send a POST request to the task servlet
       new TaskServlet().doPost(request, response);
@@ -156,6 +159,7 @@ public final class TaskServletTest {
         // Test the stored task information
         assertEquals("1234567890", (String) entity.getProperty("Owner"));
         assertEquals("Testing task 1", (String) entity.getProperty("detail"));
+        assertEquals("Task Overview", (String) entity.getProperty("overview"));
         assertEquals(50, (long) entity.getProperty("reward"));
       }
     }
