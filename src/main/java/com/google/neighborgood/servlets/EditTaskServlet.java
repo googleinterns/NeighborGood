@@ -96,6 +96,7 @@ public class EditTaskServlet extends HttpServlet {
       task = datastore.get(taskKey);
     } catch (EntityNotFoundException e) {
       System.err.println("Unable to find the entity based on the input key");
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       response.sendError(HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
       return;
     }
@@ -122,6 +123,7 @@ public class EditTaskServlet extends HttpServlet {
     // If input task detail is empty, reject the request to edit and send a 400 error.
     if (taskDetail.equals("")) {
       System.err.println("The input task detail is empty");
+      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       response.sendRedirect("/400.html");
       return;
     }
@@ -130,6 +132,7 @@ public class EditTaskServlet extends HttpServlet {
     String taskCategory = request.getParameter("edit-category-input");
     if (taskCategory == null || taskCategory.isEmpty()) {
       System.err.println("The task must have a category");
+      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       response.sendRedirect("/400.html");
       return;
     }
@@ -138,6 +141,7 @@ public class EditTaskServlet extends HttpServlet {
       task = datastore.get(taskKey);
     } catch (EntityNotFoundException e) {
       System.err.println("Unable to find the entity based on the input key");
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       response.sendError(HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
       return;
     }
