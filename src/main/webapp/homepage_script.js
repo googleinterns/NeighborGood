@@ -214,6 +214,7 @@ function getUserNeighborhood() {
             .catch(() => {
                 console.error("User location and/or neighborhood could not be retrieved");
                 document.getElementById("location-missing-message").style.display = "block";
+                fetch("/tasks");
             });
 	}
 }
@@ -221,11 +222,15 @@ function getUserNeighborhood() {
 /* Function that returns a promise to get and return the user's location */
 function getUserLocation() {
     return new Promise((resolve, reject) => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                var location = {lat: position.coords.latitude, lng: position.coords.longitude};
-                resolve(location);
-            }, function(err) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var location = {lat: position.coords.latitude, lng: position.coords.longitude};
+            resolve(location);
+        }, function(err) {
+            let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
+            const request = new Request(url, {method: "POST"});
+            fetch(request).then(response => response.json()).then(jsonresponse => {
+                resolve(jsonresponse["location"]);
+            }).catch(() => {
                 // Check to see if this failed because we're in an insecure
                 // context, such as a local dev environment that isn't
                 // http://localhost (https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts).
@@ -235,13 +240,9 @@ function getUserLocation() {
                     } else {
                         reject("User location failed");
                     }
-                } else {
-                    reject("User location failed");
-                }
+                } else reject("User location failed");
             });
-        } else {
-            reject("User location is not supported by this browser");
-        }
+        });
     });
 }
 
