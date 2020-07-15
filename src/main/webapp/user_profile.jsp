@@ -65,6 +65,7 @@
                     <th>Task Overview</th>
                     <th>Status</th>
                     <th>Neighbor</th>
+                    <th>Address</th>
                     <th>Mark as complete</th>
                     <th>Abandon</th>
                 </tr>
