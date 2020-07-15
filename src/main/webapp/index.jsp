@@ -56,7 +56,7 @@
               %>
               </div>
 
-              <div id="login-logout">
+              <div id="UI-messages">
           	    <%
             	  if (userLoggedIn) {
                   List<String> userInfo = RetrieveUserInfo.getInfo(userService);
@@ -64,7 +64,7 @@
                   String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
                   String nickname = (userInfo == null) ? userService.getCurrentUser().getEmail() : userInfo.get(0);
                 %>
-          	      <p class="login-messages"> <%=nickname%> | <a href="<%=logoutUrl%>" id="loginLogoutMessage">Logout</a></p>
+          	      <p class="login-messages" id="login-logout"> <%=nickname%> | <a href="<%=logoutUrl%>" id="loginLogoutMessage">Logout</a></p>
                 <%
                 } else {
                       String urlToRedirectToAfterUserLogsIn = "/account.jsp";

@@ -14,8 +14,7 @@
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
-import static org.openqa.selenium.support.ui.ExpectedConditions.urlContains;
+import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import java.util.List;
@@ -33,7 +32,9 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 @RunWith(JUnit4.class)
@@ -42,6 +43,7 @@ public class IntegrationTest {
 
   private static WebDriver driver;
   private static WebDriverWait wait;
+  private static Wait<WebDriver> fluentWait;
   private static JavascriptExecutor js;
 
   private final String USER_NICKNAME = "Mafe";
@@ -49,6 +51,8 @@ public class IntegrationTest {
   private final String USER_EMAIL = "123456@example.com";
   private final String USER_EMAIL_HELPER = "helper@example.com";
   private final String USER_ADDRESS = "123 Street Name, City, ST";
+  private final String USER_ZIPCODE = "59715";
+  private final String USER_COUNTRY = "United States";
   private final String USER_PHONE = "1231231234";
   private final String TASK_DETAIL = "Help!";
   private final String[] TASK_CATEGORIES = {"garden", "shopping", "pets", "misc"};
@@ -62,6 +66,11 @@ public class IntegrationTest {
     // options.addArguments("--disable-gpu");
     // driver = new ChromeDriver(options);
     wait = new WebDriverWait(driver, 20);
+    fluentWait =
+        new FluentWait<WebDriver>(driver)
+            .withTimeout(30, TimeUnit.SECONDS)
+            .pollingEvery(1, TimeUnit.SECONDS)
+            .ignoring(Exception.class);
     js = (JavascriptExecutor) driver;
     clearAllDatastoreEntities(driver);
   }
@@ -77,7 +86,7 @@ public class IntegrationTest {
   public void _01_Homepage_AsNewGuestUser_LoginAndInputUserInfo() {
     driver.get("http://localhost:8080/");
     By loginMessage = By.id("loginLogoutMessage");
-    wait.until(presenceOfElementLocated(loginMessage));
+    fluentWait.until(presenceOfElementLocated(loginMessage));
     WebElement loginElement = driver.findElement(loginMessage);
     String actualLoginText = loginElement.getText();
 
@@ -103,17 +112,16 @@ public class IntegrationTest {
         "Dashboard icons must not be present for guest users", dashboardIconsElement.isEmpty());
 
     By taskResultsMessage = By.id("no-tasks-message");
-    wait.until(presenceOfElementLocated(taskResultsMessage));
+    fluentWait.until(presenceOfElementLocated(taskResultsMessage));
     WebElement taskResultsMessageElement = driver.findElement(taskResultsMessage);
+    fluentWait.until(visibilityOf(taskResultsMessageElement));
 
     // Message alerting user there are no tasks nearby should be displayed
-    // assertTrue(
-    //    "No tasks in neighborhood message should be displayed",
-    //    taskResultsMessageElement.isDisplayed());
+    assertTrue(
+        "No tasks in neighborhood message should be displayed",
+        taskResultsMessageElement.isDisplayed());
 
-    loginNewUser(USER_EMAIL, USER_NICKNAME, USER_ADDRESS, USER_PHONE);
-
-    wait.until(urlContains("/user_profile.jsp"));
+    loginNewUser(USER_EMAIL, USER_NICKNAME, USER_ADDRESS, USER_PHONE, USER_ZIPCODE, USER_COUNTRY);
 
     // After new user fills out user info, they should be redirected to userpage
     assertTrue("User in user profile page", driver.getCurrentUrl().contains("/user_profile.jsp"));
@@ -175,18 +183,25 @@ public class IntegrationTest {
   public void _04_Homepage_AsLoggedUser_LogOut() {
     // Logs out first from previous user session
     By loginMessage = By.id("loginLogoutMessage");
-    wait.until(presenceOfElementLocated(loginMessage));
+    fluentWait.until(presenceOfElementLocated(loginMessage));
     WebElement loginMessageElement = driver.findElement(loginMessage);
     js.executeScript("arguments[0].click();", loginMessageElement);
-    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+    fluentWait.until(presenceOfElementLocated(loginMessage));
     loginMessageElement = driver.findElement(loginMessage);
     assertEquals("Login to help out a neighbor!", loginMessageElement.getText());
   }
 
   @Test
   public void _05_Homepage_AsLoggedHelper_HelpOut() {
-    loginNewUser(USER_EMAIL_HELPER, USER_NICKNAME_HELPER, USER_ADDRESS, USER_PHONE);
-    wait.until(urlContains("/user_profile.jsp"));
+    loginNewUser(
+        USER_EMAIL_HELPER,
+        USER_NICKNAME_HELPER,
+        USER_ADDRESS,
+        USER_PHONE,
+        USER_ZIPCODE,
+        USER_COUNTRY);
+
     verifyLoggedUserUserPage(USER_NICKNAME_HELPER);
     backToHome();
     verifyLoggedUserHomePage(USER_NICKNAME_HELPER);
@@ -201,8 +216,9 @@ public class IntegrationTest {
   private static void clearAllDatastoreEntities(WebDriver driver) {
     // Clears datastore entities for start of test
     driver.get("http://localhost:8080/_ah/admin");
+    fluentWait.until(urlContains("/_ah/admin"));
     By entityKindSelect = By.id("kind_input");
-    wait.until(presenceOfElementLocated(entityKindSelect));
+    fluentWait.until(presenceOfElementLocated(entityKindSelect));
     // Retrieves number of Entity Kind select options to iterate through them
     Select kindSelect = new Select(driver.findElement(entityKindSelect));
     List<WebElement> allEntityKinds = kindSelect.getOptions();
@@ -211,15 +227,16 @@ public class IntegrationTest {
     By deleteButton;
     for (int i = 1; i < allEntityKinds.size(); i++) {
       listButton = By.id("list_button");
-      wait.until(presenceOfElementLocated(listButton));
+      fluentWait.until(presenceOfElementLocated(listButton));
       WebElement listButtonElement = driver.findElement(listButton);
       js.executeScript("arguments[0].click();", listButtonElement);
+      fluentWait.until(urlContains("/datastore?"));
       allKeys = By.id("allkeys");
-      wait.until(presenceOfElementLocated(allKeys));
+      fluentWait.until(presenceOfElementLocated(allKeys));
       WebElement allKeysElement = driver.findElement(allKeys);
       js.executeScript("arguments[0].click();", allKeysElement);
       deleteButton = By.id("delete_button");
-      wait.until(presenceOfElementLocated(deleteButton));
+      fluentWait.until(presenceOfElementLocated(deleteButton));
       WebElement deleteButtonElement = driver.findElement(deleteButton);
       js.executeScript("arguments[0].click();", deleteButtonElement);
       driver.switchTo().alert().accept();
@@ -229,16 +246,17 @@ public class IntegrationTest {
   private void addTask(String details, String points, int categoryIndex) {
 
     By addTaskButton = By.id("create-task-button");
-    wait.until(presenceOfElementLocated((addTaskButton)));
+    fluentWait.until(presenceOfElementLocated((addTaskButton)));
     WebElement addTaskButtonElement = driver.findElement(addTaskButton);
     addTaskButtonElement.click();
 
     By createTaskModal = By.id("createTaskModal");
-    wait.until(presenceOfElementLocated(createTaskModal));
+    fluentWait.until(presenceOfElementLocated(createTaskModal));
     WebElement createTaskModalElement = driver.findElement(createTaskModal);
+    fluentWait.until(visibilityOf(createTaskModalElement));
 
     // After clicking on the add task button, the modal should be displayed
-    // assertTrue("Create task modal should be displayed", createTaskModalElement.isDisplayed());
+    assertTrue("Create task modal should be displayed", createTaskModalElement.isDisplayed());
 
     js.executeScript("document.getElementById('task-detail-input').value='" + details + "';");
     js.executeScript("document.getElementById('rewarding-point-input').value='" + points + "';");
@@ -248,26 +266,28 @@ public class IntegrationTest {
             + "';");
 
     By submitButton = By.id("submit-create-task");
-    wait.until(presenceOfElementLocated(submitButton));
+    fluentWait.until(presenceOfElementLocated(submitButton));
     WebElement submitButtonElement = driver.findElement(submitButton);
     js.executeScript("arguments[0].click();", submitButtonElement);
+
+    fluentWait.until(urlContains("/user_profile.jsp"));
   }
 
   private void verifyNewTaskUserPage(String expectedDetails) {
     // Verify that inputted task info is correctly displayed in need help table
     String taskRowXPath = "//table[@id='need-help']/tbody/tr[1]";
     By rowTaskDetails = By.xpath(taskRowXPath + "/td[1]");
-    wait.until(presenceOfElementLocated(rowTaskDetails));
+    fluentWait.until(presenceOfElementLocated(rowTaskDetails));
     String rowDetailsActual = driver.findElement(rowTaskDetails).getText();
     assertEquals(expectedDetails, rowDetailsActual);
 
     By rowTaskHelper = By.xpath(taskRowXPath + "/td[2]");
-    wait.until(presenceOfElementLocated(rowTaskHelper));
+    fluentWait.until(presenceOfElementLocated(rowTaskHelper));
     String rowHelperActual = driver.findElement(rowTaskHelper).getText();
     assertEquals("N/A", rowHelperActual);
 
     By rowTaskStatus = By.xpath(taskRowXPath + "/td[3]");
-    wait.until(presenceOfElementLocated(rowTaskStatus));
+    fluentWait.until(presenceOfElementLocated(rowTaskStatus));
     String rowStatusActual = driver.findElement(rowTaskStatus).getText();
     assertEquals("OPEN", rowStatusActual);
   }
@@ -276,36 +296,37 @@ public class IntegrationTest {
     String taskXPath = "//div[@id='tasks-list']/div[1]/div[2]";
 
     By taskDetails = By.xpath(taskXPath + "/div[2]");
-    wait.until(presenceOfElementLocated(taskDetails));
+    fluentWait.until(presenceOfElementLocated(taskDetails));
     String taskDetailsActual = driver.findElement(taskDetails).getText();
     assertEquals(expectedDetails, taskDetailsActual);
 
     By taskNickname = By.xpath(taskXPath + "/div[1]/div[1]");
-    wait.until(presenceOfElementLocated(taskNickname));
+    fluentWait.until(presenceOfElementLocated(taskNickname));
     String taskNicknameActual = driver.findElement(taskNickname).getText();
     assertEquals(USER_NICKNAME, taskNicknameActual);
 
     By taskCategory = By.xpath(taskXPath + "/div[3]/div[1]");
-    wait.until(presenceOfElementLocated(taskCategory));
+    fluentWait.until(presenceOfElementLocated(taskCategory));
     String taskCategoryActual = driver.findElement(taskCategory).getText();
     assertEquals("#" + expectedCategory, taskCategoryActual);
   }
 
-  private void loginNewUser(String email, String nickname, String address, String phone) {
+  private void loginNewUser(
+      String email, String nickname, String address, String phone, String zipcode, String country) {
     By loginMessage = By.id("loginLogoutMessage");
-    wait.until(presenceOfElementLocated(loginMessage));
+    fluentWait.until(presenceOfElementLocated(loginMessage));
     WebElement loginElement = driver.findElement(loginMessage);
 
     js.executeScript("arguments[0].click();", loginElement);
 
-    wait.until(urlContains("_ah/login?continue=%2Faccount.jsp"));
+    fluentWait.until(urlContains("_ah/login?continue=%2Faccount.jsp"));
     js.executeScript("document.getElementById('email').value='" + email + "';");
 
     By loginButton = By.id("btn-login");
-    wait.until(presenceOfElementLocated(loginButton));
+    fluentWait.until(presenceOfElementLocated(loginButton));
     WebElement loginButtonElement = driver.findElement(loginButton);
     js.executeScript("arguments[0].click();", loginButtonElement);
-    wait.until(urlContains("/account.jsp"));
+    fluentWait.until(urlContains("/account.jsp"));
 
     // User should now be logged in and redirected to the
     // account page to enter their user info
@@ -313,18 +334,21 @@ public class IntegrationTest {
     assertEquals("My Personal Info", driver.getTitle());
 
     js.executeScript("document.getElementById('nickname-input').value='" + nickname + "';");
-    js.executeScript("document.getElementById('address-input').value='" + address + "';");
+    js.executeScript("document.getElementById('edit-address-input').value='" + address + "';");
+    js.executeScript("document.getElementById('edit-zipcode-input').value='" + zipcode + "';");
+    js.executeScript("document.getElementById('edit-country-input').value='" + country + "';");
     js.executeScript("document.getElementById('phone-input').value='" + phone + "';");
 
     By submitButton = By.id("submit-button");
-    wait.until(presenceOfElementLocated(submitButton));
+    fluentWait.until(presenceOfElementLocated(submitButton));
     WebElement submitButtonElement = driver.findElement(submitButton);
     js.executeScript("arguments[0].click();", submitButtonElement);
+    fluentWait.until(urlContains("/user_profile.jsp"));
   }
 
   private void verifyLoggedUserUserPage(String nickname) {
     By logoutMessage = By.id("log-out-link");
-    wait.until(presenceOfElementLocated(logoutMessage));
+    fluentWait.until(presenceOfElementLocated(logoutMessage));
     String logoutActualMessage = driver.findElement(logoutMessage).getText();
     // Userpage should show a custom logout message with user's nickname
     assertEquals(nickname + " | Logout", logoutActualMessage);
@@ -334,20 +358,20 @@ public class IntegrationTest {
     By backToHome = By.id("backtohome");
     WebElement backToHomeElement = driver.findElement(backToHome);
     js.executeScript("arguments[0].click();", backToHomeElement);
-    wait.until(urlContains("/index.jsp"));
+    fluentWait.until(urlContains("/index.jsp"));
   }
 
   private void goToUserPage() {
     By goToUserPage = By.xpath("//div[@id='dashboard-icon-container']/a");
-    wait.until(presenceOfElementLocated(goToUserPage));
+    fluentWait.until(presenceOfElementLocated(goToUserPage));
     WebElement goToUserPageElement = driver.findElement(goToUserPage);
     js.executeScript("arguments[0].click();", goToUserPageElement);
-    wait.until(urlContains("/user_profile.jsp"));
+    fluentWait.until(urlContains("/user_profile.jsp"));
   }
 
   private void goToOfferHelp() {
     By offerHelpButton = By.id("offer-help-button");
-    wait.until(presenceOfElementLocated(offerHelpButton));
+    fluentWait.until(presenceOfElementLocated(offerHelpButton));
     WebElement offerHelpElement = driver.findElement(offerHelpButton);
     js.executeScript("arguments[0].click();", offerHelpElement);
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
@@ -355,7 +379,7 @@ public class IntegrationTest {
 
   private void verifyLoggedUserHomePage(String nickname) {
     By logoutMessage = By.id("login-logout");
-    wait.until(presenceOfElementLocated(logoutMessage));
+    fluentWait.until(presenceOfElementLocated(logoutMessage));
     String actualLogoutText = driver.findElement(logoutMessage).getText();
 
     // Homepage should show a custom logout message with user's nickname
@@ -369,22 +393,23 @@ public class IntegrationTest {
     String taskXPath = "//div[@id='tasks-list']/div[1]";
 
     By taskNeighborNickname = By.xpath(taskXPath + "/div[2]/div[1]/div[1]");
-    wait.until(presenceOfElementLocated(taskNeighborNickname));
+    fluentWait.until(presenceOfElementLocated(taskNeighborNickname));
     expectedNicknameAndDetails[0] = driver.findElement(taskNeighborNickname).getText();
 
     By neighborTaskDetails = By.xpath(taskXPath + "/div[2]/div[2]");
-    wait.until(presenceOfElementLocated(neighborTaskDetails));
+    fluentWait.until(presenceOfElementLocated(neighborTaskDetails));
     expectedNicknameAndDetails[1] = driver.findElement(neighborTaskDetails).getText();
 
     By helpOutButton = By.xpath(taskXPath + "/div[2]/div[1]/div[2]");
-    wait.until(presenceOfElementLocated(helpOutButton));
+    fluentWait.until(presenceOfElementLocated(helpOutButton));
     WebElement helpOutElement = driver.findElement(helpOutButton);
     js.executeScript("arguments[0].click();", helpOutElement);
 
     By confirmHelp = By.xpath(taskXPath + "/div[1]/a");
-    wait.until(presenceOfElementLocated(confirmHelp));
+    fluentWait.until(presenceOfElementLocated(confirmHelp));
     WebElement confirmHelpElement = driver.findElement(confirmHelp);
     js.executeScript("arguments[0].click();", confirmHelpElement);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
     return expectedNicknameAndDetails;
   }
@@ -393,13 +418,13 @@ public class IntegrationTest {
     String offerHelpRowXPath = "//tbody[@id='offer-help-body']/tr[1]";
 
     By taskDetails = By.xpath(offerHelpRowXPath + "/td[1]");
-    wait.until(presenceOfElementLocated(taskDetails));
+    fluentWait.until(presenceOfElementLocated(taskDetails));
     assertEquals(expectedNicknameAndDetails[1], driver.findElement(taskDetails).getText());
     By taskStatus = By.xpath(offerHelpRowXPath + "/td[2]");
-    wait.until(presenceOfElementLocated(taskStatus));
+    fluentWait.until(presenceOfElementLocated(taskStatus));
     assertEquals("IN PROGRESS", driver.findElement(taskStatus).getText());
     By taskNeighbor = By.xpath(offerHelpRowXPath + "/td[3]");
-    wait.until(presenceOfElementLocated(taskNeighbor));
+    fluentWait.until(presenceOfElementLocated(taskNeighbor));
     assertEquals(expectedNicknameAndDetails[0], driver.findElement(taskNeighbor).getText());
   }
 }

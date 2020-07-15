@@ -47,8 +47,8 @@ if (document.readyState === 'loading') {
 function addUIClickHandlers() {
     // adds showModal and closeModal click events for the add task button
     if ((document.getElementById("create-task-button") !== null)) {
-        document.getElementById("create-task-button").addEventListener("click", showModal);
-    	document.getElementById("close-button").addEventListener("click", closeModal);
+        document.getElementById("create-task-button").addEventListener("click", showCreateTaskModal);
+    	document.getElementById("close-addtask-button").addEventListener("click", closeCreateTaskModal);
     }
 
     // adds filterTasksBy click event listener to category buttons
