@@ -14,9 +14,7 @@
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
-import static org.openqa.selenium.support.ui.ExpectedConditions.urlContains;
-import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
+import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import java.util.HashMap;
@@ -26,22 +24,15 @@ import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.junit.runners.MethodSorters;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoAlertPresentException;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 
-@Ignore
 @RunWith(JUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IntegrationTest {
@@ -216,19 +207,7 @@ public class IntegrationTest {
 
   @Test
   public void _06_Userpage_AsLoggedHelper_CompleteTask() {
-    String taskMarkCompleteXPath = "//tbody[@id='offer-help-body']/tr[1]/td[4]/button";
-    By markComplete = By.xpath(taskMarkCompleteXPath);
-    wait.until(presenceOfElementLocated(markComplete));
-    WebElement markCompleteElement = driver.findElement(markComplete);
-    js.executeScript("arguments[0].click();", markCompleteElement);
-    for (int i = 0; i < 60; i++) {
-      try {
-        driver.switchTo().alert().accept();
-        break;
-      } catch (NoAlertPresentException e) {
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
-      }
-    }
+    completeTaskAsHelper();
 
     String taskCompletedXPath = "//tbody[@id='complete-task-body']/tr[1]";
 
@@ -238,7 +217,7 @@ public class IntegrationTest {
 
     By taskStatus = By.xpath(taskCompletedXPath + "/td[2]");
     wait.until(presenceOfElementLocated(taskStatus));
-    assertEquals("COMPLETE: AWAIT VERIFICATION", driver.findElement(taskStatus).getText());
+    assertEquals(recentTask.get("status"), driver.findElement(taskStatus).getText());
 
     By taskNeighbor = By.xpath(taskCompletedXPath + "/td[3]");
     wait.until(presenceOfElementLocated(taskNeighbor));
@@ -267,7 +246,7 @@ public class IntegrationTest {
 
     By taskStatus = By.xpath(awaitVerifTaskXPath + "/td[3]");
     wait.until(presenceOfElementLocated(taskStatus));
-    assertEquals("COMPLETE: AWAIT VERIFICATION", driver.findElement(taskStatus).getText());
+    assertEquals(recentTask.get("status"), driver.findElement(taskStatus).getText());
 
     By verifyComplete = By.xpath(awaitVerifTaskXPath + "/td[4]/button");
     wait.until(presenceOfElementLocated(verifyComplete));
@@ -281,8 +260,10 @@ public class IntegrationTest {
         driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
       }
     }
+    recentTask.put("status", "COMPLETE");
+
     wait.until(presenceOfElementLocated(taskStatus));
-    assertEquals("COMPLETE", driver.findElement(taskStatus).getText());
+    assertEquals(recentTask.get("status"), driver.findElement(taskStatus).getText());
 
     helperPoints += Integer.parseInt(recentTask.get("points"));
   }
@@ -300,7 +281,48 @@ public class IntegrationTest {
     goToOfferHelp();
     By completedTaskStatus = By.xpath("//tbody[@id='complete-task-body']/tr[1]/td[2]");
     wait.until(presenceOfElementLocated(completedTaskStatus));
-    assertEquals("COMPLETE", driver.findElement(completedTaskStatus).getText());
+    assertEquals(recentTask.get("status"), driver.findElement(completedTaskStatus).getText());
+  }
+
+  @Test
+  public void _09_Userpage_AsLoggedUser_DisapproveTask() {
+    backToHome();
+    updateRecentTask();
+    helpOut();
+    goToUserPage();
+    goToOfferHelp();
+    completeTaskAsHelper();
+    logOut("logout-href");
+    loginUser(USER_EMAIL);
+    wait.until(urlContains("/user_profile.jsp"));
+
+    // this is row 2 for now but we probably need a better sorting system for completed tasks
+    // so that it sorts by time of completion (makes it easier to find and test)
+    By disapproveComplete = By.xpath("//tbody[@id='await-verif-body']/tr[2]/td[5]/button");
+    wait.until(presenceOfElementLocated(disapproveComplete));
+    WebElement disapproveCompleteElem = driver.findElement(disapproveComplete);
+    js.executeScript("arguments[0].click();", disapproveCompleteElem);
+    for (int i = 0; i < 60; i++) {
+      try {
+        driver.switchTo().alert().accept();
+        break;
+      } catch (NoAlertPresentException e) {
+        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+      }
+    }
+    recentTask.put("status", "IN PROGRESS");
+
+    By taskStatus = By.xpath("//tbody[@id='need-help-body']/tr[1]/td[3]");
+    wait.until(presenceOfElementLocated(taskStatus));
+    assertEquals(recentTask.get("status"), driver.findElement(taskStatus).getText());
+
+    By taskDetail = By.xpath("//tbody[@id='need-help-body']/tr[1]/td[1]");
+    wait.until(presenceOfElementLocated(taskDetail));
+    assertEquals(recentTask.get("detail"), driver.findElement(taskDetail).getText());
+
+    By taskHelper = By.xpath("//tbody[@id='need-help-body']/tr[1]/td[2]");
+    wait.until(presenceOfElementLocated(taskHelper));
+    assertEquals(recentTask.get("helper"), driver.findElement(taskHelper).getText());
   }
 
   private static void clearAllDatastoreEntities(WebDriver driver) {
@@ -345,6 +367,7 @@ public class IntegrationTest {
     recentTask.put("points", points);
     recentTask.put("category", TASK_CATEGORIES[categoryIndex]);
     recentTask.put("nickname", USER_NICKNAME);
+    recentTask.put("status", "OPEN");
 
     By addTaskButton = By.id("create-task-button");
     wait.until(presenceOfElementLocated((addTaskButton)));
@@ -519,6 +542,7 @@ public class IntegrationTest {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
     recentTask.put("helper", USER_NICKNAME_HELPER);
+    recentTask.put("status", "IN PROGRESS");
   }
 
   private void verifyOfferHelpTask() {
@@ -529,7 +553,7 @@ public class IntegrationTest {
     assertEquals(recentTask.get("detail"), driver.findElement(taskDetails).getText());
     By taskStatus = By.xpath(offerHelpRowXPath + "/td[2]");
     wait.until(presenceOfElementLocated(taskStatus));
-    assertEquals("IN PROGRESS", driver.findElement(taskStatus).getText());
+    assertEquals(recentTask.get("status"), driver.findElement(taskStatus).getText());
     By taskNeighbor = By.xpath(offerHelpRowXPath + "/td[3]");
     wait.until(presenceOfElementLocated(taskNeighbor));
     assertEquals(recentTask.get("nickname"), driver.findElement(taskNeighbor).getText());
@@ -541,5 +565,40 @@ public class IntegrationTest {
     WebElement logoutLinkElem = driver.findElement(logoutLink);
     js.executeScript("arguments[0].click();", logoutLinkElem);
     wait.until(urlContains("/index.jsp"));
+  }
+
+  private void updateRecentTask() {
+    recentTask.clear();
+    String taskXPath = "//div[@id='tasks-list']/div[1]/div[2]";
+    By taskNickname = By.xpath(taskXPath + "/div[1]/div[1]");
+    wait.until(presenceOfElementLocated(taskNickname));
+    recentTask.put("nickname", driver.findElement(taskNickname).getText());
+
+    By taskDetail = By.xpath(taskXPath + "/div[2]");
+    wait.until(presenceOfElementLocated(taskDetail));
+    recentTask.put("detail", driver.findElement(taskDetail).getText());
+
+    By taskCategory = By.xpath(taskXPath + "/div[3]/div[1]");
+    wait.until(presenceOfElementLocated(taskCategory));
+    recentTask.put("category", driver.findElement(taskCategory).getText());
+
+    recentTask.put("status", "OPEN");
+  }
+
+  private void completeTaskAsHelper() {
+    String taskMarkCompleteXPath = "//tbody[@id='offer-help-body']/tr[1]/td[4]/button";
+    By markComplete = By.xpath(taskMarkCompleteXPath);
+    wait.until(presenceOfElementLocated(markComplete));
+    WebElement markCompleteElement = driver.findElement(markComplete);
+    js.executeScript("arguments[0].click();", markCompleteElement);
+    for (int i = 0; i < 60; i++) {
+      try {
+        driver.switchTo().alert().accept();
+        break;
+      } catch (NoAlertPresentException e) {
+        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+      }
+    }
+    recentTask.put("status", "COMPLETE: AWAIT VERIFICATION");
   }
 }
