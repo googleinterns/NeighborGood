@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -56,6 +57,7 @@ public class IntegrationTest {
   private final String USER_PHONE = "1231231234";
   private final String TASK_DETAIL = "Help!";
   private final String[] TASK_CATEGORIES = {"garden", "shopping", "pets", "misc"};
+  private static HashMap<String, String> recentTask = new HashMap<String, String>();
 
   @BeforeClass
   public static void setupClass() {
@@ -201,16 +203,42 @@ public class IntegrationTest {
         USER_PHONE,
         USER_ZIPCODE,
         USER_COUNTRY);
-
     verifyLoggedUserUserPage(USER_NICKNAME_HELPER);
     backToHome();
     verifyLoggedUserHomePage(USER_NICKNAME_HELPER);
-
-    String[] expectedNicknameAndDetails = helpOut();
-
+    helpOut();
     goToUserPage();
     goToOfferHelp();
-    verifyOfferHelpTask(expectedNicknameAndDetails);
+    verifyOfferHelpTask();
+  }
+
+  @Test
+  public void _06_Userpage_AsLoggedHelper_CompleteTask() {
+    String taskMarkCompleteXPath = "//tbody[@id='offer-help-body']/tr[1]/td[4]/button";
+    By markComplete = By.xpath(taskMarkCompleteXPath);
+    fluentWait.until(presenceOfElementLocated(markComplete));
+    WebElement markCompleteElement = driver.findElement(markComplete);
+    js.executeScript("arguments[0].click();", markCompleteElement);
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.switchTo().alert().accept();
+
+    String taskCompletedXPath = "//tbody[@id='complete-task-body']/tr[1]";
+
+    By taskDetails = By.xpath(taskCompletedXPath + "/td[1]");
+    fluentWait.until(presenceOfElementLocated(taskDetails));
+    assertEquals(recentTask.get("detail"), driver.findElement(taskDetails).getText());
+
+    By taskStatus = By.xpath(taskCompletedXPath + "/td[2]");
+    fluentWait.until(presenceOfElementLocated(taskStatus));
+    assertEquals("COMPLETE: AWAIT VERIFICATION", driver.findElement(taskStatus).getText());
+
+    By taskNeighbor = By.xpath(taskCompletedXPath + "/td[3]");
+    fluentWait.until(presenceOfElementLocated(taskNeighbor));
+    assertEquals(recentTask.get("nickname"), driver.findElement(taskNeighbor).getText());
+
+    By taskPoints = By.xpath(taskCompletedXPath + "/td[4]");
+    fluentWait.until(presenceOfElementLocated(taskPoints));
+    assertEquals(recentTask.get("points"), driver.findElement(taskPoints).getText());
   }
 
   private static void clearAllDatastoreEntities(WebDriver driver) {
@@ -244,6 +272,10 @@ public class IntegrationTest {
   }
 
   private void addTask(String details, String points, int categoryIndex) {
+    recentTask.put("detail", details);
+    recentTask.put("points", points);
+    recentTask.put("category", TASK_CATEGORIES[categoryIndex]);
+    recentTask.put("nickname", USER_NICKNAME);
 
     By addTaskButton = By.id("create-task-button");
     fluentWait.until(presenceOfElementLocated((addTaskButton)));
@@ -386,19 +418,21 @@ public class IntegrationTest {
     assertEquals(nickname + " | Logout", actualLogoutText);
   }
 
-  private String[] helpOut() {
+  private void helpOut() {
 
-    String[] expectedNicknameAndDetails = new String[2];
+    // String[] expectedNicknameAndDetails = new String[2];
 
     String taskXPath = "//div[@id='tasks-list']/div[1]";
 
     By taskNeighborNickname = By.xpath(taskXPath + "/div[2]/div[1]/div[1]");
     fluentWait.until(presenceOfElementLocated(taskNeighborNickname));
-    expectedNicknameAndDetails[0] = driver.findElement(taskNeighborNickname).getText();
+    assertEquals(recentTask.get("nickname"), driver.findElement(taskNeighborNickname).getText());
+    // expectedNicknameAndDetails[0] = driver.findElement(taskNeighborNickname).getText();
 
     By neighborTaskDetails = By.xpath(taskXPath + "/div[2]/div[2]");
     fluentWait.until(presenceOfElementLocated(neighborTaskDetails));
-    expectedNicknameAndDetails[1] = driver.findElement(neighborTaskDetails).getText();
+    assertEquals(recentTask.get("detail"), driver.findElement(neighborTaskDetails).getText());
+    // expectedNicknameAndDetails[1] = driver.findElement(neighborTaskDetails).getText();
 
     By helpOutButton = By.xpath(taskXPath + "/div[2]/div[1]/div[2]");
     fluentWait.until(presenceOfElementLocated(helpOutButton));
@@ -410,21 +444,19 @@ public class IntegrationTest {
     WebElement confirmHelpElement = driver.findElement(confirmHelp);
     js.executeScript("arguments[0].click();", confirmHelpElement);
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-
-    return expectedNicknameAndDetails;
   }
 
-  private void verifyOfferHelpTask(String[] expectedNicknameAndDetails) {
+  private void verifyOfferHelpTask() {
     String offerHelpRowXPath = "//tbody[@id='offer-help-body']/tr[1]";
 
     By taskDetails = By.xpath(offerHelpRowXPath + "/td[1]");
     fluentWait.until(presenceOfElementLocated(taskDetails));
-    assertEquals(expectedNicknameAndDetails[1], driver.findElement(taskDetails).getText());
+    assertEquals(recentTask.get("detail"), driver.findElement(taskDetails).getText());
     By taskStatus = By.xpath(offerHelpRowXPath + "/td[2]");
     fluentWait.until(presenceOfElementLocated(taskStatus));
     assertEquals("IN PROGRESS", driver.findElement(taskStatus).getText());
     By taskNeighbor = By.xpath(offerHelpRowXPath + "/td[3]");
     fluentWait.until(presenceOfElementLocated(taskNeighbor));
-    assertEquals(expectedNicknameAndDetails[0], driver.findElement(taskNeighbor).getText());
+    assertEquals(recentTask.get("nickname"), driver.findElement(taskNeighbor).getText());
   }
 }
