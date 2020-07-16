@@ -53,7 +53,7 @@ public class IntegrationTest {
   private final String USER_PHONE = "1231231234";
   private final String TASK_DETAIL = "Help!";
   private final String[] TASK_CATEGORIES = {"garden", "shopping", "pets", "misc"};
-  private static int helperPoints = 0;
+  private static int helperPoints;
   // recentTask instance used to reference tasks throughout the tests
   private static HashMap<String, String> recentTask = new HashMap<String, String>();
 
@@ -340,6 +340,11 @@ public class IntegrationTest {
     // update recent task
     recentTask.put("status", "COMPLETE");
 
+    // Refreshes page due to flakiness of test caused by the partial refresh of the div in the page.
+    // Without refreshing this often resulted in a a stale element error
+    driver.navigate().refresh();
+    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+
     String taskStatusAfter =
         wait.until(
                 new Function<WebDriver, WebElement>() {
@@ -351,7 +356,7 @@ public class IntegrationTest {
     assertEquals(recentTask.get("status"), taskStatusAfter);
 
     // updates helper's total points
-    helperPoints += Integer.parseInt(recentTask.get("points"));
+    helperPoints = Integer.parseInt(recentTask.get("points"));
     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
   }
 
