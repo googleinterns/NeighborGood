@@ -230,18 +230,7 @@ function getUserLocation() {
                 const request = new Request(url, {method: "POST"});
                 fetch(request).then(response => {
                     if (response.status == 400 || response.status == 403 || response.status == 404) {
-                        // Check to see if this failed because we're in an insecure
-                        // context, such as a local dev environment that isn't
-                        // http://localhost (https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts).
-                        if (err.code === 1 && !window.isSecureContext) {
-                            if (config.LOCAL_DEV_LAT_LNG) {
-                                resolve(config.LOCAL_DEV_LAT_LNG);
-                            } else {
-                                reject("User location failed");
-                            }
-                        } else {
-                            reject("User location failed");
-                        }
+                        reject("User location failed");
                     } else {
                         response.json().then(jsonresponse => {
                             resolve(jsonresponse["location"]);
