@@ -24,14 +24,14 @@
         <div id="form-container">
             <form id="new-user-info-form" action="/account" method="POST" onsubmit="return validateInfoForm('new-user-info-form')">
                 <div>
-                    <label for="nickname-input">Your Preferred Nickname:</label>
+                    <label for="nickname-input">Your Preferred Nickname<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
                 <textarea name="nickname-input" id="nickname-input" placeholder="Input your preferred nickname here:"></textarea>
                 <br/><br/>
                 <div>
-                    <label for="address-input">Your Address:</label>
+                    <label for="address-input">Your Address<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
@@ -41,21 +41,21 @@
                 <div id="map"></div>
                 <br/><br/>
                 <div>
-                    <label for="edit-zipcode-input">Your Zip Code:</label>
+                    <label for="edit-zipcode-input">Your Zip Code<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
                 <input type="text" name="zipcode-input" id="edit-zipcode-input" placeholder="Input your zipcode here:">
                 <br/><br/>
                 <div>
-                    <label for="edit-country-input">Your Country:</label>
+                    <label for="edit-country-input">Your Country<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
                 <input type="text" name="country-input" id="edit-country-input" placeholder="Input your country here:">
                 <br/><br/>
                 <div>
-                    <label for="phone-input">Your Phone Number:</label>
+                    <label for="phone-input">Your Phone Number<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>

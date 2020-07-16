@@ -103,23 +103,23 @@
             <form id="new-task-form" action="/tasks" method="POST" onsubmit="return validateTaskForm('new-task-form')">
                 <h1>CREATE A NEW TASK: </h1>
                 <div>
-                    <label for="task-overview-input">Task Overview:</label>
+                    <label for="task-overview-input">Task Overview<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
                 <textarea name="task-overview-input" id="task-overview-input" placeholder="Briefly describe your task here:"></textarea>
                 <br/><br/>
                 <div>
-                    <label for="task-detail-input">Task Detail:</label>
+                    <label for="task-detail-input">Task Detail<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
                 <textarea name="task-detail-input" id="task-detail-input" placeholder="Describe your task here:"></textarea>
                 <br/><br/>
-                <label for="rewarding-point-input">Rewarding Points:</label>
+                <label for="rewarding-point-input">Rewarding Points<span class="req">*</span></label>
                 <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50">
                 <br/><br/>
-                <label for="category-input">Task Category:</label>
+                <label for="category-input">Task Category<span class="req">*</span></label>
                 <select name="category-input" id="category-input" form="new-task-form">
                   <option value="garden">Garden</option>
                   <option value="shopping">Shopping</option>
@@ -137,24 +137,24 @@
             <form id="edit-task-form" action="/tasks/edit" method="POST" onsubmit="return validateTaskForm('edit-task-form')">
                 <h1>EDIT THE CURRENT TASK: </h1>
                 <div>
-                    <label for="edit-overview-input">Task Overview:</label>
+                    <label for="edit-overview-input">Task Overview<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
                 <textarea name="task-overview-input" id="edit-overview-input"></textarea>
                 <br/><br/>
                 <div>
-                    <label for="edit-detail-input">Task Detail:</label>
+                    <label for="edit-detail-input">Task Detail<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
                 <textarea name="task-detail-input" id="edit-detail-input"></textarea>
                 <br/><br/>
-                <label for="edit-point-input">Rewarding Points: </label>
+                <label for="edit-point-input">Rewarding Points<span class="req">*</span></label>
                 <input type="number" id="edit-point-input" name="reward-input" min="0" max="200">
                 <input type="hidden" name="task-id" id="task-id-input">
                 <br/><br/>
-                <label for="edit-category-input">Task Category:</label>
+                <label for="edit-category-input">Task Category<span class="req">*</span></label>
                 <select name="category-input" id="edit-category-input" form="edit-task-form">
                   <option value="garden">Garden</option>
                   <option value="shopping">Shopping</option>
@@ -173,14 +173,14 @@
             <form id="update-info-form" action="/account" method="POST" onsubmit="return validateInfoForm('update-info-form')">
                 <h1>EDIT YOUR PERSONAL INFORMATION: </h1>
                 <div>
-                    <label for="edit-nickname-input">New nickname:</label>
+                    <label for="edit-nickname-input">Your nickname<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
                 <textarea name="nickname-input" id="edit-nickname-input"></textarea>
                 <br/><br/>
                 <div>
-                    <label for="edit-address-input">New address:</label>
+                    <label for="edit-address-input">Your address<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
@@ -190,21 +190,21 @@
                 <div id="map"></div>
                 <br/><br/>
                 <div>
-                    <label for="edit-zipcode-input">New Zip Code:</label>
+                    <label for="edit-zipcode-input">Your Zip Code<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
                 <input type="text" name="zipcode-input" id="edit-zipcode-input">
                 <br/><br/>
                 <div>
-                    <label for="edit-country-input">New Country:</label>
+                    <label for="edit-country-input">Your Country<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
                 <input type="text" name="country-input" id="edit-country-input">
                 <br/><br/>
                 <div>
-                    <label for="edit-phone-number-input">New phone number:</label>
+                    <label for="edit-phone-number-input">Your phone number<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
