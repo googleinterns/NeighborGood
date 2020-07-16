@@ -22,20 +22,20 @@
         <div class="empty" style="clear: both"><div/>
         <hr/>
         <div id="form-container">
-            <form id="new-user-info-form" action="/account" method="POST">
+            <form id="new-user-info-form" action="/account" method="POST" onsubmit="return validateInfoForm('new-user-info-form')">
                 <div>
                     <label for="nickname-input">Your Preferred Nickname:</label>
                     <br/>
                 </div>
                 <br/>
-                <textarea name="nickname-input" id="nickname-input" required="true" placeholder="Input your preferred nickname here:"></textarea>
+                <textarea name="nickname-input" id="nickname-input" placeholder="Input your preferred nickname here:"></textarea>
                 <br/><br/>
                 <div>
                     <label for="address-input">Your Address:</label>
                     <br/>
                 </div>
                 <br/>
-                <textarea name="address-input" id="edit-address-input" required="true" placeholder="Input your address here:"></textarea>
+                <textarea name="address-input" id="edit-address-input" placeholder="Input your address here:"></textarea>
                 <p id="rest-map">Click to mark your personal address on the map!</p>
                 <input id="place-input" class="controls" type="text" placeholder="Search Box">
                 <div id="map"></div>
@@ -45,21 +45,21 @@
                     <br/>
                 </div>
                 <br/>
-                <input type="text" name="zipcode-input" id="edit-zipcode-input" required="true" placeholder="Input your zipcode here:">
+                <input type="text" name="zipcode-input" id="edit-zipcode-input" placeholder="Input your zipcode here:">
                 <br/><br/>
                 <div>
                     <label for="edit-country-input">Your Country:</label>
                     <br/>
                 </div>
                 <br/>
-                <input type="text" name="country-input" id="edit-country-input" required="true" placeholder="Input your country here:">
+                <input type="text" name="country-input" id="edit-country-input" placeholder="Input your country here:">
                 <br/><br/>
                 <div>
                     <label for="phone-input">Your Phone Number:</label>
                     <br/>
                 </div>
                 <br/>
-                <input type="text" name="phone-input" id="phone-input" required="true" placeholder="Input your phone number here:">
+                <input type="text" name="phone-input" id="phone-input" placeholder="Input your phone number here:">
                 <br/><br/>
                 <button type="submit" id="submit-button"/>GET STARTED</button>
                 <br/><br/>

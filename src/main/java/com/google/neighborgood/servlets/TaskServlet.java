@@ -172,7 +172,6 @@ public class TaskServlet extends HttpServlet {
     String taskCategory = request.getParameter("category-input");
     if (taskCategory == null || taskCategory.isEmpty()) {
       System.err.println("The task must have a category");
-      response.sendRedirect("/400.html");
       return;
     }
 
@@ -184,10 +183,9 @@ public class TaskServlet extends HttpServlet {
       taskDetail = input.trim();
     }
 
-    // If input task detail is empty, reject the request to add a new task and send a 400 error.
+    // If input task detail is empty, reject the request to add a new task.
     if (taskDetail.equals("")) {
       System.err.println("The input task detail is empty");
-      response.sendRedirect("/400.html");
       return;
     }
 
@@ -199,10 +197,9 @@ public class TaskServlet extends HttpServlet {
       taskOverview = input.trim();
     }
 
-    // If input task overview is empty, reject the request to add a new task and send a 400 error.
+    // If input task overview is empty, reject the request to add a new task.
     if (taskOverview.equals("")) {
       System.err.println("The input task overview is empty");
-      response.sendRedirect("/400.html");
       return;
     }
 

@@ -135,9 +135,31 @@ function showModal() {
     var modal = document.getElementById("createTaskModalWrapper");
     modal.style.display = "block";
 }
+
 function closeModal() {
     var modal = document.getElementById("createTaskModalWrapper");
     modal.style.display = "none";
+}
+
+function validateTaskForm(id) {
+    var result = true;
+    var form = document.getElementById(id);
+    var inputName = ["task-overview", "task-detail", "reward", "category"];
+    for (var i = 0; i < inputName.length; i++) {
+        var name = inputName[i];
+        var inputField = form[name.concat("-input")].value.trim();
+        if (inputField === "") {
+            result = false;
+            form[name.concat("-input")].classList.add("highlight");
+        } else {
+            form[name.concat("-input")].classList.remove("highlight");
+        }
+    }
+    if (!result) {
+        alert("All fields are required. Please fill out all fields with non-empty input.");
+        return false;
+    }
+    return true;
 }
 // If the user clicks outside of the modal, closes the modal directly
 window.onclick = function(event) {

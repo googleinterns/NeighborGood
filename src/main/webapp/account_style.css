@@ -56,7 +56,7 @@ textarea {
 
 textarea:focus {
   width: 100%;
-  border: 4px solid rgb(97, 245, 195);
+  border: 4px solid black;
 }
 
 label {
@@ -111,4 +111,9 @@ label {
 
 #place-input:focus {
   border-color: skyblue;
+}
+
+.highlight {
+  box-shadow: 0 0 5px rgba(255, 0, 0, 1);
+  border: 4px solid rgb(255, 0, 0);
 }
