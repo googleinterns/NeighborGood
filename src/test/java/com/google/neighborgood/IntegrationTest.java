@@ -17,10 +17,12 @@ import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -58,14 +60,10 @@ public class IntegrationTest {
   public static void setupClass() {
     WebDriverManager.chromedriver().setup();
     driver = new ChromeDriver();
-    // ChromeOptions options = new ChromeOptions();
-    // options.addArguments("--headless");
-    // options.addArguments("--disable-gpu");
-    // driver = new ChromeDriver(options);
     wait =
         new FluentWait<WebDriver>(driver)
-            .withTimeout(60, TimeUnit.SECONDS)
-            .pollingEvery(1, TimeUnit.SECONDS)
+            .withTimeout(Duration.ofSeconds(60))
+            .pollingEvery(Duration.ofSeconds(1))
             .ignoring(NoSuchElementException.class);
     ;
 
@@ -83,9 +81,13 @@ public class IntegrationTest {
   @Test
   public void _01_Homepage_AsNewGuestUser_LoginAndInputUserInfo() {
     driver.get("http://localhost:8080/");
-    By loginMessage = By.id("loginLogoutMessage");
-    wait.until(presenceOfElementLocated(loginMessage));
-    WebElement loginElement = driver.findElement(loginMessage);
+    WebElement loginElement =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("loginLogoutMessage"));
+              }
+            });
     String actualLoginText = loginElement.getText();
 
     // Guest user should expect to see login message
@@ -109,10 +111,13 @@ public class IntegrationTest {
     assertTrue(
         "Dashboard icons must not be present for guest users", dashboardIconsElement.isEmpty());
 
-    By taskResultsMessage = By.id("no-tasks-message");
-    wait.until(presenceOfElementLocated(taskResultsMessage));
-    WebElement taskResultsMessageElement = driver.findElement(taskResultsMessage);
-    wait.until(visibilityOf(taskResultsMessageElement));
+    WebElement taskResultsMessageElement =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("no-tasks-message"));
+              }
+            });
 
     // Message alerting user there are no tasks nearby should be displayed
     assertTrue(
@@ -181,9 +186,13 @@ public class IntegrationTest {
   public void _04_Homepage_AsLoggedUser_LogOut() {
     // Logs out first from previous user session
     logOut("loginLogoutMessage");
-    By loginMessage = By.id("loginLogoutMessage");
-    wait.until(presenceOfElementLocated(loginMessage));
-    WebElement loginMessageElement = driver.findElement(loginMessage);
+    WebElement loginMessageElement =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("loginLogoutMessage"));
+              }
+            });
     assertEquals("Login to help out a neighbor!", loginMessageElement.getText());
   }
 
@@ -211,46 +220,85 @@ public class IntegrationTest {
 
     String taskCompletedXPath = "//tbody[@id='complete-task-body']/tr[1]";
 
-    By taskDetails = By.xpath(taskCompletedXPath + "/td[1]");
-    wait.until(presenceOfElementLocated(taskDetails));
-    assertEquals(recentTask.get("detail"), driver.findElement(taskDetails).getText());
+    WebElement taskDetails =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskCompletedXPath + "/td[1]"));
+              }
+            });
+    assertEquals(recentTask.get("detail"), taskDetails.getText());
 
-    By taskStatus = By.xpath(taskCompletedXPath + "/td[2]");
-    wait.until(presenceOfElementLocated(taskStatus));
-    assertEquals(recentTask.get("status"), driver.findElement(taskStatus).getText());
+    WebElement taskStatus =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskCompletedXPath + "/td[2]"));
+              }
+            });
+    assertEquals(recentTask.get("status"), taskStatus.getText());
 
-    By taskNeighbor = By.xpath(taskCompletedXPath + "/td[3]");
-    wait.until(presenceOfElementLocated(taskNeighbor));
-    assertEquals(recentTask.get("nickname"), driver.findElement(taskNeighbor).getText());
+    WebElement taskNeighbor =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskCompletedXPath + "/td[3]"));
+              }
+            });
+    assertEquals(recentTask.get("nickname"), taskNeighbor.getText());
 
-    By taskPoints = By.xpath(taskCompletedXPath + "/td[4]");
-    wait.until(presenceOfElementLocated(taskPoints));
-    assertEquals(recentTask.get("points"), driver.findElement(taskPoints).getText());
+    WebElement taskPoints =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskCompletedXPath + "/td[4]"));
+              }
+            });
+    assertEquals(recentTask.get("points"), taskPoints.getText());
   }
 
   @Test
   public void _07_Userpage_AsLoggedUser_VerifyCompletedTask() {
     logOut("logout-href");
     loginUser(USER_EMAIL);
-    wait.until(urlContains("/user_profile.jsp"));
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 
     String awaitVerifTaskXPath = "//tbody[@id='await-verif-body']/tr[1]";
 
-    By taskDetail = By.xpath(awaitVerifTaskXPath + "/td[1]");
-    wait.until(presenceOfElementLocated(taskDetail));
-    assertEquals(recentTask.get("detail"), driver.findElement(taskDetail).getText());
+    WebElement taskDetail =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(awaitVerifTaskXPath + "/td[1]"));
+              }
+            });
+    assertEquals(recentTask.get("detail"), taskDetail.getText());
 
-    By taskHelper = By.xpath(awaitVerifTaskXPath + "/td[2]");
-    wait.until(presenceOfElementLocated(taskHelper));
-    assertEquals(recentTask.get("helper"), driver.findElement(taskHelper).getText());
+    WebElement taskHelper =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(awaitVerifTaskXPath + "/td[2]"));
+              }
+            });
+    assertEquals(recentTask.get("helper"), taskHelper.getText());
 
-    By taskStatus = By.xpath(awaitVerifTaskXPath + "/td[3]");
-    wait.until(presenceOfElementLocated(taskStatus));
-    assertEquals(recentTask.get("status"), driver.findElement(taskStatus).getText());
+    WebElement taskStatus =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(awaitVerifTaskXPath + "/td[3]"));
+              }
+            });
+    assertEquals(recentTask.get("status"), taskStatus.getText());
 
-    By verifyComplete = By.xpath(awaitVerifTaskXPath + "/td[4]/button");
-    wait.until(presenceOfElementLocated(verifyComplete));
-    WebElement verifyCompleteElem = driver.findElement(verifyComplete);
+    WebElement verifyCompleteElem =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(awaitVerifTaskXPath + "/td[4]/button"));
+              }
+            });
     js.executeScript("arguments[0].click();", verifyCompleteElem);
     for (int i = 0; i < 60; i++) {
       try {
@@ -262,26 +310,46 @@ public class IntegrationTest {
     }
     recentTask.put("status", "COMPLETE");
 
-    wait.until(presenceOfElementLocated(taskStatus));
-    assertEquals(recentTask.get("status"), driver.findElement(taskStatus).getText());
+    WebElement taskStatusAfter =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(awaitVerifTaskXPath + "/td[3]"));
+              }
+            });
+    assertEquals(recentTask.get("status"), taskStatusAfter.getText());
 
+    System.out.println("\n\n\n recent task points before adding: " + recentTask.get("points"));
+    System.out.println("\n\n\n helperpoints before adding: " + helperPoints);
     helperPoints += Integer.parseInt(recentTask.get("points"));
+    System.out.println("\n\n\n helperpoints after adding: " + helperPoints + "\n\n\n");
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
   @Test
   public void _08_Userpage_AsHelper_CompletedTask() {
     logOut("logout-href");
     loginUser(USER_EMAIL_HELPER);
-    wait.until(urlContains("/user_profile.jsp"));
-    By points = By.id("points");
-    wait.until(presenceOfElementLocated(points));
-    assertEquals(
-        "My current points: " + Integer.toString(helperPoints) + "pts",
-        driver.findElement(points).getText());
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+
+    WebElement points =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("points"));
+              }
+            });
+    assertEquals("My current points: " + Integer.toString(helperPoints) + "pts", points.getText());
     goToOfferHelp();
-    By completedTaskStatus = By.xpath("//tbody[@id='complete-task-body']/tr[1]/td[2]");
-    wait.until(presenceOfElementLocated(completedTaskStatus));
-    assertEquals(recentTask.get("status"), driver.findElement(completedTaskStatus).getText());
+    WebElement completedTaskStatus =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(
+                    By.xpath("//tbody[@id='complete-task-body']/tr[1]/td[2]"));
+              }
+            });
+    assertEquals(recentTask.get("status"), completedTaskStatus.getText());
   }
 
   @Test
@@ -294,13 +362,18 @@ public class IntegrationTest {
     completeTaskAsHelper();
     logOut("logout-href");
     loginUser(USER_EMAIL);
-    wait.until(urlContains("/user_profile.jsp"));
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 
     // this is row 2 for now but we probably need a better sorting system for completed tasks
     // so that it sorts by time of completion (makes it easier to find and test)
-    By disapproveComplete = By.xpath("//tbody[@id='await-verif-body']/tr[2]/td[5]/button");
-    wait.until(presenceOfElementLocated(disapproveComplete));
-    WebElement disapproveCompleteElem = driver.findElement(disapproveComplete);
+    WebElement disapproveCompleteElem =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(
+                    By.xpath("//tbody[@id='await-verif-body']/tr[2]/td[5]/button"));
+              }
+            });
     js.executeScript("arguments[0].click();", disapproveCompleteElem);
     for (int i = 0; i < 60; i++) {
       try {
@@ -312,28 +385,48 @@ public class IntegrationTest {
     }
     recentTask.put("status", "IN PROGRESS");
 
-    By taskStatus = By.xpath("//tbody[@id='need-help-body']/tr[1]/td[3]");
-    wait.until(presenceOfElementLocated(taskStatus));
-    assertEquals(recentTask.get("status"), driver.findElement(taskStatus).getText());
+    WebElement taskStatus =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath("//tbody[@id='need-help-body']/tr[1]/td[3]"));
+              }
+            });
+    assertEquals(recentTask.get("status"), taskStatus.getText());
 
-    By taskDetail = By.xpath("//tbody[@id='need-help-body']/tr[1]/td[1]");
-    wait.until(presenceOfElementLocated(taskDetail));
-    assertEquals(recentTask.get("detail"), driver.findElement(taskDetail).getText());
+    WebElement taskDetail =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath("//tbody[@id='need-help-body']/tr[1]/td[1]"));
+              }
+            });
+    assertEquals(recentTask.get("detail"), taskDetail.getText());
 
-    By taskHelper = By.xpath("//tbody[@id='need-help-body']/tr[1]/td[2]");
-    wait.until(presenceOfElementLocated(taskHelper));
-    assertEquals(recentTask.get("helper"), driver.findElement(taskHelper).getText());
+    WebElement taskHelper =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath("//tbody[@id='need-help-body']/tr[1]/td[2]"));
+              }
+            });
+    assertEquals(recentTask.get("helper"), taskHelper.getText());
   }
 
   @Test
   public void _10_UserPage_AsHelper_AbandonTask() {
     logOut("logout-href");
     loginUser(USER_EMAIL_HELPER);
-    wait.until(urlContains("user_profile.jsp"));
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
     goToOfferHelp();
-    By abandonTask = By.xpath("//tbody[@id='offer-help-body']/tr/td[6]/button");
-    wait.until(presenceOfElementLocated(abandonTask));
-    WebElement abandonTaskElem = driver.findElement(abandonTask);
+    WebElement abandonTaskElem =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(
+                    By.xpath("//tbody[@id='offer-help-body']/tr/td[6]/button"));
+              }
+            });
     js.executeScript("arguments[0].click();", abandonTaskElem);
     for (int i = 0; i < 60; i++) {
       try {
@@ -345,35 +438,52 @@ public class IntegrationTest {
     }
     recentTask.put("status", "OPEN");
     backToHome();
-    wait.until(urlContains("/index.jsp"));
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
     verifyNewTaskHomepage();
   }
 
   private static void clearAllDatastoreEntities(WebDriver driver) {
     // Clears datastore entities for start of test
     driver.get("http://localhost:8080/_ah/admin");
-    wait.until(urlContains("/_ah/admin"));
-    By entityKindSelect = By.id("kind_input");
-    wait.until(presenceOfElementLocated(entityKindSelect));
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    WebElement entityKindSelect =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("kind_input"));
+              }
+            });
     // Retrieves number of Entity Kind select options to iterate through them
-    Select kindSelect = new Select(driver.findElement(entityKindSelect));
+    Select kindSelect = new Select(entityKindSelect);
     List<WebElement> allEntityKinds = kindSelect.getOptions();
     By listButton;
     By allKeys;
     By deleteButton;
     for (int j = 1; j < allEntityKinds.size(); j++) {
-      listButton = By.id("list_button");
-      wait.until(presenceOfElementLocated(listButton));
-      WebElement listButtonElement = driver.findElement(listButton);
+      WebElement listButtonElement =
+          wait.until(
+              new Function<WebDriver, WebElement>() {
+                public WebElement apply(WebDriver driver) {
+                  return driver.findElement(By.id("list_button"));
+                }
+              });
       js.executeScript("arguments[0].click();", listButtonElement);
-      wait.until(urlContains("/datastore?"));
-      allKeys = By.id("allkeys");
-      wait.until(presenceOfElementLocated(allKeys));
-      WebElement allKeysElement = driver.findElement(allKeys);
+      driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+      WebElement allKeysElement =
+          wait.until(
+              new Function<WebDriver, WebElement>() {
+                public WebElement apply(WebDriver driver) {
+                  return driver.findElement(By.id("allkeys"));
+                }
+              });
       js.executeScript("arguments[0].click();", allKeysElement);
-      deleteButton = By.id("delete_button");
-      wait.until(presenceOfElementLocated(deleteButton));
-      WebElement deleteButtonElement = driver.findElement(deleteButton);
+      WebElement deleteButtonElement =
+          wait.until(
+              new Function<WebDriver, WebElement>() {
+                public WebElement apply(WebDriver driver) {
+                  return driver.findElement(By.id("delete_button"));
+                }
+              });
       js.executeScript("arguments[0].click();", deleteButtonElement);
       for (int i = 0; i < 60; i++) {
         try {
@@ -394,15 +504,23 @@ public class IntegrationTest {
     recentTask.put("status", "OPEN");
     recentTask.put("helper", "N/A");
 
-    By addTaskButton = By.id("create-task-button");
-    wait.until(presenceOfElementLocated((addTaskButton)));
-    WebElement addTaskButtonElement = driver.findElement(addTaskButton);
+    WebElement addTaskButtonElement =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("create-task-button"));
+              }
+            });
     addTaskButtonElement.click();
 
-    By createTaskModal = By.id("createTaskModal");
-    wait.until(presenceOfElementLocated(createTaskModal));
-    WebElement createTaskModalElement = driver.findElement(createTaskModal);
-    wait.until(visibilityOf(createTaskModalElement));
+    WebElement createTaskModalElement =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("createTaskModal"));
+              }
+            });
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 
     // After clicking on the add task button, the modal should be displayed
     assertTrue("Create task modal should be displayed", createTaskModalElement.isDisplayed());
@@ -414,56 +532,84 @@ public class IntegrationTest {
             + TASK_CATEGORIES[categoryIndex]
             + "';");
 
-    By submitButton = By.id("submit-create-task");
-    wait.until(presenceOfElementLocated(submitButton));
-    WebElement submitButtonElement = driver.findElement(submitButton);
+    WebElement submitButtonElement =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("submit-create-task"));
+              }
+            });
     js.executeScript("arguments[0].click();", submitButtonElement);
 
-    wait.until(urlContains("/user_profile.jsp"));
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
   }
 
   private void verifyNewTaskUserPage() {
     // Verify that inputted task info is correctly displayed in need help table
     String taskRowXPath = "//table[@id='need-help']/tbody/tr[1]";
-    By rowTaskDetails = By.xpath(taskRowXPath + "/td[1]");
-    wait.until(presenceOfElementLocated(rowTaskDetails));
-    String rowDetailsActual = driver.findElement(rowTaskDetails).getText();
-    assertEquals(recentTask.get("detail"), rowDetailsActual);
+    WebElement rowTaskDetails =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskRowXPath + "/td[1]"));
+              }
+            });
+    assertEquals(recentTask.get("detail"), rowTaskDetails.getText());
 
-    By rowTaskHelper = By.xpath(taskRowXPath + "/td[2]");
-    wait.until(presenceOfElementLocated(rowTaskHelper));
-    String rowHelperActual = driver.findElement(rowTaskHelper).getText();
-    assertEquals(recentTask.get("helper"), rowHelperActual);
+    WebElement rowHelperActual =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskRowXPath + "/td[2]"));
+              }
+            });
+    assertEquals(recentTask.get("helper"), rowHelperActual.getText());
 
-    By rowTaskStatus = By.xpath(taskRowXPath + "/td[3]");
-    wait.until(presenceOfElementLocated(rowTaskStatus));
-    String rowStatusActual = driver.findElement(rowTaskStatus).getText();
-    assertEquals(recentTask.get("status"), rowStatusActual);
+    WebElement rowStatusActual =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskRowXPath + "/td[3]"));
+              }
+            });
+    assertEquals(recentTask.get("status"), rowStatusActual.getText());
   }
 
   private void verifyNewTaskHomepage() {
     String taskXPath = "//div[@id='tasks-list']/div[1]/div[2]";
 
-    By taskDetails = By.xpath(taskXPath + "/div[2]");
-    wait.until(presenceOfElementLocated(taskDetails));
-    String taskDetailsActual = driver.findElement(taskDetails).getText();
-    assertEquals(recentTask.get("detail"), taskDetailsActual);
+    WebElement taskDetailsActual =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskXPath + "/div[2]"));
+              }
+            });
+    assertEquals(recentTask.get("detail"), taskDetailsActual.getText());
 
-    By taskNickname = By.xpath(taskXPath + "/div[1]/div[1]");
-    wait.until(presenceOfElementLocated(taskNickname));
-    String taskNicknameActual = driver.findElement(taskNickname).getText();
-    assertEquals(recentTask.get("nickname"), taskNicknameActual);
+    WebElement taskNicknameActual =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskXPath + "/div[1]/div[1]"));
+              }
+            });
+    assertEquals(recentTask.get("nickname"), taskNicknameActual.getText());
 
-    By taskCategory = By.xpath(taskXPath + "/div[3]/div[1]");
-    wait.until(presenceOfElementLocated(taskCategory));
-    String taskCategoryActual = driver.findElement(taskCategory).getText();
-    assertEquals("#" + recentTask.get("category"), taskCategoryActual);
+    WebElement taskCategoryActual =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskXPath + "/div[3]/div[1]"));
+              }
+            });
+    assertEquals("#" + recentTask.get("category"), taskCategoryActual.getText());
   }
 
   private void loginNewUser(
       String email, String nickname, String address, String phone, String zipcode, String country) {
     loginUser(email);
-    wait.until(urlContains("/account.jsp"));
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 
     // User should now be logged in and redirected to the
     // account page to enter their user info
@@ -476,93 +622,140 @@ public class IntegrationTest {
     js.executeScript("document.getElementById('edit-country-input').value='" + country + "';");
     js.executeScript("document.getElementById('phone-input').value='" + phone + "';");
 
-    By submitButton = By.id("submit-button");
-    wait.until(presenceOfElementLocated(submitButton));
-    WebElement submitButtonElement = driver.findElement(submitButton);
+    WebElement submitButtonElement =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("submit-button"));
+              }
+            });
     js.executeScript("arguments[0].click();", submitButtonElement);
-    wait.until(urlContains("/user_profile.jsp"));
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
   }
 
   private void loginUser(String email) {
-    By loginMessage = By.id("loginLogoutMessage");
-    wait.until(presenceOfElementLocated(loginMessage));
-    WebElement loginElement = driver.findElement(loginMessage);
-
+    WebElement loginElement =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("loginLogoutMessage"));
+              }
+            });
     js.executeScript("arguments[0].click();", loginElement);
 
-    wait.until(urlContains("_ah/login"));
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
     js.executeScript("document.getElementById('email').value='" + email + "';");
 
-    By loginButton = By.id("btn-login");
-    wait.until(presenceOfElementLocated(loginButton));
-    WebElement loginButtonElement = driver.findElement(loginButton);
+    WebElement loginButtonElement =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("btn-login"));
+              }
+            });
     js.executeScript("arguments[0].click();", loginButtonElement);
   }
 
   private void verifyLoggedUserUserPage(String nickname) {
-    By logoutMessage = By.id("log-out-link");
-    wait.until(presenceOfElementLocated(logoutMessage));
-    String logoutActualMessage = driver.findElement(logoutMessage).getText();
+    WebElement logoutActualMessage =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("log-out-link"));
+              }
+            });
     // Userpage should show a custom logout message with user's nickname
-    assertEquals(nickname + " | Logout", logoutActualMessage);
+    assertEquals(nickname + " | Logout", logoutActualMessage.getText());
   }
 
   private void backToHome() {
-    By backToHome = By.id("backtohome");
-    WebElement backToHomeElement = driver.findElement(backToHome);
+    WebElement backToHomeElement =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("backtohome"));
+              }
+            });
     js.executeScript("arguments[0].click();", backToHomeElement);
-    wait.until(urlContains("/index.jsp"));
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
   }
 
   private void goToUserPage() {
-    By goToUserPage = By.xpath("//div[@id='dashboard-icon-container']/a");
-    wait.until(presenceOfElementLocated(goToUserPage));
-    WebElement goToUserPageElement = driver.findElement(goToUserPage);
+    WebElement goToUserPageElement =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath("//div[@id='dashboard-icon-container']/a"));
+              }
+            });
     js.executeScript("arguments[0].click();", goToUserPageElement);
-    wait.until(urlContains("/user_profile.jsp"));
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
   }
 
   private void goToOfferHelp() {
-    By offerHelpButton = By.id("offer-help-button");
-    wait.until(presenceOfElementLocated(offerHelpButton));
-    WebElement offerHelpElement = driver.findElement(offerHelpButton);
+    WebElement offerHelpElement =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("offer-help-button"));
+              }
+            });
     js.executeScript("arguments[0].click();", offerHelpElement);
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
   private void verifyLoggedUserHomePage(String nickname) {
-    By logoutMessage = By.id("login-logout");
-    wait.until(presenceOfElementLocated(logoutMessage));
-    String actualLogoutText = driver.findElement(logoutMessage).getText();
+    WebElement actualLogoutText =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("login-logout"));
+              }
+            });
 
     // Homepage should show a custom logout message with user's nickname
-    assertEquals(nickname + " | Logout", actualLogoutText);
+    assertEquals(nickname + " | Logout", actualLogoutText.getText());
   }
 
   private void helpOut() {
-
-    // String[] expectedNicknameAndDetails = new String[2];
-
     String taskXPath = "//div[@id='tasks-list']/div[1]";
 
-    By taskNeighborNickname = By.xpath(taskXPath + "/div[2]/div[1]/div[1]");
-    wait.until(presenceOfElementLocated(taskNeighborNickname));
-    assertEquals(recentTask.get("nickname"), driver.findElement(taskNeighborNickname).getText());
+    WebElement taskNeighborNickname =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskXPath + "/div[2]/div[1]/div[1]"));
+              }
+            });
+    assertEquals(recentTask.get("nickname"), taskNeighborNickname.getText());
     // expectedNicknameAndDetails[0] = driver.findElement(taskNeighborNickname).getText();
 
-    By neighborTaskDetails = By.xpath(taskXPath + "/div[2]/div[2]");
-    wait.until(presenceOfElementLocated(neighborTaskDetails));
-    assertEquals(recentTask.get("detail"), driver.findElement(neighborTaskDetails).getText());
+    WebElement neighborTaskDetails =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskXPath + "/div[2]/div[2]"));
+              }
+            });
+    assertEquals(recentTask.get("detail"), neighborTaskDetails.getText());
     // expectedNicknameAndDetails[1] = driver.findElement(neighborTaskDetails).getText();
 
-    By helpOutButton = By.xpath(taskXPath + "/div[2]/div[1]/div[2]");
-    wait.until(presenceOfElementLocated(helpOutButton));
-    WebElement helpOutElement = driver.findElement(helpOutButton);
+    WebElement helpOutElement =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskXPath + "/div[2]/div[1]/div[2]"));
+              }
+            });
     js.executeScript("arguments[0].click();", helpOutElement);
 
-    By confirmHelp = By.xpath(taskXPath + "/div[1]/a");
-    wait.until(presenceOfElementLocated(confirmHelp));
-    WebElement confirmHelpElement = driver.findElement(confirmHelp);
+    WebElement confirmHelpElement =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskXPath + "/div[1]/a"));
+              }
+            });
     js.executeScript("arguments[0].click();", confirmHelpElement);
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
@@ -573,48 +766,89 @@ public class IntegrationTest {
   private void verifyOfferHelpTask() {
     String offerHelpRowXPath = "//tbody[@id='offer-help-body']/tr[1]";
 
-    By taskDetails = By.xpath(offerHelpRowXPath + "/td[1]");
-    wait.until(presenceOfElementLocated(taskDetails));
-    assertEquals(recentTask.get("detail"), driver.findElement(taskDetails).getText());
-    By taskStatus = By.xpath(offerHelpRowXPath + "/td[2]");
-    wait.until(presenceOfElementLocated(taskStatus));
-    assertEquals(recentTask.get("status"), driver.findElement(taskStatus).getText());
-    By taskNeighbor = By.xpath(offerHelpRowXPath + "/td[3]");
-    wait.until(presenceOfElementLocated(taskNeighbor));
-    assertEquals(recentTask.get("nickname"), driver.findElement(taskNeighbor).getText());
+    WebElement taskDetails =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(offerHelpRowXPath + "/td[1]"));
+              }
+            });
+    assertEquals(recentTask.get("detail"), taskDetails.getText());
+
+    WebElement taskStatus =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(offerHelpRowXPath + "/td[2]"));
+              }
+            });
+    assertEquals(recentTask.get("status"), taskStatus.getText());
+
+    WebElement taskNeighbor =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(offerHelpRowXPath + "/td[3]"));
+              }
+            });
+    assertEquals(recentTask.get("nickname"), taskNeighbor.getText());
   }
 
   private void logOut(String logoutId) {
-    By logoutLink = By.id(logoutId);
-    wait.until(presenceOfElementLocated(logoutLink));
-    WebElement logoutLinkElem = driver.findElement(logoutLink);
+    WebElement logoutLinkElem =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id(logoutId));
+              }
+            });
     js.executeScript("arguments[0].click();", logoutLinkElem);
-    wait.until(urlContains("/index.jsp"));
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
   }
 
   private void updateRecentTask() {
     recentTask.clear();
     String taskXPath = "//div[@id='tasks-list']/div[1]/div[2]";
-    By taskNickname = By.xpath(taskXPath + "/div[1]/div[1]");
-    wait.until(presenceOfElementLocated(taskNickname));
-    recentTask.put("nickname", driver.findElement(taskNickname).getText());
 
-    By taskDetail = By.xpath(taskXPath + "/div[2]");
-    wait.until(presenceOfElementLocated(taskDetail));
-    recentTask.put("detail", driver.findElement(taskDetail).getText());
+    WebElement taskNickname =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskXPath + "/div[1]/div[1]"));
+              }
+            });
+    recentTask.put("nickname", taskNickname.getText());
 
-    By taskCategory = By.xpath(taskXPath + "/div[3]/div[1]");
-    wait.until(presenceOfElementLocated(taskCategory));
-    recentTask.put("category", driver.findElement(taskCategory).getText().substring(1));
+    WebElement taskDetail =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskXPath + "/div[2]"));
+              }
+            });
+    recentTask.put("detail", taskDetail.getText());
+
+    WebElement taskCategory =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskXPath + "/div[3]/div[1]"));
+              }
+            });
+    recentTask.put("category", taskCategory.getText().substring(1));
 
     recentTask.put("status", "OPEN");
   }
 
   private void completeTaskAsHelper() {
     String taskMarkCompleteXPath = "//tbody[@id='offer-help-body']/tr[1]/td[5]/button";
-    By markComplete = By.xpath(taskMarkCompleteXPath);
-    wait.until(presenceOfElementLocated(markComplete));
-    WebElement markCompleteElement = driver.findElement(markComplete);
+    WebElement markCompleteElement =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskMarkCompleteXPath));
+              }
+            });
     js.executeScript("arguments[0].click();", markCompleteElement);
     for (int i = 0; i < 60; i++) {
       try {
