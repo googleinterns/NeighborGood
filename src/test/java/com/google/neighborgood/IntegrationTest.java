@@ -633,7 +633,7 @@ public class IntegrationTest {
     List<WebElement> tasks =
         wait.until(
             new Function<WebDriver, List<WebElement>>() {
-              public WebElement apply(WebDriver driver) {
+              public List<WebElement> apply(WebDriver driver) {
                 return driver.findElements(By.xpath("//tr"));
               }
             });
@@ -681,7 +681,7 @@ public class IntegrationTest {
     List<WebElement> tasks =
         wait.until(
             new Function<WebDriver, List<WebElement>>() {
-              public WebElement apply(WebDriver driver) {
+              public List<WebElement> apply(WebDriver driver) {
                 return driver.findElements(By.xpath("//div[@class='task']"));
               }
             });
