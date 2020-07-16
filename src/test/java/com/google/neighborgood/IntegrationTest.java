@@ -169,9 +169,11 @@ public class IntegrationTest {
         driver.getCurrentUrl().contains("/user_profile.jsp"));
 
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+    // Verifies that newly added task's details are correctly display in userpage's need help table
     verifyNewTaskUserPage();
     backToHome();
     ifLaggingThenRefresh();
+    // Verifies that newly added tasks are displayed properply in homepage
     verifyNewTaskHomepage();
   }
 
@@ -197,9 +199,11 @@ public class IntegrationTest {
         driver.getCurrentUrl().contains("/user_profile.jsp"));
 
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+    // Verifies that newly added task's details are correctly display in userpage's need help table
     verifyNewTaskUserPage();
     backToHome();
     ifLaggingThenRefresh();
+    // Verifies that newly added tasks are displayed properply in homepage
     verifyNewTaskHomepage();
   }
 
@@ -256,46 +260,24 @@ public class IntegrationTest {
     // Location of first task listed in the complete task table in userpage
     String taskCompletedXPath = "//tbody[@id='complete-task-body']/tr[1]";
 
-    String taskOverview =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(taskCompletedXPath + "/td[1]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("overview"), taskOverview);
+    // Content targets that will be verified
+    String[] taskContentsTarget = {"overview", "status", "nickname", "points"};
 
-    String taskStatus =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(taskCompletedXPath + "/td[2]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("status"), taskStatus);
-
-    String taskNeighbor =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(taskCompletedXPath + "/td[3]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("nickname"), taskNeighbor);
-
-    String taskPoints =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(taskCompletedXPath + "/td[4]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("points"), taskPoints);
-
+    // Iterates over task elements and compares the element's text with that of the stored
+    // recentTask
+    for (int i = 0; i < taskContentsTarget.length; i++) {
+      String taskContentItem =
+          wait.until(
+                  new Function<WebDriver, WebElement>() {
+                    public WebElement apply(WebDriver driver) {
+                      return driver.findElement(
+                          By.xpath(taskCompletedXPath + "/td[" + (i + 1) + "]"));
+                    }
+                  })
+              .getText();
+      assertEquals(recentTask.get(taskContentsTarget[i]), taskContentItem);
+    }
+    // Opens up task details modal to verify its contents
     verifyTaskDetails(taskCompletedXPath + "/td[1]");
   }
 
@@ -310,36 +292,23 @@ public class IntegrationTest {
     // Location of first task listed in the await verification table
     String awaitVerifTaskXPath = "//tbody[@id='await-verif-body']/tr[1]";
 
-    String taskOverview =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(awaitVerifTaskXPath + "/td[1]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("overview"), taskOverview);
+    // Content targets that will be verified
+    String[] taskContentsTarget = {"overview", "helper", "status"};
 
-    String taskHelper =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(awaitVerifTaskXPath + "/td[2]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("helper"), taskHelper);
-
-    String taskStatus =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(awaitVerifTaskXPath + "/td[3]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("status"), taskStatus);
-
+    // Iterates over task elements and compares the element's text with that of the stored
+    // recentTask
+    for (int i = 0; i < taskContentsTarget.length; i++) {
+      String taskContentItem =
+          wait.until(
+                  new Function<WebDriver, WebElement>() {
+                    public WebElement apply(WebDriver driver) {
+                      return driver.findElement(By.xpath(awaitVerifTaskXPath + "/td[1]"));
+                    }
+                  })
+              .getText();
+      assertEquals(recentTask.get(taskContentsTarget[i]), taskContentItem);
+    }
+    // Opens up task details modal to verify its contents
     verifyTaskDetails(awaitVerifTaskXPath + "/td[1]");
 
     // click button to verify a task has been completed
@@ -381,7 +350,7 @@ public class IntegrationTest {
     assertEquals(recentTask.get("status"), taskStatusAfter);
 
     // updates helper's total points
-    helperPoints = Integer.parseInt(recentTask.get("points"));
+    helperPoints += Integer.parseInt(recentTask.get("points"));
     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
   }
 
@@ -460,39 +429,24 @@ public class IntegrationTest {
     // updates recentTask
     recentTask.put("status", "IN PROGRESS");
 
-    String taskStatus =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(
-                        By.xpath("//tbody[@id='need-help-body']/tr[1]/td[3]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("status"), taskStatus);
+    // Content targets that will be verified
+    String[] taskContentsTarget = {"overview", "helper", "status"};
 
-    String taskOverview =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(
-                        By.xpath("//tbody[@id='need-help-body']/tr[1]/td[1]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("overview"), taskOverview);
-
-    String taskHelper =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(
-                        By.xpath("//tbody[@id='need-help-body']/tr[1]/td[2]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("helper"), taskHelper);
-
+    // Iterates over task elements and compares the element's text with that of the stored
+    // recentTask
+    for (int i = 0; i < taskContentsTarget.length; i++) {
+      String taskContentItem =
+          wait.until(
+                  new Function<WebDriver, WebElement>() {
+                    public WebElement apply(WebDriver driver) {
+                      return driver.findElement(
+                          By.xpath("//tbody[@id='need-help-body']/tr[1]/td[" + (i + 1) + "]"));
+                    }
+                  })
+              .getText();
+      assertEquals(recentTask.get(taskContentsTarget[i]), taskContentItem);
+    }
+    // Opens up task details modal to verify its contents
     verifyTaskDetails("//tbody[@id='need-help-body']/tr[1]/td[1]");
   }
 
@@ -648,36 +602,23 @@ public class IntegrationTest {
     // Location of most recent task in user page's need help
     String taskRowXPath = "//table[@id='need-help']/tbody/tr[1]";
 
-    String rowTaskOverview =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(taskRowXPath + "/td[1]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("overview"), rowTaskOverview);
+    // Content targets that will be verified
+    String[] taskContentsTarget = {"overview", "helper", "status"};
 
-    String rowHelper =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(taskRowXPath + "/td[2]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("helper"), rowHelper);
-
-    String rowStatus =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(taskRowXPath + "/td[3]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("status"), rowStatus);
-
+    // Iterates over task elements and compares the element's text with that of the stored
+    // recentTask
+    for (int i = 0; i < taskContentsTarget.length; i++) {
+      String taskContentItem =
+          wait.until(
+                  new Function<WebDriver, WebElement>() {
+                    public WebElement apply(WebDriver driver) {
+                      return driver.findElement(By.xpath(taskRowXPath + "/td[" + (i + 1) + "]"));
+                    }
+                  })
+              .getText();
+      assertEquals(recentTask.get(taskContentsTarget[i]), taskContentItem);
+    }
+    // Opens up task details modal to verify its contents
     verifyTaskDetails(taskRowXPath + "/td[1]");
   }
 
@@ -716,7 +657,7 @@ public class IntegrationTest {
                 })
             .getText();
     assertEquals(recentTask.get("category"), taskCategoryActual.substring(1));
-
+    // Opens up task details modal to verify its contents
     verifyTaskDetails(taskXPath + "/div[2]");
   }
 
@@ -863,6 +804,7 @@ public class IntegrationTest {
             .getText();
     assertEquals(recentTask.get("overview"), neighborTaskOverview);
 
+    // Opens up task details modal to verify its contents
     verifyTaskDetails(taskXPath + "/div[2]/div[2]");
 
     // clicks on offer help button
@@ -897,36 +839,23 @@ public class IntegrationTest {
     // Location of most recent task in offer help table in userpage
     String offerHelpRowXPath = "//tbody[@id='offer-help-body']/tr[1]";
 
-    String taskOverview =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(offerHelpRowXPath + "/td[1]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("overview"), taskOverview);
-
-    String taskStatus =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(offerHelpRowXPath + "/td[2]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("status"), taskStatus);
-
-    String taskNeighbor =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(offerHelpRowXPath + "/td[3]"));
-                  }
-                })
-            .getText();
-    assertEquals(recentTask.get("nickname"), taskNeighbor);
-
+    // Content targets that will be verified
+    String[] taskContentsTarget = {"overview", "status", "nickname"};
+    // Iterates over task elements and compares the element's text with that of the stored
+    // recentTask
+    for (int i = 0; i < taskContentsTarget.length; i++) {
+      String taskContentItem =
+          wait.until(
+                  new Function<WebDriver, WebElement>() {
+                    public WebElement apply(WebDriver driver) {
+                      return driver.findElement(
+                          By.xpath(offerHelpRowXPath + "/td[" + (i + 1) + "]"));
+                    }
+                  })
+              .getText();
+      assertEquals(recentTask.get(taskContentsTarget[i]), taskContentItem);
+    }
+    // Opens up task details modal to verify its contents
     verifyTaskDetails(offerHelpRowXPath + "/td[1]");
   }
 

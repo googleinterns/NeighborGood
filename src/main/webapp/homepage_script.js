@@ -45,7 +45,7 @@ if (document.readyState === 'loading') {
 
 /* Function adds all the necessary UI 'click' event listeners*/
 function addUIClickHandlers() {
-    // adds showModal and closeModal click events for the add task button
+    // adds showCreateTaskModal and closeCreateTaskModal click events for the add task button
     if ((document.getElementById("create-task-button") !== null)) {
         document.getElementById("create-task-button").addEventListener("click", showCreateTaskModal);
     	document.getElementById("close-addtask-button").addEventListener("click", closeCreateTaskModal);
@@ -58,7 +58,7 @@ function addUIClickHandlers() {
             filterTasksBy(e.target.id);
         });
     }
-    // adds showTopScoresModal click event
+    // adds showTopScoresModal and closeTopScoresModal click event
     document.getElementById("topscore-button").addEventListener("click", showTopScoresModal);
     document.getElementById("close-topscore-button").addEventListener("click", closeTopScoresModal);
 }
