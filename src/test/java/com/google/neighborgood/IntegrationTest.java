@@ -51,7 +51,9 @@ public class IntegrationTest {
   private final String USER_ZIPCODE = "59715";
   private final String USER_COUNTRY = "United States";
   private final String USER_PHONE = "1231231234";
-  private final String TASK_DETAIL = "Help!";
+  private final String TASK_DETAIL =
+      "Help! this is a detailed version of the task where I give a lot of random information";
+  private final String TASK_OVERVIEW = "Help!";
   private final String[] TASK_CATEGORIES = {"garden", "shopping", "pets", "misc"};
   private static int helperPoints;
   // recentTask instance used to reference tasks throughout the tests
@@ -154,11 +156,12 @@ public class IntegrationTest {
     // Randomizes task contents
     Random random = new Random();
     String taskDetail = TASK_DETAIL + random.nextInt(1000);
+    String taskOverview = TASK_OVERVIEW + random.nextInt(1000);
     String rewardPoints = Integer.toString(random.nextInt(201));
     int categoryOptionIndex = random.nextInt(TASK_CATEGORIES.length);
     String taskCategory = TASK_CATEGORIES[categoryOptionIndex];
 
-    addTask(taskDetail, rewardPoints, categoryOptionIndex);
+    addTask(taskDetail, rewardPoints, categoryOptionIndex, taskOverview);
 
     // User should be redirected to user profile page after adding a task
     assertTrue(
@@ -181,11 +184,12 @@ public class IntegrationTest {
     // Randomizes task contents
     Random random = new Random();
     String taskDetail = TASK_DETAIL + random.nextInt(1000);
+    String taskOverview = TASK_OVERVIEW + random.nextInt(1000);
     String rewardPoints = Integer.toString(random.nextInt(201));
     int categoryOptionIndex = random.nextInt(TASK_CATEGORIES.length);
     String taskCategory = TASK_CATEGORIES[categoryOptionIndex];
 
-    addTask(taskDetail, rewardPoints, categoryOptionIndex);
+    addTask(taskDetail, rewardPoints, categoryOptionIndex, taskOverview);
 
     // User should be redirected to user profile page after adding a task
     assertTrue(
@@ -252,7 +256,7 @@ public class IntegrationTest {
     // Location of first task listed in the complete task table in userpage
     String taskCompletedXPath = "//tbody[@id='complete-task-body']/tr[1]";
 
-    String taskDetails =
+    String taskOverview =
         wait.until(
                 new Function<WebDriver, WebElement>() {
                   public WebElement apply(WebDriver driver) {
@@ -260,7 +264,7 @@ public class IntegrationTest {
                   }
                 })
             .getText();
-    assertEquals(recentTask.get("detail"), taskDetails);
+    assertEquals(recentTask.get("overview"), taskOverview);
 
     String taskStatus =
         wait.until(
@@ -291,6 +295,8 @@ public class IntegrationTest {
                 })
             .getText();
     assertEquals(recentTask.get("points"), taskPoints);
+
+    verifyTaskDetails(taskCompletedXPath + "/td[1]");
   }
 
   @Test
@@ -305,7 +311,7 @@ public class IntegrationTest {
     // Location of first task listed in the await verification table
     String awaitVerifTaskXPath = "//tbody[@id='await-verif-body']/tr[1]";
 
-    String taskDetail =
+    String taskOverview =
         wait.until(
                 new Function<WebDriver, WebElement>() {
                   public WebElement apply(WebDriver driver) {
@@ -313,7 +319,7 @@ public class IntegrationTest {
                   }
                 })
             .getText();
-    assertEquals(recentTask.get("detail"), taskDetail);
+    assertEquals(recentTask.get("overview"), taskOverview);
 
     String taskHelper =
         wait.until(
@@ -335,14 +341,7 @@ public class IntegrationTest {
             .getText();
     assertEquals(recentTask.get("status"), taskStatus);
 
-    // click button to verify a task has been completed
-    wait.until(
-            new Function<WebDriver, WebElement>() {
-              public WebElement apply(WebDriver driver) {
-                return driver.findElement(By.xpath(awaitVerifTaskXPath + "/td[4]/button"));
-              }
-            })
-        .click();
+    verifyTaskDetails(awaitVerifTaskXPath + "/td[1]");
 
     // Clicking on verify button triggers an alert confirmation window
     // Driver will try to accept the alert to verify the task every second for a minute
@@ -464,7 +463,7 @@ public class IntegrationTest {
             .getText();
     assertEquals(recentTask.get("status"), taskStatus);
 
-    String taskDetail =
+    String taskOverview =
         wait.until(
                 new Function<WebDriver, WebElement>() {
                   public WebElement apply(WebDriver driver) {
@@ -473,7 +472,7 @@ public class IntegrationTest {
                   }
                 })
             .getText();
-    assertEquals(recentTask.get("detail"), taskDetail);
+    assertEquals(recentTask.get("overview"), taskOverview);
 
     String taskHelper =
         wait.until(
@@ -485,6 +484,8 @@ public class IntegrationTest {
                 })
             .getText();
     assertEquals(recentTask.get("helper"), taskHelper);
+
+    verifyTaskDetails("//tbody[@id='need-help-body']/tr[1]/td[1]");
   }
 
   @Test
@@ -580,10 +581,11 @@ public class IntegrationTest {
   }
 
   /** Adds task with provided details, points, and category index */
-  private void addTask(String details, String points, int categoryIndex) {
+  private void addTask(String details, String points, int categoryIndex, String overview) {
 
     // Stores recentTask contents so tests can reference it
     recentTask.put("detail", details);
+    recentTask.put("overview", overview);
     recentTask.put("points", points);
     recentTask.put("category", TASK_CATEGORIES[categoryIndex]);
     recentTask.put("nickname", USER_NICKNAME);
@@ -612,6 +614,7 @@ public class IntegrationTest {
 
     // Inputs task details using Javascript Executor
     js.executeScript("document.getElementById('task-detail-input').value='" + details + "';");
+    js.executeScript("document.getElementById('task-overview-input').value='" + overview + "';");
     js.executeScript("document.getElementById('rewarding-point-input').value='" + points + "';");
     js.executeScript(
         "document.getElementById('category-input').value='"
@@ -637,7 +640,7 @@ public class IntegrationTest {
     // Location of most recent task in user page's need help
     String taskRowXPath = "//table[@id='need-help']/tbody/tr[1]";
 
-    String rowTaskDetails =
+    String rowTaskOverview =
         wait.until(
                 new Function<WebDriver, WebElement>() {
                   public WebElement apply(WebDriver driver) {
@@ -645,7 +648,7 @@ public class IntegrationTest {
                   }
                 })
             .getText();
-    assertEquals(recentTask.get("detail"), rowTaskDetails);
+    assertEquals(recentTask.get("overview"), rowTaskOverview);
 
     String rowHelper =
         wait.until(
@@ -666,6 +669,8 @@ public class IntegrationTest {
                 })
             .getText();
     assertEquals(recentTask.get("status"), rowStatus);
+
+    verifyTaskDetails(taskRowXPath + "/td[1]");
   }
 
   /** Verifies that newly added tasks are displayed properply in homepage */
@@ -674,7 +679,7 @@ public class IntegrationTest {
     // First task location in homepage
     String taskXPath = "//div[@id='tasks-list']/div[1]/div[2]";
 
-    String taskDetailsActual =
+    String taskOverviewActual =
         wait.until(
                 new Function<WebDriver, WebElement>() {
                   public WebElement apply(WebDriver driver) {
@@ -682,7 +687,7 @@ public class IntegrationTest {
                   }
                 })
             .getText();
-    assertEquals(recentTask.get("detail"), taskDetailsActual);
+    assertEquals(recentTask.get("overview"), taskOverviewActual);
 
     String taskNicknameActual =
         wait.until(
@@ -703,6 +708,8 @@ public class IntegrationTest {
                 })
             .getText();
     assertEquals(recentTask.get("category"), taskCategoryActual.substring(1));
+
+    verifyTaskDetails(taskXPath + "/div[2]");
   }
 
   /** Logs a new user in and provides the user info details to fill out in the form */
@@ -838,7 +845,7 @@ public class IntegrationTest {
             .getText();
     assertEquals(recentTask.get("nickname"), taskNeighborNickname);
 
-    String neighborTaskDetails =
+    String neighborTaskOverview =
         wait.until(
                 new Function<WebDriver, WebElement>() {
                   public WebElement apply(WebDriver driver) {
@@ -846,7 +853,9 @@ public class IntegrationTest {
                   }
                 })
             .getText();
-    assertEquals(recentTask.get("detail"), neighborTaskDetails);
+    assertEquals(recentTask.get("overview"), neighborTaskOverview);
+
+    verifyTaskDetails(taskXPath + "/div[2]/div[2]");
 
     // clicks on offer help button
     wait.until(
@@ -880,7 +889,7 @@ public class IntegrationTest {
     // Location of most recent task in offer help table in userpage
     String offerHelpRowXPath = "//tbody[@id='offer-help-body']/tr[1]";
 
-    String taskDetails =
+    String taskOverview =
         wait.until(
                 new Function<WebDriver, WebElement>() {
                   public WebElement apply(WebDriver driver) {
@@ -888,7 +897,7 @@ public class IntegrationTest {
                   }
                 })
             .getText();
-    assertEquals(recentTask.get("detail"), taskDetails);
+    assertEquals(recentTask.get("overview"), taskOverview);
 
     String taskStatus =
         wait.until(
@@ -909,6 +918,8 @@ public class IntegrationTest {
                 })
             .getText();
     assertEquals(recentTask.get("nickname"), taskNeighbor);
+
+    verifyTaskDetails(offerHelpRowXPath + "/td[1]");
   }
 
   /** Logs out user - takes logout link id as a parameter */
@@ -996,10 +1007,54 @@ public class IntegrationTest {
     recentTask.put("status", "COMPLETE: AWAIT VERIFICATION");
   }
 
+  /** Attempts to auto refresh the page if the page is lagging */
   private void ifLaggingThenRefresh() {
     while (js.executeScript("return document.readyState").equals("loading")) {
       driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
       driver.navigate().refresh();
     }
+  }
+
+  /** clicks on task overview to open up task detail modal */
+  private void verifyTaskDetails(String taskOverviewXpath) {
+    // open modal
+    wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(taskOverviewXpath));
+              }
+            })
+        .click();
+    // verify modal is displayed
+    boolean taskDetailModalDisplayed =
+        wait.until(
+                new Function<WebDriver, WebElement>() {
+                  public WebElement apply(WebDriver driver) {
+                    return driver.findElement(By.id("createTaskModal"));
+                  }
+                })
+            .isDisplayed();
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+    assertTrue("Task detail modal should be displayed", taskDetailModalDisplayed);
+
+    // verify task detail
+    String taskDetail =
+        wait.until(
+                new Function<WebDriver, WebElement>() {
+                  public WebElement apply(WebDriver driver) {
+                    return driver.findElement(By.id("task-detail-container"));
+                  }
+                })
+            .getText();
+    assertEquals(recentTask.get("detail"), taskDetail);
+
+    // close modal
+    wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("task-info-close-button"));
+              }
+            })
+        .click();
   }
 }
