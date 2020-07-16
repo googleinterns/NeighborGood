@@ -233,6 +233,11 @@ public class IntegrationTest {
   public void _06_Userpage_AsLoggedHelper_CompleteTask() {
     completeTaskAsHelper();
 
+    // Refreshes page due to flakiness of test caused by the partial refresh of the div in the page.
+    // Without refreshing this often resulted in a a stale element error
+    driver.navigate().refresh();
+    goToOfferHelp();
+
     // Location of first task listed in the complete task table in userpage
     String taskCompletedXPath = "//tbody[@id='complete-task-body']/tr[1]";
 
