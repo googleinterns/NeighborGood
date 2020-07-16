@@ -17,11 +17,11 @@ package com.google.neighborgood.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
-import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -59,20 +59,17 @@ public class UserInfoServlet extends HttpServlet {
       return;
     }
 
-    Query query =
-        new Query("UserInfo")
-            .setFilter(
-                new FilterPredicate(
-                    "userId", FilterOperator.EQUAL, userService.getCurrentUser().getUserId()));
-    PreparedQuery results = datastore.prepare(query);
-    Entity entity = results.asSingleEntity();
-
-    if (entity == null) {
+    Key userEntityKey = KeyFactory.createKey("UserInfo", userService.getCurrentUser().getUserId());
+    Entity entity;
+    try {
+      entity = datastore.get(userEntityKey);
+    } catch (EntityNotFoundException e) {
       System.err.println("Unable to find the UserInfo entity based on the current user id");
       response.sendError(
           HttpServletResponse.SC_NOT_FOUND, "The requested user info could not be found");
       return;
     }
+
     List<String> result = new ArrayList<>();
     result.add((String) entity.getProperty("nickname"));
     result.add((String) entity.getProperty("address"));
@@ -124,11 +121,14 @@ public class UserInfoServlet extends HttpServlet {
     }
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Query query =
-        new Query("UserInfo")
-            .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, userId));
-    PreparedQuery results = datastore.prepare(query);
-    Entity entity = results.asSingleEntity();
+    Key userEntityKey = KeyFactory.createKey("UserInfo", userId);
+    Entity entity = null;
+    try {
+      entity = datastore.get(userEntityKey);
+    } catch (EntityNotFoundException e) {
+      System.out.println("UserInfo entity does not exist. Creating a new one...");
+    }
+
     if (entity == null) {
       entity = new Entity("UserInfo", userId);
       entity.setProperty("nickname", nickname);
@@ -137,11 +137,6 @@ public class UserInfoServlet extends HttpServlet {
       entity.setProperty("country", "United States");
       entity.setProperty("phone", phone);
       entity.setProperty("email", email);
-      // "userId" now becomes obsolete as the entity
-      // ID/Name is the same value as userId.
-      // I will modify this in all servlets
-      // in a different PR
-      entity.setProperty("userId", userId);
       entity.setProperty("country", country);
       entity.setProperty("zipcode", zipcode);
       entity.setProperty("points", 0);
@@ -153,7 +148,6 @@ public class UserInfoServlet extends HttpServlet {
       entity.setProperty("zipcode", zipcode);
     }
     datastore.put(entity);
-
     response.sendRedirect("/user_profile.jsp");
   }
 
