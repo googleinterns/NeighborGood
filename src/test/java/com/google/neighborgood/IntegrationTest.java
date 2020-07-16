@@ -632,7 +632,7 @@ public class IntegrationTest {
     // Verifies the total number of tasks shown in the userpage against what they should be
     List<WebElement> tasks =
         wait.until(
-            new Function<WebDriver, WebElement>() {
+            new Function<WebDriver, List<WebElement>>() {
               public WebElement apply(WebDriver driver) {
                 return driver.findElements(By.xpath("//tr"));
               }
@@ -680,7 +680,7 @@ public class IntegrationTest {
     // Verifies the total number of tasks shown in the homepage against what they should be
     List<WebElement> tasks =
         wait.until(
-            new Function<WebDriver, WebElement>() {
+            new Function<WebDriver, List<WebElement>>() {
               public WebElement apply(WebDriver driver) {
                 return driver.findElements(By.xpath("//div[@class='task']"));
               }
