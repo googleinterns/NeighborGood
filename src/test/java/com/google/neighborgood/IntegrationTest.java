@@ -485,6 +485,7 @@ public class IntegrationTest {
     }
     // Updates recentTask
     recentTask.put("status", "OPEN");
+    openTotalTaskCount++;
     backToHome();
     ifLaggingThenRefresh();
     // verifies that abandoned task is now the most recent task in homepage
@@ -630,14 +631,21 @@ public class IntegrationTest {
     // Opens up task details modal to verify its contents
     verifyTaskDetails(taskRowXPath + "/td[1]");
     // Verifies the total number of tasks shown in the userpage against what they should be
-    List<WebElement> tasks =
+    List<WebElement> notCompletedTasks =
         wait.until(
             new Function<WebDriver, List<WebElement>>() {
               public List<WebElement> apply(WebDriver driver) {
-                return driver.findElements(By.xpath("//tr"));
+                return driver.findElements(By.xpath("//tbody[@id='need-help-body']/tr"));
               }
             });
-    assertEquals(userTaskCount, tasks.size());
+    List<WebElement> completedTasks =
+        wait.until(
+            new Function<WebDriver, List<WebElement>>() {
+              public List<WebElement> apply(WebDriver driver) {
+                return driver.findElements(By.xpath("//tbody[@id='await-verif-body']/tr"));
+              }
+            });
+    assertEquals(userTaskCount, notCompletedTasks.size() + completedTasks.size());
   }
 
   /** Verifies that newly added tasks are displayed properply in homepage */
