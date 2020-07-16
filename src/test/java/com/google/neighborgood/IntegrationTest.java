@@ -137,16 +137,17 @@ public class IntegrationTest {
     assertTrue("User in user profile page", driver.getCurrentUrl().contains("/user_profile.jsp"));
     assertEquals("My Account", driver.getTitle());
 
-    verifyLoggedUserUserPage(USER_NICKNAME);
+    // Verifies logged user in userpage and then in homepage
+    verifyLoggedUser(USER_NICKNAME, "log-out-link");
     backToHome();
-    verifyLoggedUserHomePage(USER_NICKNAME);
+    verifyLoggedUser(USER_NICKNAME, "login-logout");
   }
 
   @Test
   /** Tests functionality of adding tasks from the homepage */
   public void _02_Homepage_AsLoggedUser_AddTask() {
     // Confirm that the user is still logged in
-    verifyLoggedUserHomePage(USER_NICKNAME);
+    verifyLoggedUser(USER_NICKNAME, "login-logout");
 
     // Randomizes task contents
     Random random = new Random();
@@ -217,9 +218,10 @@ public class IntegrationTest {
         USER_PHONE,
         USER_ZIPCODE,
         USER_COUNTRY);
-    verifyLoggedUserUserPage(USER_NICKNAME_HELPER);
+    // Verifies logged user in userpage and then in homepage
+    verifyLoggedUser(USER_NICKNAME_HELPER, "log-out-link");
     backToHome();
-    verifyLoggedUserHomePage(USER_NICKNAME_HELPER);
+    verifyLoggedUser(USER_NICKNAME_HELPER, "login-logout");
     helpOut();
     goToUserPage();
     goToOfferHelp();
@@ -766,33 +768,22 @@ public class IntegrationTest {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
-  /** Verifies that logged user's details are correctly displayed in userpage */
-  private void verifyLoggedUserUserPage(String nickname) {
+  /**
+   * Verifies that logged user's details are correctly displayed. Takes in the user nickname as an
+   * argument and the elementId for the login display message, which will depend on whether the user
+   * is in the userpage or homepage
+   */
+  private void verifyLoggedUser(String nickname, String elementId) {
     String logoutActualMessage =
         wait.until(
                 new Function<WebDriver, WebElement>() {
                   public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.id("log-out-link"));
+                    return driver.findElement(By.id(elementId));
                   }
                 })
             .getText();
     // Userpage should show a custom logout message with user's nickname
     assertEquals(nickname + " | Logout", logoutActualMessage);
-  }
-
-  /** Verifies that logged user's details are correctly displayed in homepage */
-  private void verifyLoggedUserHomePage(String nickname) {
-    String actualLogoutText =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.id("login-logout"));
-                  }
-                })
-            .getText();
-
-    // Homepage should show a custom logout message with user's nickname
-    assertEquals(nickname + " | Logout", actualLogoutText);
   }
 
   /** Helper claims a task from the homepage */
