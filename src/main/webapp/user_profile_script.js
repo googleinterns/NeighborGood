@@ -267,7 +267,7 @@ async function displayOfferHelpTasks() {
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
-        var data = [task.detail, task.status, task.owner];
+        var data = [task.detail, task.status, task.owner, task.address];
         for (var i = 0; i < data.length; i++) {
             var td = document.createElement("td");
             td.appendChild(document.createTextNode(data[i]));
