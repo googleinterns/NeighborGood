@@ -106,14 +106,14 @@ public class IntegrationTest {
         loginElement.getText());
 
     By addTaskButton = By.id("addtaskbutton");
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     List<WebElement> addTaskButtonElement = driver.findElements(addTaskButton);
     // Add task button should be missing when user is not logged in
     assertTrue(
         "Add task button must not be present for guest users", addTaskButtonElement.isEmpty());
 
     By dashboardIcon = By.className("dashboard-icon");
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     List<WebElement> dashboardIconsElement = driver.findElements(dashboardIcon);
     // Dashboard icons should be missing when user is not logged in
     assertTrue(
@@ -147,7 +147,6 @@ public class IntegrationTest {
   @Test
   /** Tests functionality of adding tasks from the homepage */
   public void _02_Homepage_AsLoggedUser_AddTask() {
-    backToHome();
     // Confirm that the user is still logged in
     verifyLoggedUserHomePage(USER_NICKNAME);
 
@@ -279,7 +278,7 @@ public class IntegrationTest {
     // Logs out by using 'logout-href' element id;
     logOut("logout-href");
     loginUser(USER_EMAIL);
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
     // Location of first task listed in the await verification table
     String awaitVerifTaskXPath = "//tbody[@id='await-verif-body']/tr[1]";
@@ -346,7 +345,7 @@ public class IntegrationTest {
 
     // updates helper's total points
     helperPoints += Integer.parseInt(recentTask.get("points"));
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
   }
 
   @Test
@@ -354,7 +353,7 @@ public class IntegrationTest {
   public void _08_Userpage_AsHelper_CompletedTask() {
     logOut("logout-href");
     loginUser(USER_EMAIL_HELPER);
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
     // Helper's total points
     WebElement points =
@@ -390,7 +389,7 @@ public class IntegrationTest {
     completeTaskAsHelper();
     logOut("logout-href");
     loginUser(USER_EMAIL);
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
     // Disapprove task button.
     // this is located in row 2 for this order of events but we probably need a better sorting
@@ -451,7 +450,7 @@ public class IntegrationTest {
   public void _10_UserPage_AsHelper_AbandonTask() {
     logOut("logout-href");
     loginUser(USER_EMAIL_HELPER);
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     goToOfferHelp();
     // Abandon task button element
     WebElement abandonTaskElem =
@@ -476,7 +475,7 @@ public class IntegrationTest {
     // Updates recentTask
     recentTask.put("status", "OPEN");
     backToHome();
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     // verifies that abandoned task is now the most recent task in homepage
     verifyNewTaskHomepage();
   }
@@ -484,7 +483,7 @@ public class IntegrationTest {
   /** Clears entities from Datastore so `mvn clean` isn't necessary before test class */
   private static void clearAllDatastoreEntities(WebDriver driver) {
     driver.get("http://localhost:8080/_ah/admin");
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     WebElement entityKindSelect =
         wait.until(
             new Function<WebDriver, WebElement>() {
@@ -495,11 +494,11 @@ public class IntegrationTest {
     // Retrieves number of Entity Kind select options to iterate through them
     Select kindSelect = new Select(entityKindSelect);
     List<WebElement> allEntityKinds = kindSelect.getOptions();
-    By listButton;
-    By allKeys;
-    By deleteButton;
+    WebElement listButtonElement;
+    WebElement allKeysElement;
+    WebElement deleteButtonElement;
     for (int j = 1; j < allEntityKinds.size(); j++) {
-      WebElement listButtonElement =
+      listButtonElement =
           wait.until(
               new Function<WebDriver, WebElement>() {
                 public WebElement apply(WebDriver driver) {
@@ -507,8 +506,8 @@ public class IntegrationTest {
                 }
               });
       js.executeScript("arguments[0].click();", listButtonElement);
-      driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-      WebElement allKeysElement =
+      driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+      allKeysElement =
           wait.until(
               new Function<WebDriver, WebElement>() {
                 public WebElement apply(WebDriver driver) {
@@ -516,7 +515,7 @@ public class IntegrationTest {
                 }
               });
       js.executeScript("arguments[0].click();", allKeysElement);
-      WebElement deleteButtonElement =
+      deleteButtonElement =
           wait.until(
               new Function<WebDriver, WebElement>() {
                 public WebElement apply(WebDriver driver) {
@@ -548,26 +547,25 @@ public class IntegrationTest {
     recentTask.put("status", "OPEN");
     recentTask.put("helper", "N/A");
 
-    WebElement addTaskButtonElement =
-        wait.until(
+    wait.until(
             new Function<WebDriver, WebElement>() {
               public WebElement apply(WebDriver driver) {
                 return driver.findElement(By.id("create-task-button"));
               }
-            });
-    addTaskButtonElement.click();
+            })
+        .click();
 
-    WebElement createTaskModalElement =
+    boolean createTaskModalElementDisplayed =
         wait.until(
-            new Function<WebDriver, WebElement>() {
-              public WebElement apply(WebDriver driver) {
-                return driver.findElement(By.id("createTaskModal"));
-              }
-            });
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+                new Function<WebDriver, WebElement>() {
+                  public WebElement apply(WebDriver driver) {
+                    return driver.findElement(By.id("createTaskModal"));
+                  }
+                })
+            .isDisplayed();
 
     // After clicking on the add task button, the modal should be displayed
-    assertTrue("Create task modal should be displayed", createTaskModalElement.isDisplayed());
+    assertTrue("Create task modal should be displayed", createTaskModalElementDisplayed);
 
     // Inputs task details using Javascript Executor
     js.executeScript("document.getElementById('task-detail-input').value='" + details + "';");
@@ -586,7 +584,7 @@ public class IntegrationTest {
             });
     js.executeScript("arguments[0].click();", submitButtonElement);
 
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
   /**
@@ -662,7 +660,7 @@ public class IntegrationTest {
   private void loginNewUser(
       String email, String nickname, String address, String phone, String zipcode, String country) {
     loginUser(email);
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
     // User should now be logged in and redirected to the
     // account page to enter their user info
@@ -684,7 +682,7 @@ public class IntegrationTest {
               }
             });
     js.executeScript("arguments[0].click();", submitButtonElement);
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
   /** Logs in users that already have their information saved (not new users) */
@@ -699,7 +697,7 @@ public class IntegrationTest {
             });
     js.executeScript("arguments[0].click();", loginElement);
 
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
     // enters user email
     js.executeScript("document.getElementById('email').value='" + email + "';");
@@ -724,7 +722,7 @@ public class IntegrationTest {
               }
             });
     js.executeScript("arguments[0].click();", backToHomeElement);
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
   /** Sends driver to User Page */
@@ -737,7 +735,7 @@ public class IntegrationTest {
               }
             });
     js.executeScript("arguments[0].click();", goToUserPageElement);
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
   /** Sends driver to the offer help table within the user page */
@@ -872,7 +870,7 @@ public class IntegrationTest {
               }
             });
     js.executeScript("arguments[0].click();", logoutLinkElem);
-    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
   /**
