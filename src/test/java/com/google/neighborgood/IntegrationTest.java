@@ -53,19 +53,25 @@ public class IntegrationTest {
   private final String USER_PHONE = "1231231234";
   private final String TASK_DETAIL = "Help!";
   private final String[] TASK_CATEGORIES = {"garden", "shopping", "pets", "misc"};
-  private static HashMap<String, String> recentTask = new HashMap<String, String>();
   private static int helperPoints = 0;
+  // recentTask instance used to reference tasks throughout the tests
+  private static HashMap<String, String> recentTask = new HashMap<String, String>();
 
   @BeforeClass
+  /**
+   * Sets up test class by initializing driver, wait, js executor, and clearing all datastore
+   * entities
+   */
   public static void setupClass() {
     WebDriverManager.chromedriver().setup();
     driver = new ChromeDriver();
+    // FluentWait set to timeout after 60 seconds of waiting for a WebElement to be returned and
+    // polling every second
     wait =
         new FluentWait<WebDriver>(driver)
             .withTimeout(Duration.ofSeconds(60))
             .pollingEvery(Duration.ofSeconds(1))
             .ignoring(NoSuchElementException.class);
-    ;
 
     js = (JavascriptExecutor) driver;
     clearAllDatastoreEntities(driver);
@@ -79,6 +85,10 @@ public class IntegrationTest {
   }
 
   @Test
+  /**
+   * Tests functionality of a guest user who logs in for the first time in the site and has to input
+   * their new user info
+   */
   public void _01_Homepage_AsNewGuestUser_LoginAndInputUserInfo() {
     driver.get("http://localhost:8080/");
     WebElement loginElement =
@@ -88,29 +98,28 @@ public class IntegrationTest {
                 return driver.findElement(By.id("loginLogoutMessage"));
               }
             });
-    String actualLoginText = loginElement.getText();
 
     // Guest user should expect to see login message
     assertEquals(
-        "Homepage login message as guest user", "Login to help out a neighbor!", actualLoginText);
+        "Homepage login message as guest user",
+        "Login to help out a neighbor!",
+        loginElement.getText());
 
     By addTaskButton = By.id("addtaskbutton");
-    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
     List<WebElement> addTaskButtonElement = driver.findElements(addTaskButton);
-
     // Add task button should be missing when user is not logged in
     assertTrue(
         "Add task button must not be present for guest users", addTaskButtonElement.isEmpty());
 
     By dashboardIcon = By.className("dashboard-icon");
-    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
     List<WebElement> dashboardIconsElement = driver.findElements(dashboardIcon);
-
-    // Dashboard icon (userpage or admin page) buttons
-    // should be missing when user is not logged in
+    // Dashboard icons should be missing when user is not logged in
     assertTrue(
         "Dashboard icons must not be present for guest users", dashboardIconsElement.isEmpty());
 
+    // Element holding message displayed when there are no tasks
     WebElement taskResultsMessageElement =
         wait.until(
             new Function<WebDriver, WebElement>() {
@@ -118,8 +127,8 @@ public class IntegrationTest {
                 return driver.findElement(By.id("no-tasks-message"));
               }
             });
-
-    // Message alerting user there are no tasks nearby should be displayed
+    // Message alerting user there are no tasks nearby should be displayed since there are no tasks
+    // yet in the site
     assertTrue(
         "No tasks in neighborhood message should be displayed",
         taskResultsMessageElement.isDisplayed());
@@ -136,12 +145,13 @@ public class IntegrationTest {
   }
 
   @Test
+  /** Tests functionality of adding tasks from the homepage */
   public void _02_Homepage_AsLoggedUser_AddTask() {
-    driver.get("http://localhost:8080/");
-
+    backToHome();
     // Confirm that the user is still logged in
     verifyLoggedUserHomePage(USER_NICKNAME);
 
+    // Randomizes task contents
     Random random = new Random();
     String taskDetail = TASK_DETAIL + random.nextInt(1000);
     String rewardPoints = Integer.toString(random.nextInt(201));
@@ -161,9 +171,11 @@ public class IntegrationTest {
   }
 
   @Test
+  /** Tests functionality of adding tasks from the userpage */
   public void _03_UserPage_AsLoggedUser_AddTask() {
     goToUserPage();
 
+    // Randomizes task contents
     Random random = new Random();
     String taskDetail = TASK_DETAIL + random.nextInt(1000);
     String rewardPoints = Integer.toString(random.nextInt(201));
@@ -183,8 +195,9 @@ public class IntegrationTest {
   }
 
   @Test
+  /** Tests functionality of logging out */
   public void _04_Homepage_AsLoggedUser_LogOut() {
-    // Logs out first from previous user session
+    // Logs out by using 'loginLogoutMessage' element id;
     logOut("loginLogoutMessage");
     WebElement loginMessageElement =
         wait.until(
@@ -197,6 +210,7 @@ public class IntegrationTest {
   }
 
   @Test
+  /** Tests functionality of a helper helping out with a task */
   public void _05_Homepage_AsLoggedHelper_HelpOut() {
     loginNewUser(
         USER_EMAIL_HELPER,
@@ -215,9 +229,11 @@ public class IntegrationTest {
   }
 
   @Test
+  /** Tests functionality of having a helper mark a task as complete */
   public void _06_Userpage_AsLoggedHelper_CompleteTask() {
     completeTaskAsHelper();
 
+    // Location of first task listed in the complete task table in userpage
     String taskCompletedXPath = "//tbody[@id='complete-task-body']/tr[1]";
 
     WebElement taskDetails =
@@ -258,11 +274,14 @@ public class IntegrationTest {
   }
 
   @Test
+  /** Tests functionality of neighbor user verifying that helper did indeed complete a task */
   public void _07_Userpage_AsLoggedUser_VerifyCompletedTask() {
+    // Logs out by using 'logout-href' element id;
     logOut("logout-href");
     loginUser(USER_EMAIL);
     driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 
+    // Location of first task listed in the await verification table
     String awaitVerifTaskXPath = "//tbody[@id='await-verif-body']/tr[1]";
 
     WebElement taskDetail =
@@ -292,6 +311,7 @@ public class IntegrationTest {
             });
     assertEquals(recentTask.get("status"), taskStatus.getText());
 
+    // Button to verify a task has been completed
     WebElement verifyCompleteElem =
         wait.until(
             new Function<WebDriver, WebElement>() {
@@ -299,7 +319,11 @@ public class IntegrationTest {
                 return driver.findElement(By.xpath(awaitVerifTaskXPath + "/td[4]/button"));
               }
             });
+
+    // Clicking on verify button triggers an alert confirmation window
     js.executeScript("arguments[0].click();", verifyCompleteElem);
+
+    // Driver will try to accept the alert to verify the task every second for a minute
     for (int i = 0; i < 60; i++) {
       try {
         driver.switchTo().alert().accept();
@@ -308,6 +332,7 @@ public class IntegrationTest {
         driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
       }
     }
+    // update recent task
     recentTask.put("status", "COMPLETE");
 
     WebElement taskStatusAfter =
@@ -319,19 +344,19 @@ public class IntegrationTest {
             });
     assertEquals(recentTask.get("status"), taskStatusAfter.getText());
 
-    System.out.println("\n\n\n recent task points before adding: " + recentTask.get("points"));
-    System.out.println("\n\n\n helperpoints before adding: " + helperPoints);
+    // updates helper's total points
     helperPoints += Integer.parseInt(recentTask.get("points"));
-    System.out.println("\n\n\n helperpoints after adding: " + helperPoints + "\n\n\n");
-    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
   }
 
   @Test
+  /** Verifies that the completed task shows as completed on the helper's user profile */
   public void _08_Userpage_AsHelper_CompletedTask() {
     logOut("logout-href");
     loginUser(USER_EMAIL_HELPER);
     driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 
+    // Helper's total points
     WebElement points =
         wait.until(
             new Function<WebDriver, WebElement>() {
@@ -349,13 +374,16 @@ public class IntegrationTest {
                     By.xpath("//tbody[@id='complete-task-body']/tr[1]/td[2]"));
               }
             });
+    // Verifies that the task got updated to the COMPLETED status
     assertEquals(recentTask.get("status"), completedTaskStatus.getText());
   }
 
   @Test
+  /** Test functionality of disapproving a helper's completed task */
   public void _09_Userpage_AsLoggedUser_DisapproveTask() {
     backToHome();
-    updateRecentTask();
+    updateRecentTask(); // updates the recent task we have saved with the most recent task in the
+    // homepage
     helpOut();
     goToUserPage();
     goToOfferHelp();
@@ -364,8 +392,10 @@ public class IntegrationTest {
     loginUser(USER_EMAIL);
     driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 
-    // this is row 2 for now but we probably need a better sorting system for completed tasks
-    // so that it sorts by time of completion (makes it easier to find and test)
+    // Disapprove task button.
+    // this is located in row 2 for this order of events but we probably need a better sorting
+    // system for completed tasks so that it sorts by time of completion (making it easier to
+    // find where the most recently approved/completed task is and easier to test in the future)
     WebElement disapproveCompleteElem =
         wait.until(
             new Function<WebDriver, WebElement>() {
@@ -374,7 +404,9 @@ public class IntegrationTest {
                     By.xpath("//tbody[@id='await-verif-body']/tr[2]/td[5]/button"));
               }
             });
+    // Clicking disapprove triggers an alert confirmation window
     js.executeScript("arguments[0].click();", disapproveCompleteElem);
+    // Driver will try to accept the alert to verify the task every second for a minute
     for (int i = 0; i < 60; i++) {
       try {
         driver.switchTo().alert().accept();
@@ -383,6 +415,7 @@ public class IntegrationTest {
         driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
       }
     }
+    // updates recentTask
     recentTask.put("status", "IN PROGRESS");
 
     WebElement taskStatus =
@@ -414,11 +447,13 @@ public class IntegrationTest {
   }
 
   @Test
+  /** Test functionality of a helper abandoning a task */
   public void _10_UserPage_AsHelper_AbandonTask() {
     logOut("logout-href");
     loginUser(USER_EMAIL_HELPER);
     driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
     goToOfferHelp();
+    // Abandon task button element
     WebElement abandonTaskElem =
         wait.until(
             new Function<WebDriver, WebElement>() {
@@ -427,7 +462,9 @@ public class IntegrationTest {
                     By.xpath("//tbody[@id='offer-help-body']/tr/td[6]/button"));
               }
             });
+    // Clicking abandon triggers and alert confirmation window
     js.executeScript("arguments[0].click();", abandonTaskElem);
+    // Driver will try to accept the alert to verify the task every second for a minute
     for (int i = 0; i < 60; i++) {
       try {
         driver.switchTo().alert().accept();
@@ -436,14 +473,16 @@ public class IntegrationTest {
         driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
       }
     }
+    // Updates recentTask
     recentTask.put("status", "OPEN");
     backToHome();
     driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+    // verifies that abandoned task is now the most recent task in homepage
     verifyNewTaskHomepage();
   }
 
+  /** Clears entities from Datastore so `mvn clean` isn't necessary before test class */
   private static void clearAllDatastoreEntities(WebDriver driver) {
-    // Clears datastore entities for start of test
     driver.get("http://localhost:8080/_ah/admin");
     driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
     WebElement entityKindSelect =
@@ -484,7 +523,9 @@ public class IntegrationTest {
                   return driver.findElement(By.id("delete_button"));
                 }
               });
+      // Triggers an alert confirmation window
       js.executeScript("arguments[0].click();", deleteButtonElement);
+      // Driver will try to accept the alert to verify the task every second for a minute
       for (int i = 0; i < 60; i++) {
         try {
           driver.switchTo().alert().accept();
@@ -496,7 +537,10 @@ public class IntegrationTest {
     }
   }
 
+  /** Adds task with provided details, points, and category index */
   private void addTask(String details, String points, int categoryIndex) {
+
+    // Stores recentTask contents so tests can reference it
     recentTask.put("detail", details);
     recentTask.put("points", points);
     recentTask.put("category", TASK_CATEGORIES[categoryIndex]);
@@ -525,6 +569,7 @@ public class IntegrationTest {
     // After clicking on the add task button, the modal should be displayed
     assertTrue("Create task modal should be displayed", createTaskModalElement.isDisplayed());
 
+    // Inputs task details using Javascript Executor
     js.executeScript("document.getElementById('task-detail-input').value='" + details + "';");
     js.executeScript("document.getElementById('rewarding-point-input').value='" + points + "';");
     js.executeScript(
@@ -544,9 +589,13 @@ public class IntegrationTest {
     driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
   }
 
+  /**
+   * Verifies that newly added task's details are correctly display in userpage's need help table
+   */
   private void verifyNewTaskUserPage() {
-    // Verify that inputted task info is correctly displayed in need help table
+    // Location of most recent task in user page's need help
     String taskRowXPath = "//table[@id='need-help']/tbody/tr[1]";
+
     WebElement rowTaskDetails =
         wait.until(
             new Function<WebDriver, WebElement>() {
@@ -556,26 +605,29 @@ public class IntegrationTest {
             });
     assertEquals(recentTask.get("detail"), rowTaskDetails.getText());
 
-    WebElement rowHelperActual =
+    WebElement rowHelper =
         wait.until(
             new Function<WebDriver, WebElement>() {
               public WebElement apply(WebDriver driver) {
                 return driver.findElement(By.xpath(taskRowXPath + "/td[2]"));
               }
             });
-    assertEquals(recentTask.get("helper"), rowHelperActual.getText());
+    assertEquals(recentTask.get("helper"), rowHelper.getText());
 
-    WebElement rowStatusActual =
+    WebElement rowStatus =
         wait.until(
             new Function<WebDriver, WebElement>() {
               public WebElement apply(WebDriver driver) {
                 return driver.findElement(By.xpath(taskRowXPath + "/td[3]"));
               }
             });
-    assertEquals(recentTask.get("status"), rowStatusActual.getText());
+    assertEquals(recentTask.get("status"), rowStatus.getText());
   }
 
+  /** Verifies that newly added tasks are displayed properply in homepage */
   private void verifyNewTaskHomepage() {
+
+    // First task location in homepage
     String taskXPath = "//div[@id='tasks-list']/div[1]/div[2]";
 
     WebElement taskDetailsActual =
@@ -606,6 +658,7 @@ public class IntegrationTest {
     assertEquals("#" + recentTask.get("category"), taskCategoryActual.getText());
   }
 
+  /** Logs a new user in and provides the user info details to fill out in the form */
   private void loginNewUser(
       String email, String nickname, String address, String phone, String zipcode, String country) {
     loginUser(email);
@@ -613,9 +666,10 @@ public class IntegrationTest {
 
     // User should now be logged in and redirected to the
     // account page to enter their user info
-    assertTrue(driver.getCurrentUrl().contains("/account.jsp"));
+    assertTrue("User should be in account page", driver.getCurrentUrl().contains("/account.jsp"));
     assertEquals("My Personal Info", driver.getTitle());
 
+    // Uses JS executor to fill out user info form
     js.executeScript("document.getElementById('nickname-input').value='" + nickname + "';");
     js.executeScript("document.getElementById('edit-address-input').value='" + address + "';");
     js.executeScript("document.getElementById('edit-zipcode-input').value='" + zipcode + "';");
@@ -633,7 +687,9 @@ public class IntegrationTest {
     driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
   }
 
+  /** Logs in users that already have their information saved (not new users) */
   private void loginUser(String email) {
+    // login link element
     WebElement loginElement =
         wait.until(
             new Function<WebDriver, WebElement>() {
@@ -644,6 +700,8 @@ public class IntegrationTest {
     js.executeScript("arguments[0].click();", loginElement);
 
     driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+
+    // enters user email
     js.executeScript("document.getElementById('email').value='" + email + "';");
 
     WebElement loginButtonElement =
@@ -656,18 +714,7 @@ public class IntegrationTest {
     js.executeScript("arguments[0].click();", loginButtonElement);
   }
 
-  private void verifyLoggedUserUserPage(String nickname) {
-    WebElement logoutActualMessage =
-        wait.until(
-            new Function<WebDriver, WebElement>() {
-              public WebElement apply(WebDriver driver) {
-                return driver.findElement(By.id("log-out-link"));
-              }
-            });
-    // Userpage should show a custom logout message with user's nickname
-    assertEquals(nickname + " | Logout", logoutActualMessage.getText());
-  }
-
+  /** Sends driver back to the homepage */
   private void backToHome() {
     WebElement backToHomeElement =
         wait.until(
@@ -680,6 +727,7 @@ public class IntegrationTest {
     driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
   }
 
+  /** Sends driver to User Page */
   private void goToUserPage() {
     WebElement goToUserPageElement =
         wait.until(
@@ -692,6 +740,7 @@ public class IntegrationTest {
     driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
   }
 
+  /** Sends driver to the offer help table within the user page */
   private void goToOfferHelp() {
     WebElement offerHelpElement =
         wait.until(
@@ -704,6 +753,20 @@ public class IntegrationTest {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
+  /** Verifies that logged user's details are correctly displayed in userpage */
+  private void verifyLoggedUserUserPage(String nickname) {
+    WebElement logoutActualMessage =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("log-out-link"));
+              }
+            });
+    // Userpage should show a custom logout message with user's nickname
+    assertEquals(nickname + " | Logout", logoutActualMessage.getText());
+  }
+
+  /** Verifies that logged user's details are correctly displayed in homepage */
   private void verifyLoggedUserHomePage(String nickname) {
     WebElement actualLogoutText =
         wait.until(
@@ -717,6 +780,7 @@ public class IntegrationTest {
     assertEquals(nickname + " | Logout", actualLogoutText.getText());
   }
 
+  /** Helper claims a task from the homepage */
   private void helpOut() {
     String taskXPath = "//div[@id='tasks-list']/div[1]";
 
@@ -728,7 +792,6 @@ public class IntegrationTest {
               }
             });
     assertEquals(recentTask.get("nickname"), taskNeighborNickname.getText());
-    // expectedNicknameAndDetails[0] = driver.findElement(taskNeighborNickname).getText();
 
     WebElement neighborTaskDetails =
         wait.until(
@@ -738,7 +801,6 @@ public class IntegrationTest {
               }
             });
     assertEquals(recentTask.get("detail"), neighborTaskDetails.getText());
-    // expectedNicknameAndDetails[1] = driver.findElement(neighborTaskDetails).getText();
 
     WebElement helpOutElement =
         wait.until(
@@ -759,11 +821,17 @@ public class IntegrationTest {
     js.executeScript("arguments[0].click();", confirmHelpElement);
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
+    // Updates recentTask
     recentTask.put("helper", USER_NICKNAME_HELPER);
     recentTask.put("status", "IN PROGRESS");
   }
 
+  /**
+   * Verifies that after claiming a task/offering help with a task, that it displays correctly in
+   * the user page's offer help table
+   */
   private void verifyOfferHelpTask() {
+    // Location of most recent task in offer help table in userpage
     String offerHelpRowXPath = "//tbody[@id='offer-help-body']/tr[1]";
 
     WebElement taskDetails =
@@ -794,6 +862,7 @@ public class IntegrationTest {
     assertEquals(recentTask.get("nickname"), taskNeighbor.getText());
   }
 
+  /** Logs out user - takes logout link id as a parameter */
   private void logOut(String logoutId) {
     WebElement logoutLinkElem =
         wait.until(
@@ -806,8 +875,14 @@ public class IntegrationTest {
     driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
   }
 
+  /**
+   * Updates the stored instance of recentTask with the most recent open task's contents displayed
+   * in the homepage
+   */
   private void updateRecentTask() {
     recentTask.clear();
+
+    // Most recent task location in homepage
     String taskXPath = "//div[@id='tasks-list']/div[1]/div[2]";
 
     WebElement taskNickname =
@@ -838,10 +913,14 @@ public class IntegrationTest {
     recentTask.put("category", taskCategory.getText().substring(1));
 
     recentTask.put("status", "OPEN");
+    recentTask.put("helper", "N/A");
   }
 
+  /** Has helper mark a task as complete */
   private void completeTaskAsHelper() {
+    // Location of most recent task in offer help table
     String taskMarkCompleteXPath = "//tbody[@id='offer-help-body']/tr[1]/td[5]/button";
+
     WebElement markCompleteElement =
         wait.until(
             new Function<WebDriver, WebElement>() {
@@ -849,7 +928,9 @@ public class IntegrationTest {
                 return driver.findElement(By.xpath(taskMarkCompleteXPath));
               }
             });
+    // Triggers an alert confirmation window
     js.executeScript("arguments[0].click();", markCompleteElement);
+    // Driver will try to accept the alert to verify the task every second for a minute
     for (int i = 0; i < 60; i++) {
       try {
         driver.switchTo().alert().accept();
@@ -858,6 +939,7 @@ public class IntegrationTest {
         driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
       }
     }
+    // Updates recentTask
     recentTask.put("status", "COMPLETE: AWAIT VERIFICATION");
   }
 }
