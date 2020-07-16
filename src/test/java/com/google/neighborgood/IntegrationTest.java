@@ -55,7 +55,9 @@ public class IntegrationTest {
       "Help! this is a detailed version of the task where I give a lot of random information";
   private final String TASK_OVERVIEW = "Help!";
   private final String[] TASK_CATEGORIES = {"garden", "shopping", "pets", "misc"};
-  private static int helperPoints;
+  private static int helperPoints = 0;
+  private static int userTaskCount = 0;
+  private static int openTotalTaskCount = 0;
   // recentTask instance used to reference tasks throughout the tests
   private static HashMap<String, String> recentTask = new HashMap<String, String>();
 
@@ -243,6 +245,8 @@ public class IntegrationTest {
     goToUserPage();
     ifLaggingThenRefresh();
     goToOfferHelp();
+    // Verifies that after offering help with a task it displays correctly in the user page's offer
+    // help table
     verifyOfferHelpTask();
   }
 
@@ -594,6 +598,9 @@ public class IntegrationTest {
             })
         .click();
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+
+    userTaskCount++;
+    openTotalTaskCount++;
   }
 
   /**
@@ -622,6 +629,15 @@ public class IntegrationTest {
     }
     // Opens up task details modal to verify its contents
     verifyTaskDetails(taskRowXPath + "/td[1]");
+    // Verifies the total number of tasks shown in the userpage against what they should be
+    List<WebElement> tasks =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElements(By.xpath("//tr"));
+              }
+            });
+    assertEquals(userTaskCount, tasks.size());
   }
 
   /** Verifies that newly added tasks are displayed properply in homepage */
@@ -661,6 +677,15 @@ public class IntegrationTest {
     assertEquals(recentTask.get("category"), taskCategoryActual.substring(1));
     // Opens up task details modal to verify its contents
     verifyTaskDetails(taskXPath + "/div[2]");
+    // Verifies the total number of tasks shown in the homepage against what they should be
+    List<WebElement> tasks =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElements(By.xpath("//div[@class='task']"));
+              }
+            });
+    assertEquals(openTotalTaskCount, tasks.size());
   }
 
   /** Logs a new user in and provides the user info details to fill out in the form */
@@ -831,6 +856,8 @@ public class IntegrationTest {
     // Updates recentTask
     recentTask.put("helper", USER_NICKNAME_HELPER);
     recentTask.put("status", "IN PROGRESS");
+
+    openTotalTaskCount--;
   }
 
   /**
