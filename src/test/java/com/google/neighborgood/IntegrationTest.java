@@ -306,7 +306,6 @@ public class IntegrationTest {
     logOut("logout-href");
     loginUser(USER_EMAIL);
     ifLaggingThenRefresh();
-    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
     // Location of first task listed in the await verification table
     String awaitVerifTaskXPath = "//tbody[@id='await-verif-body']/tr[1]";
@@ -342,6 +341,15 @@ public class IntegrationTest {
     assertEquals(recentTask.get("status"), taskStatus);
 
     verifyTaskDetails(awaitVerifTaskXPath + "/td[1]");
+
+    // click button to verify a task has been completed
+    wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath(awaitVerifTaskXPath + "/td[4]/button"));
+              }
+            })
+        .click();
 
     // Clicking on verify button triggers an alert confirmation window
     // Driver will try to accept the alert to verify the task every second for a minute
@@ -956,7 +964,7 @@ public class IntegrationTest {
             .getText();
     recentTask.put("nickname", taskNickname);
 
-    String taskDetail =
+    String taskOverview =
         wait.until(
                 new Function<WebDriver, WebElement>() {
                   public WebElement apply(WebDriver driver) {
@@ -964,7 +972,7 @@ public class IntegrationTest {
                   }
                 })
             .getText();
-    recentTask.put("detail", taskDetail);
+    recentTask.put("overview", taskOverview);
 
     String taskCategory =
         wait.until(
@@ -975,6 +983,9 @@ public class IntegrationTest {
                 })
             .getText();
     recentTask.put("category", taskCategory.substring(1));
+
+    String taskDetail = getTaskDetails(taskXPath + "/div[2]");
+    recentTask.put("detail", taskDetail);
 
     recentTask.put("status", "OPEN");
     recentTask.put("helper", "N/A");
@@ -1017,7 +1028,11 @@ public class IntegrationTest {
 
   /** clicks on task overview to open up task detail modal */
   private void verifyTaskDetails(String taskOverviewXpath) {
-    // open modal
+    String taskDetail = getTaskDetails(taskOverviewXpath);
+    assertEquals(recentTask.get("detail"), taskDetail);
+  }
+
+  private String getTaskDetails(String taskOverviewXpath) {
     wait.until(
             new Function<WebDriver, WebElement>() {
               public WebElement apply(WebDriver driver) {
@@ -1025,19 +1040,7 @@ public class IntegrationTest {
               }
             })
         .click();
-    // verify modal is displayed
-    boolean taskDetailModalDisplayed =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.id("createTaskModal"));
-                  }
-                })
-            .isDisplayed();
-    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-    assertTrue("Task detail modal should be displayed", taskDetailModalDisplayed);
 
-    // verify task detail
     String taskDetail =
         wait.until(
                 new Function<WebDriver, WebElement>() {
@@ -1046,7 +1049,6 @@ public class IntegrationTest {
                   }
                 })
             .getText();
-    assertEquals(recentTask.get("detail"), taskDetail);
 
     // close modal
     wait.until(
@@ -1056,5 +1058,8 @@ public class IntegrationTest {
               }
             })
         .click();
+    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+
+    return taskDetail;
   }
 }
