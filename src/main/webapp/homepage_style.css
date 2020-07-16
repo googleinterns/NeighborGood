@@ -323,6 +323,5 @@ section {
 }
 
 .task-content:hover {
-  color: blue;
-  text-decoration: underline;
+  color: gray;
 }
