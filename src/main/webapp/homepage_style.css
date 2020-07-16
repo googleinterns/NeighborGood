@@ -30,6 +30,7 @@ nav {
   position: fixed;
   width: 100%;
   top: 0;
+  padding-bottom: 1em;
 }
 
 #dashboard-icon-container {
@@ -38,7 +39,9 @@ nav {
 }
 
 #login-logout {
-  padding: 0 1em;
+  padding-right: 1em;
+  padding-top: 0.8em;
+  text-align: right;
 }
 
 a {
@@ -69,6 +72,12 @@ i:hover {
   text-align: center;
   margin-top: 1em;
   margin-bottom: 0.4em;
+  padding-top: 0.5em;
+}
+
+.login-messages {
+  margin-top: 0;
+  margin-bottom: 0.5em;
 }
 
 /* Main Content Styling */
@@ -88,7 +97,7 @@ section {
 #control-bar-message-wrapper {
   width: 100%;
   max-width: 55em;
-  z-index: 1;
+  z-index: 2;
   background-image: linear-gradient(to bottom, white 90%, transparent);
   padding-bottom: 1em;
   padding-top: 1em;
@@ -109,24 +118,26 @@ section {
 }
 
 #all {
-  background-color: #222;
-  color: white;
-  font-weight: bold;
+  background-color: rgb(62, 142, 65);
 }
 
 .categories {
-  border: solid #222;
-  margin-right: -3px;
+  border: solid 1px green;
+  margin-right: -1px;
+  margin-bottom: -1px;
   cursor: pointer;
   text-align: center;
   width: 20%;
   min-width: 0;
   overflow: hidden;
-  line-height: 3em;
+  line-height: 3.2em;
+  background-color: rgb(76, 175, 80);
+  color: white;
+  font-weight: bold;
 }
 
 .categories:hover {
-  background-color: lightgray;
+  background-color: rgb(62, 142, 65);
 }
 
 #add-task {
@@ -149,14 +160,14 @@ section {
 
 #tasks-list {
   display: none;
-  border-top: solid;
-  border-right: solid;
-  border-left: solid;
+  border-top: solid 2px;
+  border-right: solid 2px;
+  border-left: solid 2px;
   transition: 0.5s;
 }
 
 .task {
-  border-bottom: solid;
+  border-bottom: solid 2px;
   position: relative;
 }
 
@@ -196,7 +207,7 @@ section {
 
 .help-overlay {
   position: absolute;
-  z-index: 99;
+  z-index: 1;
   display: none;
   background: rgba(236, 236, 240, 0.85);
   backdrop-filter: blur(4px);
@@ -222,11 +233,11 @@ section {
   padding-top: 1em;
 }
 
-/* Add task modal styling */
+/* Add modal styling */
 .modalWrapper {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
+  z-index: 3; /* Sit on top */
   padding-top: 100px; /* Location of the box */
   left: 0;
   top: 0;
@@ -279,9 +290,53 @@ section {
   cursor: pointer;
 }
 
+/* Top Scores modal specific styling */
+#topScoresModalWrapper {
+  padding-top: 200px;
+}
+
+#topScoresModal {
+  width: 70%;
+  text-align: center;
+  overflow: auto;
+}
+
+.topScoresTable {
+  width: 100%;
+}
+
+.topScoresDiv {
+  width: 50%;
+  padding: 0 1em;
+  text-align: center;
+}
+
+tr:nth-child(even) {
+  background-color: #eee;
+}
+
+tr:nth-child(odd) {
+  background-color: #fff;
+}
+
+td {
+  text-align: center;
+}
+
+.topscores {
+  width: 33.3%;
+}
+
+#topScoresTablesWrapper {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 2em;
+}
+
 @media only screen and (max-width: 600px) {
   #title {
     font-size: 2.5em;
+    padding-top: 1.5em;
   }
 
   #control-bar {
@@ -311,6 +366,18 @@ section {
 
   .fa-3x {
     font-size: 2.5em;
+  }
+
+  h2 {
+    font-size: 1em;
+  }
+
+  .topScoresDiv {
+    padding: 0 0.5em;
+  }
+
+  #topScoresTitle {
+    font-size: 1.5em;
   }
 }
 
