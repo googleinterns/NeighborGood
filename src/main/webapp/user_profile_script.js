@@ -46,6 +46,7 @@ async function editTask(keyString) {
         window.alert("You can only edit an 'OPEN' task.");
     } else {
         document.getElementById("edit-detail-input").value = info.detail;
+        document.getElementById("edit-overview-input").value = info.overview;
         document.getElementById("edit-category-input").value = info.category;
         document.getElementById("edit-point-input").value = info.reward.toString();
         const id_input = document.getElementById("task-id-input");
@@ -125,6 +126,15 @@ async function disapproveTask(keyString) {
     }
 }
 
+async function showTaskInfo(keyString) {
+    const info = await getTaskInfo(keyString);
+    var detailContainer = document.getElementById("task-detail-container");
+    detailContainer.innerHTML = "";
+    detailContainer.appendChild(document.createTextNode(info.detail));
+    var modal = document.getElementById("taskInfoModalWrapper");
+    modal.style.display = "block";
+}
+
 function showNeedHelp() {
     if (document.getElementById("need-help") == null) return;
     document.getElementById("need-help").style.display = "table";
@@ -175,15 +185,19 @@ function closeInfoModal() {
     modal.style.display = "none";
 }
 
+function closeTaskInfoModal() {
+    var modal = document.getElementById("taskInfoModalWrapper");
+    modal.style.display = "none";
+}
+
 // If the user clicks outside of the modal, closes the modal directly
 window.onclick = function(event) {
-    var modal = document.getElementById("createTaskModalWrapper");
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-    var editModal = document.getElementById("editTaskModalWrapper");
-    if (event.target == editModal) {
-        editModal.style.display = "none";
+    var wrapperId = ["createTaskModalWrapper", "editTaskModalWrapper", "updateInfoModalWrapper", "taskInfoModalWrapper"];
+    for (var i = 0; i < wrapperId.length; i++) {
+        var modal = document.getElementById(wrapperId[i]);
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
     }
 }
 
@@ -197,13 +211,17 @@ async function displayNeedHelpTasks() {
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
-        var data = [task.detail, task.helper, task.status];
+        var data = [task.overview, task.helper, task.status];
+        const keyStringCopy = task.keyString.slice();
         for (var i = 0; i < data.length; i++) {
             var td = document.createElement("td");
+            if (i === 0) {
+                td.addEventListener("click", function () { showTaskInfo(keyStringCopy) });
+                td.className = "task-overview";
+            }
             td.appendChild(document.createTextNode(data[i]));
             tr.appendChild(td);
         }
-        const keyStringCopy = task.keyString.slice();
         var editTd = document.createElement("td");
         var editBtn = document.createElement("button");
         editBtn.className = "edit-task";
@@ -232,13 +250,17 @@ async function displayNeedHelpCompleteTasks() {
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
-        var data = [task.detail, task.helper, task.status];
+        var data = [task.overview, task.helper, task.status];
+        const keyStringCopy = task.keyString.slice();
         for (var i = 0; i < data.length; i++) {
             var td = document.createElement("td");
+            if (i === 0) {
+                td.addEventListener("click", function () { showTaskInfo(keyStringCopy) });
+                td.className = "task-overview";
+            }
             td.appendChild(document.createTextNode(data[i]));
             tr.appendChild(td);
         }
-        const keyStringCopy = task.keyString.slice();
         var verifyTd = document.createElement("td");
         var verifyBtn = document.createElement("button");
         verifyBtn.className = "verify-task";
@@ -267,13 +289,17 @@ async function displayOfferHelpTasks() {
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
-        var data = [task.detail, task.status, task.owner, task.address];
+        var data = [task.overview, task.status, task.owner, task.address];
+        const keyStringCopy = task.keyString.slice();
         for (var i = 0; i < data.length; i++) {
             var td = document.createElement("td");
+            if (i === 0) {
+                td.addEventListener("click", function () { showTaskInfo(keyStringCopy) });
+                td.className = "task-overview";
+            }
             td.appendChild(document.createTextNode(data[i]));
             tr.appendChild(td);
         }
-        const keyStringCopy = task.keyString.slice();
         var completeTd = document.createElement("td");
         var completeBtn = document.createElement("button");
         completeBtn.className = "complete-task";
@@ -302,9 +328,14 @@ async function displayOfferHelpCompleteTasks() {
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
-        var data = [task.detail, task.status, task.owner, task.reward.toString()];
+        var data = [task.overview, task.status, task.owner, task.reward.toString()];
+        const keyStringCopy = task.keyString.slice();
         for (var i = 0; i < data.length; i++) {
             var td = document.createElement("td");
+            if (i === 0) {
+                td.addEventListener("click", function () { showTaskInfo(keyStringCopy) });
+                td.className = "task-overview";
+            }
             td.appendChild(document.createTextNode(data[i]));
             tr.appendChild(td);
         }
@@ -327,7 +358,6 @@ if (document.readyState === 'loading') {
  * Initialize a map on the page
  */
 async function initMap() {
-    console.log("Start loading");
     const script = document.createElement("script");
     script.type = "text/javascript";
     script.src = "https://maps.googleapis.com/maps/api/js?key=" + 
@@ -337,7 +367,6 @@ async function initMap() {
     // After the Google Maps API script has been loaded, start initializing the map
     window.initialize = async function() {
         markers = [];
-        console.log("Draw map");
         map = new google.maps.Map(document.getElementById("map"), {
             center: {lat: GOOGLE_KIRKLAND_LAT, lng: GOOGLE_KIRKLAND_LNG},
             zoom: 18,

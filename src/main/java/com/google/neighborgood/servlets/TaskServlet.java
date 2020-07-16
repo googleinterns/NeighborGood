@@ -131,8 +131,11 @@ public class TaskServlet extends HttpServlet {
         }
       }
       out.append("</div>");
-      out.append("<div class='task-content'>")
-          .append((String) entity.getProperty("detail"))
+      out.append(
+              "<div class='task-content' onclick='showTaskInfo(\""
+                  + KeyFactory.keyToString(entity.getKey())
+                  + "\")'>")
+          .append((String) entity.getProperty("overview"))
           .append("</div>");
       out.append("<div class='task-footer'><div class='task-category'>#")
           .append((String) entity.getProperty("category"))
@@ -199,6 +202,21 @@ public class TaskServlet extends HttpServlet {
       return;
     }
 
+    // Get the task overview from the form input
+    String taskOverview = "";
+    input = request.getParameter("task-overview-input");
+    // If the input is valid, set the taskOverview value to the input value
+    if (input != null) {
+      taskOverview = input.trim();
+    }
+
+    // If input task overview is empty, reject the request to add a new task and send a 400 error.
+    if (taskOverview.equals("")) {
+      System.err.println("The input task overview is empty");
+      response.sendRedirect("/400.html");
+      return;
+    }
+
     long creationTime = System.currentTimeMillis();
 
     String userId = userService.getCurrentUser().getUserId();
@@ -224,6 +242,7 @@ public class TaskServlet extends HttpServlet {
     // Create an Entity that stores the input comment
     Entity taskEntity = new Entity("Task", userEntity.getKey());
     taskEntity.setProperty("detail", taskDetail);
+    taskEntity.setProperty("overview", taskOverview);
     taskEntity.setProperty("timestamp", creationTime);
     taskEntity.setProperty("reward", rewardPts);
     taskEntity.setProperty("status", "OPEN");
