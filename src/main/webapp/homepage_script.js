@@ -23,11 +23,15 @@ function stickyControlBar() {
     let controlBarWrapper = document.getElementById("control-bar-message-wrapper");
     let taskListDiv = document.getElementById("tasks-list");
 
-    if (window.innerWidth > 1203) {
-        const OFFSET = 190;    
+    // Scrolling behavior in screens smaller than 1204 will result in overlapping DOM elements
+    // therefore this scrolling function only applies to screens as big or bigger than that
+    if (window.innerWidth >= 1204) {
+        const OFFSET = 190; //Distance from top of page to top of control (categories) bar
         if (window.pageYOffset >= OFFSET || document.body.scrollTop >= OFFSET || document.documentElement.scrollTop >= OFFSET) {
             controlBarWrapper.style.position = "fixed";
-            taskListDiv.style.marginTop = "165px";
+            // adjust task list container so it appears like it's in the same position
+            // after controlBarWrapper's position is changed to 'fixed' 
+            taskListDiv.style.marginTop = "165px"; 
         } else {
             controlBarWrapper.style.position = "relative";
             taskListDiv.style.marginTop = "auto";
