@@ -25,3 +25,10 @@ var config = {
     ...
 }
 ```
+## Testing
+
+All servlet unit tests can be run using the command `mvn test`.
+
+In order to run the IntegrationTest you must have Google Chrome installed and it must be accessible from where you are running the IntegrationTest.
+To run the IntegrationTest first start the devServer with the command `mvn package appengine:start` and once the devServer is running use the command `mvn -Dtest=IntegrationTest test`.
+
