@@ -90,7 +90,8 @@ public class IntegrationTest {
    * their new user info
    */
   public void _01_Homepage_AsNewGuestUser_LoginAndInputUserInfo() {
-    driver.get("http://localhost:8080/");
+    driver.navigate().to("http://localhost:8080/");
+    ifLaggingThenRefresh();
     String loginElement =
         wait.until(
                 new Function<WebDriver, WebElement>() {
@@ -132,6 +133,7 @@ public class IntegrationTest {
     assertTrue("No tasks in neighborhood message should be displayed", taskResultsMessageDisplayed);
 
     loginNewUser(USER_EMAIL, USER_NICKNAME, USER_ADDRESS, USER_PHONE, USER_ZIPCODE, USER_COUNTRY);
+    ifLaggingThenRefresh();
 
     // After new user fills out user info, they should be redirected to userpage
     assertTrue("User in user profile page", driver.getCurrentUrl().contains("/user_profile.jsp"));
@@ -163,8 +165,10 @@ public class IntegrationTest {
         "User should be in user profile page",
         driver.getCurrentUrl().contains("/user_profile.jsp"));
 
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     verifyNewTaskUserPage();
     backToHome();
+    ifLaggingThenRefresh();
     verifyNewTaskHomepage();
   }
 
@@ -172,6 +176,7 @@ public class IntegrationTest {
   /** Tests functionality of adding tasks from the userpage */
   public void _03_UserPage_AsLoggedUser_AddTask() {
     goToUserPage();
+    ifLaggingThenRefresh();
 
     // Randomizes task contents
     Random random = new Random();
@@ -187,8 +192,10 @@ public class IntegrationTest {
         "User should be in user profile page",
         driver.getCurrentUrl().contains("/user_profile.jsp"));
 
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     verifyNewTaskUserPage();
     backToHome();
+    ifLaggingThenRefresh();
     verifyNewTaskHomepage();
   }
 
@@ -218,12 +225,15 @@ public class IntegrationTest {
         USER_PHONE,
         USER_ZIPCODE,
         USER_COUNTRY);
+    ifLaggingThenRefresh();
     // Verifies logged user in userpage and then in homepage
     verifyLoggedUser(USER_NICKNAME_HELPER, "log-out-link");
     backToHome();
+    ifLaggingThenRefresh();
     verifyLoggedUser(USER_NICKNAME_HELPER, "login-logout");
     helpOut();
     goToUserPage();
+    ifLaggingThenRefresh();
     goToOfferHelp();
     verifyOfferHelpTask();
   }
@@ -232,6 +242,7 @@ public class IntegrationTest {
   /** Tests functionality of having a helper mark a task as complete */
   public void _06_Userpage_AsLoggedHelper_CompleteTask() {
     completeTaskAsHelper();
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
     // Refreshes page due to flakiness of test caused by the partial refresh of the div in the page.
     // Without refreshing this often resulted in a a stale element error
@@ -288,6 +299,7 @@ public class IntegrationTest {
     // Logs out by using 'logout-href' element id;
     logOut("logout-href");
     loginUser(USER_EMAIL);
+    ifLaggingThenRefresh();
     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
     // Location of first task listed in the await verification table
@@ -344,6 +356,7 @@ public class IntegrationTest {
     }
     // update recent task
     recentTask.put("status", "COMPLETE");
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
     // Refreshes page due to flakiness of test caused by the partial refresh of the div in the page.
     // Without refreshing this often resulted in a a stale element error
@@ -369,7 +382,9 @@ public class IntegrationTest {
   /** Verifies that the completed task shows as completed on the helper's user profile */
   public void _08_Userpage_AsHelper_CompletedTask() {
     logOut("logout-href");
+    ifLaggingThenRefresh();
     loginUser(USER_EMAIL_HELPER);
+    ifLaggingThenRefresh();
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
     // Helper's total points
@@ -400,15 +415,18 @@ public class IntegrationTest {
   /** Test functionality of disapproving a helper's completed task */
   public void _09_Userpage_AsLoggedUser_DisapproveTask() {
     backToHome();
+    ifLaggingThenRefresh();
     updateRecentTask(); // updates the recent task we have saved with the most recent task in the
     // homepage
     helpOut();
     goToUserPage();
+    ifLaggingThenRefresh();
     goToOfferHelp();
     completeTaskAsHelper();
     logOut("logout-href");
+    ifLaggingThenRefresh();
     loginUser(USER_EMAIL);
-    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+    ifLaggingThenRefresh();
 
     // click on disapprove task button.
     // this is located in row 2 for this order of events but we probably need a better sorting
@@ -473,7 +491,9 @@ public class IntegrationTest {
   /** Test functionality of a helper abandoning a task */
   public void _10_UserPage_AsHelper_AbandonTask() {
     logOut("logout-href");
+    ifLaggingThenRefresh();
     loginUser(USER_EMAIL_HELPER);
+    ifLaggingThenRefresh();
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     goToOfferHelp();
     // clicks on abandon task button element
@@ -498,7 +518,7 @@ public class IntegrationTest {
     // Updates recentTask
     recentTask.put("status", "OPEN");
     backToHome();
-    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+    ifLaggingThenRefresh();
     // verifies that abandoned task is now the most recent task in homepage
     verifyNewTaskHomepage();
   }
@@ -597,7 +617,9 @@ public class IntegrationTest {
         "document.getElementById('category-input').value='"
             + TASK_CATEGORIES[categoryIndex]
             + "';");
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     // clicks on submit create task button
+
     wait.until(
             new Function<WebDriver, WebElement>() {
               public WebElement apply(WebDriver driver) {
@@ -605,7 +627,6 @@ public class IntegrationTest {
               }
             })
         .click();
-
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
@@ -688,6 +709,7 @@ public class IntegrationTest {
   private void loginNewUser(
       String email, String nickname, String address, String phone, String zipcode, String country) {
     loginUser(email);
+    ifLaggingThenRefresh();
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
     // User should now be logged in and redirected to the
@@ -715,6 +737,7 @@ public class IntegrationTest {
 
   /** Logs in users that already have their information saved (not new users) */
   private void loginUser(String email) {
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     // clicks on login link element
     wait.until(
             new Function<WebDriver, WebElement>() {
@@ -737,10 +760,12 @@ public class IntegrationTest {
               }
             })
         .click();
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
   /** Sends driver back to the homepage */
   private void backToHome() {
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     // clicks on back to home button
     wait.until(
             new Function<WebDriver, WebElement>() {
@@ -754,6 +779,8 @@ public class IntegrationTest {
 
   /** Sends driver to User Page */
   private void goToUserPage() {
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+
     // clicks on userpage button
     wait.until(
             new Function<WebDriver, WebElement>() {
@@ -767,6 +794,7 @@ public class IntegrationTest {
 
   /** Sends driver to the offer help table within the user page */
   private void goToOfferHelp() {
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     // clicks on offer help button
     wait.until(
             new Function<WebDriver, WebElement>() {
@@ -885,6 +913,7 @@ public class IntegrationTest {
 
   /** Logs out user - takes logout link id as a parameter */
   private void logOut(String logoutId) {
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     // clicks on logout button
     wait.until(
             new Function<WebDriver, WebElement>() {
@@ -965,5 +994,12 @@ public class IntegrationTest {
     }
     // Updates recentTask
     recentTask.put("status", "COMPLETE: AWAIT VERIFICATION");
+  }
+
+  private void ifLaggingThenRefresh() {
+    while (js.executeScript("return document.readyState").equals("loading")) {
+      driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+      driver.navigate().refresh();
+    }
   }
 }
