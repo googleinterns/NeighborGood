@@ -265,14 +265,13 @@ public class IntegrationTest {
 
     // Iterates over task elements and compares the element's text with that of the stored
     // recentTask
-    String taskContentItem;
     for (int i = 0; i < taskContentsTarget.length; i++) {
-      taskContentItem =
+      String fullXPath = taskCompletedXPath + "/td[" + (i + 1) + "]";
+      String taskContentItem =
           wait.until(
                   new Function<WebDriver, WebElement>() {
                     public WebElement apply(WebDriver driver) {
-                      return driver.findElement(
-                          By.xpath(taskCompletedXPath + "/td[" + (i + 1) + "]"));
+                      return driver.findElement(By.xpath(fullXPath));
                     }
                   })
               .getText();
@@ -298,13 +297,13 @@ public class IntegrationTest {
 
     // Iterates over task elements and compares the element's text with that of the stored
     // recentTask
-    String taskContentItem;
     for (int i = 0; i < taskContentsTarget.length; i++) {
-      taskContentItem =
+      String fullXPath = awaitVerifTaskXPath + "/td[" + (i + 1) + "]";
+      String taskContentItem =
           wait.until(
                   new Function<WebDriver, WebElement>() {
                     public WebElement apply(WebDriver driver) {
-                      return driver.findElement(By.xpath(awaitVerifTaskXPath + "/td[1]"));
+                      return driver.findElement(By.xpath(fullXPath));
                     }
                   })
               .getText();
@@ -436,14 +435,13 @@ public class IntegrationTest {
 
     // Iterates over task elements and compares the element's text with that of the stored
     // recentTask
-    String taskContentItem;
     for (int i = 0; i < taskContentsTarget.length; i++) {
-      taskContentItem =
+      String fullXPath = "//tbody[@id='need-help-body']/tr[1]/td[" + (i + 1) + "]";
+      String taskContentItem =
           wait.until(
                   new Function<WebDriver, WebElement>() {
                     public WebElement apply(WebDriver driver) {
-                      return driver.findElement(
-                          By.xpath("//tbody[@id='need-help-body']/tr[1]/td[" + (i + 1) + "]"));
+                      return driver.findElement(By.xpath(fullXPath));
                     }
                   })
               .getText();
@@ -610,13 +608,13 @@ public class IntegrationTest {
 
     // Iterates over task elements and compares the element's text with that of the stored
     // recentTask
-    String taskContentItem;
     for (int i = 0; i < taskContentsTarget.length; i++) {
-      taskContentItem =
+      String fullXPath = taskRowXPath + "/td[" + (i + 1) + "]";
+      String taskContentItem =
           wait.until(
                   new Function<WebDriver, WebElement>() {
                     public WebElement apply(WebDriver driver) {
-                      return driver.findElement(By.xpath(taskRowXPath + "/td[" + (i + 1) + "]"));
+                      return driver.findElement(By.xpath(fullXPath));
                     }
                   })
               .getText();
@@ -847,14 +845,13 @@ public class IntegrationTest {
     String[] taskContentsTarget = {"overview", "status", "nickname"};
     // Iterates over task elements and compares the element's text with that of the stored
     // recentTask
-    String taskContentItem;
     for (int i = 0; i < taskContentsTarget.length; i++) {
-      taskContentItem =
+      String fullXPath = offerHelpRowXPath + "/td[" + (i + 1) + "]";
+      String taskContentItem =
           wait.until(
                   new Function<WebDriver, WebElement>() {
                     public WebElement apply(WebDriver driver) {
-                      return driver.findElement(
-                          By.xpath(offerHelpRowXPath + "/td[" + (i + 1) + "]"));
+                      return driver.findElement(By.xpath(fullXPath));
                     }
                   })
               .getText();
