@@ -25,6 +25,7 @@ import com.google.appengine.api.datastore.Query.FilterPredicate;
 
 public final class Task {
   private final String detail;
+  private final String overview;
   private final String keyString;
   private final long creationTime;
   private final String status;
@@ -39,6 +40,7 @@ public final class Task {
   public Task(
       String keyString,
       String detail,
+      String overview,
       long creationTime,
       String status,
       long reward,
@@ -50,6 +52,7 @@ public final class Task {
       String category) {
     this.keyString = keyString;
     this.detail = detail;
+    this.overview = overview;
     this.creationTime = creationTime;
     this.status = status;
     this.reward = reward;
@@ -64,6 +67,7 @@ public final class Task {
   public Task(Entity entity) {
     this.keyString = KeyFactory.keyToString(entity.getKey());
     this.detail = (String) entity.getProperty("detail");
+    this.overview = (String) entity.getProperty("overview");
     this.creationTime = (long) entity.getProperty("timestamp");
     this.reward = (long) entity.getProperty("reward");
     this.status = (String) entity.getProperty("status");

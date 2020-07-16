@@ -103,6 +103,13 @@
             <form id="new-task-form" action="/tasks" method="POST">
                 <h1>CREATE A NEW TASK: </h1>
                 <div>
+                    <label for="task-overview-input">Task Overview:</label>
+                    <br/>
+                </div>
+                <br/>
+                <textarea name="task-overview-input" id="task-overview-input" required="true" placeholder="Briefly describe your task here:"></textarea>
+                <br/><br/>
+                <div>
                     <label for="task-detail-input">Task Detail:</label>
                     <br/>
                 </div>
@@ -129,6 +136,13 @@
             <span class="close-button" id="edit-close-button" onclick="closeEditModal()">&times;</span>
             <form id="edit-task-form" action="/tasks/edit" method="POST">
                 <h1>EDIT THE CURRENT TASK: </h1>
+                <div>
+                    <label for="edit-overview-input">Task Overview:</label>
+                    <br/>
+                </div>
+                <br/>
+                <textarea name="task-overview-input" id="edit-overview-input" required="true"></textarea>
+                <br/><br/>
                 <div>
                     <label for="edit-detail-input">Task Detail:</label>
                     <br/>
@@ -199,6 +213,13 @@
                 <br/>
                 <input type="submit" />
             </form>
+        </div>
+    </div>
+    <div class="modalWrapper" id="taskInfoModalWrapper">
+        <div class="modal" id="taskInfoModal">
+            <span class="close-button" id="task-info-close-button" onclick="closeTaskInfoModal()">&times;</span>
+            <h1>Task Detail: </h1>
+            <div id="task-detail-container"></div>
         </div>
     </div>
   </body>

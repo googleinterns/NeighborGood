@@ -129,14 +129,21 @@
             <form id="new-task-form" action="/tasks" method="POST">
                 <h1>CREATE A NEW TASK: </h1>
                 <div>
+                    <label for="task-overview-input">Task Overview:</label>
+                    <br/>
+                </div>
+                <br/>
+                <textarea name="task-overview-input" id="task-overview-input" required="true" placeholder="Briefly describe your task here:"></textarea>
+                <br/><br/>
+                <div>
                     <label for="task-detail-input">Task Detail:</label>
                     <br/>
                 </div>
                 <br/>
-                <textarea name="task-detail-input" id="task-detail-input" placeholder="Describe your task here:"></textarea>
+                <textarea name="task-detail-input" id="task-detail-input" required="true" placeholder="Describe your task here:"></textarea>
                 <br/><br/>
                 <label for="rewarding-point-input">Rewarding Points:</label>
-                <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50">
+                <input type="number" id="rewarding-point-input" name="reward-input" required="true" min="0" max="200" value="50">
                 <br/><br/>
                 <label for="category-input">Task Category:</label>
                 <select name="category-input" id="category-input" form="new-task-form">
@@ -195,6 +202,13 @@
                 </table>
               </div>
             </div>
+        </div>
+    </div>
+    <div class="modalWrapper" id="taskInfoModalWrapper">
+        <div class="modal" id="taskInfoModal">
+            <span class="close-button" id="task-info-close-button" onclick="closeTaskInfoModal()">&times;</span>
+            <h1>Task Detail: </h1>
+            <div id="task-detail-container"></div>
         </div>
     </div>
   </body>

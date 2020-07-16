@@ -191,6 +191,34 @@ window.onclick = function(event) {
     if (event.target == topScoresModal) {
         topScoresModal.style.display = "none";
     }
+
+    var infoModal = document.getElementById("taskInfoModalWrapper");
+    if (event.target == infoModal) {
+        infoModal.style.display = "none";
+    }
+}
+
+/* Leonard's implementation of showing task details in a pop up window */
+async function getTaskInfo(keyString) {
+    const queryURL = "/tasks/info?key=" + keyString;
+    const request = new Request(queryURL, {method: "GET"});
+    const response = await fetch(request);
+    const info = await response.json();
+    return info;
+}
+
+async function showTaskInfo(keyString) {
+    const info = await getTaskInfo(keyString);
+    var detailContainer = document.getElementById("task-detail-container");
+    detailContainer.innerHTML = "";
+    detailContainer.appendChild(document.createTextNode(info.detail));
+    var modal = document.getElementById("taskInfoModalWrapper");
+    modal.style.display = "block";
+}
+
+function closeTaskInfoModal() {
+    var modal = document.getElementById("taskInfoModalWrapper");
+    modal.style.display = "none";
 }
 
 /* Function dynamically adds Maps API and

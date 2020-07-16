@@ -271,3 +271,16 @@ table button:hover i {
 #place-input:focus {
   border-color: skyblue;
 }
+
+#task-detail-container {
+  margin-bottom: 20px;
+}
+
+.task-overview {
+  cursor: pointer;
+}
+
+.task-overview:hover {
+  color: blue;
+  text-decoration: underline;
+}

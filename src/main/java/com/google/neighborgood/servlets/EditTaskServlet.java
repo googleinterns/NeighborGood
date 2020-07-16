@@ -124,6 +124,22 @@ public class EditTaskServlet extends HttpServlet {
       return;
     }
 
+    // Get the task overview from the form input
+    String taskOverview = "";
+
+    input = request.getParameter("task-overview-input");
+    // If the input is valid, set the taskOverview value to the input value
+    if (input != null) {
+      taskOverview = input.trim();
+    }
+
+    // If input task overview is empty, reject the request to edit and send a 400 error.
+    if (taskOverview.equals("")) {
+      System.err.println("The input task overview is empty");
+      response.sendRedirect("/400.html");
+      return;
+    }
+
     // Get task category from the form input
     String taskCategory = request.getParameter("edit-category-input");
     if (taskCategory == null || taskCategory.isEmpty()) {
@@ -142,6 +158,7 @@ public class EditTaskServlet extends HttpServlet {
 
     // Set the details, category,and rewards to the newly input value
     task.setProperty("detail", taskDetail);
+    task.setProperty("overview", taskOverview);
     task.setProperty("reward", rewardPts);
     task.setProperty("category", taskCategory);
     datastore.put(task);
