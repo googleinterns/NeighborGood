@@ -284,3 +284,7 @@ table button:hover i {
   color: blue;
   text-decoration: underline;
 }
+
+#submit-button {
+    cursor: not-allowed;
+}

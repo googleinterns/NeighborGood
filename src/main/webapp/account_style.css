@@ -112,3 +112,7 @@ label {
 #place-input:focus {
   border-color: skyblue;
 }
+
+#submit-button {
+    cursor: not-allowed;
+}

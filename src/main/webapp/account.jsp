@@ -22,7 +22,7 @@
         <div class="empty" style="clear: both"><div/>
         <hr/>
         <div id="form-container">
-            <form id="new-user-info-form" action="/account" method="POST">
+            <form id="user-info-form" action="/account" method="POST">
                 <div>
                     <label for="nickname-input">Your Preferred Nickname:</label>
                     <br/>
@@ -63,7 +63,7 @@
                 <input type="hidden" name="lat" id="lat-input">
                 <input type="hidden" name="lng" id="lng-input">
                 <br/><br/>
-                <button type="submit" id="submit-button"/>GET STARTED</button>
+                <button type="submit" id="submit-button" title="You must mark your personal address on the map" disabled>GET STARTED</button>
                 <br/><br/>
             </form>
         </div>

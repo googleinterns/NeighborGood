@@ -343,7 +343,7 @@ async function displayOfferHelpCompleteTasks() {
     }
 }
 
-/* Calls showNeedHelp and initMap once page has loaded */
+/* Calls showNeedHelp, initMap, and alertUserMarkerRequired once page has loaded */
 if (document.readyState === 'loading') {
     // adds on load event listeners if document hasn't yet loaded
     document.addEventListener('DOMContentLoaded', initMap);
@@ -513,8 +513,6 @@ async function initMap() {
         // When the map is clicked, display a marker and fill out the address info
         map.addListener("click", function(event) {
             var marker = displayMarker(event.latLng);
-            document.getElementById("lat-input").value = event.latLng.lat();
-            document.getElementById("lng-input").value = event.latLng.lng();
             geocodeLatLng(geocoder, map, infowindow, event.latLng, marker);
         });
 
@@ -605,9 +603,19 @@ function displayMarker(position) {
     // There is at most one marker displayed on the map
     if (markers.length > 0) {
         markers[0].setMap(null);
-    }
+    } 
     markers = [];
     markers.push(marker);
+
+    document.getElementById("lat-input").value = position.lat();
+    document.getElementById("lng-input").value = position.lng();
+
+    // Enables user submit form if a marker has been set
+    let submitUserFormButton = document.getElementById("submit-button");
+    submitUserFormButton.disabled = false;
+    submitUserFormButton.style.cursor = "pointer";
+    submitUserFormButton.removeAttribute("title");
+
     return marker;
 }
 
@@ -621,6 +629,14 @@ function deleteMarker(latitude, longitude) {
             return false;
         }
     });
+    document.getElementById("lat-input").value = '';
+    document.getElementById("lng-input").value = '';
+
+    // Disables user submit form if a marker hasn't been set
+    let submitUserFormButton = document.getElementById("submit-button");
+    submitUserFormButton.disabled = true;
+    submitUserFormButton.style.cursor = "not-allowed";
+    submitUserFormButton.setAttribute("title", "You must mark your personal address on the map");
 }
 
 function geocodeLatLng(geocoder, map, infowindow, position, marker) {

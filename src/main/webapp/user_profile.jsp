@@ -170,7 +170,7 @@
     <div class="modalWrapper" id="updateInfoModalWrapper">
         <div class="modal" id="updateInfoModal">
             <span class="close-button" id="info-close-button" onclick="closeInfoModal()">&times;</span>
-            <form id="update-info-form" action="/account" method="POST">
+            <form id="user-info-form" action="/account" method="POST">
                 <h1>EDIT YOUR PERSONAL INFORMATION: </h1>
                 <div>
                     <label for="edit-nickname-input">New nickname:</label>
@@ -213,7 +213,7 @@
                 <input type="hidden" name="lng" id="lng-input">
                 <br/>
                 <br/>
-                <input type="submit" />
+                <input type="submit" id="submit-button" title="You must mark your personal address on the map" disabled/>
             </form>
         </div>
     </div>
