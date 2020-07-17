@@ -185,9 +185,10 @@ public final class UserInfoServletTest {
     try {
       entity = ds.get(userEntityKey);
     } catch (EntityNotFoundException e) {
-      // The entity can't be null
-      assertNotNull(entity);
+      System.err.println("The entity cannot be null");
     }
+    // The entity can't be null
+    assertNotNull(entity);
 
     // Test the stored personal information
     assertEquals("Leonard", (String) entity.getProperty("nickname"));
@@ -209,9 +210,10 @@ public final class UserInfoServletTest {
     try {
       entity = ds.get(userEntityKey);
     } catch (EntityNotFoundException e) {
-      // The entity can't be null
-      assertNotNull(entity);
+      System.err.println("The entity cannot be null");
     }
+    // The entity can't be null
+    assertNotNull(entity);
 
     // Test the stored personal information
     assertEquals("Leo", (String) entity.getProperty("nickname"));
@@ -306,8 +308,6 @@ public final class UserInfoServletTest {
 
     // The entity can't be null
     assertNotNull(entity);
-
-    System.out.println("\n\n\nin test. user id is: " + entity.getKey().getName());
 
     // Test the stored personal information
     assertEquals("Leonard", (String) entity.getProperty("nickname"));
