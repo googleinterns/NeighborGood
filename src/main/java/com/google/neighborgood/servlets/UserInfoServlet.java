@@ -119,7 +119,6 @@ public class UserInfoServlet extends HttpServlet {
         || country.equals("")
         || zipcode.equals("")) {
       System.err.println("At least one input field is empty");
-      response.sendRedirect("/400.html");
       return;
     }
 

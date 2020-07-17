@@ -82,6 +82,12 @@ public class RecognizeServlet extends HttpServlet {
           // Implement the onError() function called when receiving a terminating error
           public void onError(Throwable t) {
             System.err.println(t);
+            try {
+              response.setContentType("text/html;");
+              response.getWriter().println(t);
+            } catch (IOException e) {
+              System.out.println("When printing response, exception " + e + " occurs.");
+            }
           }
         };
 
@@ -149,6 +155,7 @@ public class RecognizeServlet extends HttpServlet {
       }
     } catch (LineUnavailableException e) {
       System.out.println("An exception " + e + " is thrown.");
+      responseObserver.onError(e);
     }
 
     responseObserver.onComplete();

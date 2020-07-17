@@ -182,8 +182,9 @@ public final class EditTaskServletTest {
 
     when(request.getParameter("task-id")).thenReturn(keyString);
     when(request.getParameter("reward-input")).thenReturn("150");
+    when(request.getParameter("task-overview-input")).thenReturn("Task Overview");
     when(request.getParameter("task-detail-input")).thenReturn("Edit Test Task");
-    when(request.getParameter("edit-category-input")).thenReturn("Misc");
+    when(request.getParameter("category-input")).thenReturn("Misc");
 
     // Send a POST request, which will change the task detail, reward and category
     new EditTaskServlet().doPost(request, response);
@@ -203,8 +204,9 @@ public final class EditTaskServletTest {
     // First test the situation where the input reward is not a numeric value
     when(request.getParameter("task-id")).thenReturn(keyString);
     when(request.getParameter("reward-input")).thenReturn("abcdef");
+    when(request.getParameter("task-overview-input")).thenReturn("Task Overview");
     when(request.getParameter("task-detail-input")).thenReturn("Edit Test Task");
-    when(request.getParameter("edit-category-input")).thenReturn("Misc");
+    when(request.getParameter("category-input")).thenReturn("Misc");
 
     StringWriter stringWriter = new StringWriter();
     PrintWriter writer = new PrintWriter(stringWriter);
@@ -241,8 +243,9 @@ public final class EditTaskServletTest {
     // First test the situation where the input task detail is empty
     when(request.getParameter("task-id")).thenReturn(keyString);
     when(request.getParameter("reward-input")).thenReturn("150");
+    when(request.getParameter("task-overview-input")).thenReturn("Task Overview");
     when(request.getParameter("task-detail-input")).thenReturn("");
-    when(request.getParameter("edit-category-input")).thenReturn("Misc");
+    when(request.getParameter("category-input")).thenReturn("Misc");
 
     // Try to catch the error message sent by the EditTaskServlet
     System.setErr(new PrintStream(errContent));
@@ -262,7 +265,7 @@ public final class EditTaskServletTest {
     when(request.getParameter("task-id")).thenReturn(keyString);
     when(request.getParameter("reward-input")).thenReturn("150");
     when(request.getParameter("task-detail-input")).thenReturn("Edit Test Task");
-    when(request.getParameter("edit-category-input")).thenReturn("");
+    when(request.getParameter("category-input")).thenReturn("");
 
     // Try to catch the error message sent by the EditTaskServlet
     System.setErr(new PrintStream(errContent));

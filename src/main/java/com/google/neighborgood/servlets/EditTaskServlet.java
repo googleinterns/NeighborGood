@@ -120,20 +120,34 @@ public class EditTaskServlet extends HttpServlet {
       taskDetail = input.trim();
     }
 
-    // If input task detail is empty, reject the request to edit and send a 400 error.
+    // If input task detail is empty, reject the request to edit.
     if (taskDetail.equals("")) {
       System.err.println("The input task detail is empty");
       response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-      response.sendRedirect("/400.html");
+      return;
+    }
+
+    // Get the task overview from the form input
+    String taskOverview = "";
+
+    input = request.getParameter("task-overview-input");
+    // If the input is valid, set the taskOverview value to the input value
+    if (input != null) {
+      taskOverview = input.trim();
+    }
+
+    // If input task overview is empty, reject the request to edit.
+    if (taskOverview.equals("")) {
+      System.err.println("The input task overview is empty");
+      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       return;
     }
 
     // Get task category from the form input
-    String taskCategory = request.getParameter("edit-category-input");
+    String taskCategory = request.getParameter("category-input");
     if (taskCategory == null || taskCategory.isEmpty()) {
       System.err.println("The task must have a category");
       response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-      response.sendRedirect("/400.html");
       return;
     }
 
@@ -148,6 +162,7 @@ public class EditTaskServlet extends HttpServlet {
 
     // Set the details, category,and rewards to the newly input value
     task.setProperty("detail", taskDetail);
+    task.setProperty("overview", taskOverview);
     task.setProperty("reward", rewardPts);
     task.setProperty("category", taskCategory);
     datastore.put(task);

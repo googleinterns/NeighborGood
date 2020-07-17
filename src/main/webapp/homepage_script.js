@@ -134,9 +134,31 @@ function showCreateTaskModal() {
     var modal = document.getElementById("createTaskModalWrapper");
     modal.style.display = "block";
 }
+
 function closeCreateTaskModal() {
     var modal = document.getElementById("createTaskModalWrapper");
     modal.style.display = "none";
+}
+
+function validateTaskForm(id) {
+    var result = true;
+    var form = document.getElementById(id);
+    var inputName = ["task-overview", "task-detail", "reward", "category"];
+    for (var i = 0; i < inputName.length; i++) {
+        var name = inputName[i];
+        var inputField = form[name.concat("-input")].value.trim();
+        if (inputField === "") {
+            result = false;
+            form[name.concat("-input")].classList.add("highlight");
+        } else {
+            form[name.concat("-input")].classList.remove("highlight");
+        }
+    }
+    if (!result) {
+        alert("All fields are required. Please fill out all fields with non-empty input.");
+        return false;
+    }
+    return true;
 }
 
 /* Function that calls the loadTopScorersBy functions
@@ -181,6 +203,7 @@ function loadTopScorersBy(location) {
         }
     });
 }
+
 // If the user clicks outside of the modals, closes the modals directly
 window.onclick = function(event) {
     var createTaskModal = document.getElementById("createTaskModalWrapper");
@@ -191,6 +214,34 @@ window.onclick = function(event) {
     if (event.target == topScoresModal) {
         topScoresModal.style.display = "none";
     }
+
+    var infoModal = document.getElementById("taskInfoModalWrapper");
+    if (event.target == infoModal) {
+        infoModal.style.display = "none";
+    }
+}
+
+/* Leonard's implementation of showing task details in a pop up window */
+async function getTaskInfo(keyString) {
+    const queryURL = "/tasks/info?key=" + keyString;
+    const request = new Request(queryURL, {method: "GET"});
+    const response = await fetch(request);
+    const info = await response.json();
+    return info;
+}
+
+async function showTaskInfo(keyString) {
+    const info = await getTaskInfo(keyString);
+    var detailContainer = document.getElementById("task-detail-container");
+    detailContainer.innerHTML = "";
+    detailContainer.appendChild(document.createTextNode(info.detail));
+    var modal = document.getElementById("taskInfoModalWrapper");
+    modal.style.display = "block";
+}
+
+function closeTaskInfoModal() {
+    var modal = document.getElementById("taskInfoModalWrapper");
+    modal.style.display = "none";
 }
 
 /* Function dynamically adds Maps API and
@@ -226,24 +277,24 @@ function getUserLocation() {
                 var location = {lat: position.coords.latitude, lng: position.coords.longitude};
                 resolve(location);
             }, function(err) {
-                // Check to see if this failed because we're in an insecure
-                // context, such as a local dev environment that isn't
-                // http://localhost (https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts).
-                if (err.code === 1 && !window.isSecureContext) {
-                    if (config.LOCAL_DEV_LAT_LNG) {
-                        resolve(config.LOCAL_DEV_LAT_LNG);
-                    } else {
+                let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
+                const request = new Request(url, {method: "POST"});
+                fetch(request).then(response => {
+                    if (response.status == 400 || response.status == 403 || response.status == 404) {
                         reject("User location failed");
+                    } else {
+                        response.json().then(jsonresponse => {
+                            resolve(jsonresponse["location"]);
+                        });
                     }
-                } else {
-                    reject("User location failed");
-                }
+                });
             });
         } else {
             reject("User location is not supported by this browser");
         }
     });
 }
+       
 
 /* Function that returns a promise to return a neighborhood
 array that includes the postal code and country */
