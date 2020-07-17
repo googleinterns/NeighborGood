@@ -185,7 +185,7 @@
                 </div>
                 <br/>
                 <textarea name="address-input" id="edit-address-input"></textarea>
-                <p id="rest-map">Click to mark your personal address on the map!</p>
+                <p id="rest-map">Click to mark your personal address on the map!<span class="req">*</span></p>
                 <input id="place-input" class="controls" type="text" placeholder="Search Box">
                 <div id="map"></div>
                 <br/><br/>
