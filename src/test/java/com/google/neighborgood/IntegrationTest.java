@@ -185,15 +185,18 @@ public class IntegrationTest {
     goToUserPage();
     ifLaggingThenRefresh();
 
-    // Randomizes task contents
-    Random random = new Random();
-    String taskDetail = TASK_DETAIL + random.nextInt(1000);
-    String taskOverview = TASK_OVERVIEW + random.nextInt(1000);
-    String rewardPoints = Integer.toString(random.nextInt(201));
-    int categoryOptionIndex = random.nextInt(TASK_CATEGORIES.length);
-    String taskCategory = TASK_CATEGORIES[categoryOptionIndex];
+    // Adds 10 tasks
+    for (int i = 0; i < 10; i++) {
+      // Randomizes task contents
+      Random random = new Random();
+      String taskDetail = TASK_DETAIL + random.nextInt(1000);
+      String taskOverview = TASK_OVERVIEW + random.nextInt(1000);
+      String rewardPoints = Integer.toString(random.nextInt(201));
+      int categoryOptionIndex = random.nextInt(TASK_CATEGORIES.length);
+      String taskCategory = TASK_CATEGORIES[categoryOptionIndex];
 
-    addTask(taskDetail, rewardPoints, categoryOptionIndex, taskOverview);
+      addTask(taskDetail, rewardPoints, categoryOptionIndex, taskOverview);
+    }
 
     // User should be redirected to user profile page after adding a task
     assertTrue(
@@ -433,6 +436,10 @@ public class IntegrationTest {
     }
     // updates recentTask
     recentTask.put("status", "IN PROGRESS");
+
+    // Refreshes page due to flakiness of test caused by the partial refresh of the div in the page.
+    // Without refreshing this often resulted in a a stale element error
+    driver.navigate().refresh();
 
     // Content targets that will be verified
     String[] taskContentsTarget = {"overview", "helper", "status"};
