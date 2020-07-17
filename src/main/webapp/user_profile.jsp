@@ -103,14 +103,16 @@
             <form id="new-task-form" action="/tasks" method="POST" onsubmit="return validateTaskForm('new-task-form')">
                 <h1>CREATE A NEW TASK: </h1>
                 <div>
-                    <label for="task-overview-input">Task Overview<span class="req">*</span></label>
+                    <label for="task-overview-input">Task Overview<span class="req">*</span>
+                        <span class="mic-container"><i class="fa fa-microphone" onclick="startRecognizing()"></i></span></label>
                     <br/>
                 </div>
                 <br/>
                 <textarea name="task-overview-input" id="task-overview-input" placeholder="Briefly describe your task here:"></textarea>
                 <br/><br/>
                 <div>
-                    <label for="task-detail-input">Task Detail<span class="req">*</span></label>
+                    <label for="task-detail-input">Task Detail<span class="req">*</span>
+                        <span class="mic-container"><i class="fa fa-microphone" onclick="startRecognizing()"></i></span></label>
                     <br/>
                 </div>
                 <br/>

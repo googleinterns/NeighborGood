@@ -116,7 +116,7 @@ public class RecognizeServlet extends HttpServlet {
 
     // Set the sample rate hertz of the audio format to 16000, sample size to 16bits and only one
     // channel
-    AudioFormat audioFormat = new AudioFormat(16000, 16, 1, true, false);
+    AudioFormat audioFormat = new AudioFormat(16000, 8, 2, true, true);
 
     // Receive input from the device microphone stream
     DataLine.Info targetInfo = new Info(TargetDataLine.class, audioFormat);
@@ -126,7 +126,7 @@ public class RecognizeServlet extends HttpServlet {
       System.err.println("Microphone not supported");
       response.setContentType("text/html;");
       response.getWriter().println("Microphone is not supported on the device");
-      System.exit(0);
+      return;
     }
 
     try {
