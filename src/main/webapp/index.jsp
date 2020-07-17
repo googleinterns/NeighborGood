@@ -182,12 +182,12 @@
                 </table>
               </div> 
               <!--Neighborhood Top Scorers-->
-              <div id="neighborhood-topscore" class="topScoresDiv">
-                <h2>Nearby Neighbors</h2>
+              <div id="nearby-topscore" class="topScoresDiv">
+                <h2>Near You</h2>
                 <table class="topScoresTable">
                 <%
                 for (int rank = 1; rank <= 10; rank++) {
-                  String rowId = "neighborhood" + rank;
+                  String rowId = "nearby" + rank;
                 %> 
                   <tr id="<%=rowId%>">
                     <td class="topscore-rank topscores"><%=rank%>.</td>

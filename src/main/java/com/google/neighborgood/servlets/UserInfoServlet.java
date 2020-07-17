@@ -28,6 +28,7 @@ import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import com.google.neighborgood.User;
+import com.google.neighborgood.helper.UnitConversion;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,8 +48,14 @@ public class UserInfoServlet extends HttpServlet {
     // Retrieves user accounts for the topscorers board
     if (request.getParameterMap().containsKey("action")
         && request.getParameter("action").equals("topscorers")) {
-
-      List<User> users = retrieveTopTenUsers(request, userService, datastore);
+      List<User> users = new ArrayList<User>();
+      try {
+        users = retrieveTopTenUsers(request, userService, datastore);
+      } catch (IllegalArgumentException e) {
+        response.setContentType("text/html");
+        response.getWriter().println("Your location coordinates are invalid");
+        return;
+      }
       Gson gson = new Gson();
       response.setContentType("application/json;");
       response.getWriter().println(gson.toJson(users));
@@ -177,14 +184,22 @@ public class UserInfoServlet extends HttpServlet {
     Query query = new Query("UserInfo").addSort("points", SortDirection.DESCENDING);
 
     // Adds additional filters for the nearby neighbors board
-    if (request.getParameterMap().containsKey("zipcode")
-        && request.getParameterMap().containsKey("country")) {
-      String zipcode = request.getParameter("zipcode");
-      String country = request.getParameter("country");
-      List<Query.Filter> filters = new ArrayList<Query.Filter>();
-      filters.add(new Query.FilterPredicate("zipcode", Query.FilterOperator.EQUAL, zipcode));
-      filters.add(new Query.FilterPredicate("country", Query.FilterOperator.EQUAL, country));
-      query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, filters));
+    if (request.getParameterMap().containsKey("lat")
+        && request.getParameterMap().containsKey("lng")) {
+      Float lat = null;
+      Float lng = null;
+      try {
+        lat = Float.parseFloat(request.getParameter("lat"));
+        lng = Float.parseFloat(request.getParameter("lng"));
+      } catch (NumberFormatException e) {
+        System.err.println("Invalid location coordinates");
+        throw new IllegalArgumentException("Could not convert lat and/or lng to float");
+      }
+      GeoPt userLocation = new GeoPt(lat, lng);
+      double FIVE_MILE_RADIUS = UnitConversion.milesToMeters(5);
+      query.setFilter(
+          new Query.StContainsFilter(
+              "location", new Query.GeoRegion.Circle(userLocation, FIVE_MILE_RADIUS)));
     }
 
     // Gathers the top 10 results
@@ -194,7 +209,6 @@ public class UserInfoServlet extends HttpServlet {
 
     for (Entity entity : results) {
       User user = new User(entity);
-
       if (userService.isUserLoggedIn()
           && user.getUserId().equals(userService.getCurrentUser().getUserId())) {
         user.setCurrentUser();

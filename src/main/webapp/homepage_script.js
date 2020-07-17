@@ -149,9 +149,9 @@ function closeCreateTaskModal() {
 /* Function that calls the loadTopScorersBy functions
    and then shows the top scores modal */
 function showTopScoresModal() {
-    loadTopScorersBy("world");
+    loadTopScorers("world");
     if (userNeighborhoodIsKnown()){
-      loadTopScorersBy("neighborhood");
+      loadTopScorers("nearby");
     }
     document.getElementById("topScoresModalWrapper").style.display = "block";
 }
@@ -162,10 +162,10 @@ function closeTopScoresModal() {
 }
 
 /* Function loads the data for the top scorers table */
-function loadTopScorersBy(location) {
+function loadTopScorers(location) {
     let url = "/account?action=topscorers";
-    if (location === "neighborhood") {
-      url += "&zipcode=" + neighborhood[0] + "&country=" + neighborhood[1];
+    if (location === "nearby") {
+      url += "&lat=" + userLocation.lat + "&lng=" + userLocation.lng;
     }
     fetch(url)
       .then(response => response.json())

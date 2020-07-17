@@ -29,6 +29,7 @@ import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import com.google.neighborgood.helper.RetrieveUserInfo;
 import com.google.neighborgood.helper.RewardingPoints;
+import com.google.neighborgood.helper.UnitConversion;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,7 +68,7 @@ public class TaskServlet extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     GeoPt userLocation = new GeoPt(lat, lng);
-    double FIVE_MILE_RADIUS = milesToMeters(5);
+    double FIVE_MILE_RADIUS = UnitConversion.milesToMeters(5);
 
     Query query = new Query("Task").addSort("timestamp", SortDirection.DESCENDING);
 
@@ -283,9 +284,5 @@ public class TaskServlet extends HttpServlet {
 
     // Redirect to the user profile page
     response.sendRedirect("/user_profile.jsp");
-  }
-
-  private double milesToMeters(double miles) {
-    return (miles * 1609.344);
   }
 }
