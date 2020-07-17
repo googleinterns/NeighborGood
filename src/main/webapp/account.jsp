@@ -60,6 +60,8 @@
                 </div>
                 <br/>
                 <input type="text" name="phone-input" id="phone-input" required="true" placeholder="Input your phone number here:">
+                <input type="hidden" name="lat" id="lat-input">
+                <input type="hidden" name="lng" id="lng-input">
                 <br/><br/>
                 <button type="submit" id="submit-button"/>GET STARTED</button>
                 <br/><br/>

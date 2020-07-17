@@ -18,6 +18,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.GeoPt;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.FilterOperator;
@@ -99,6 +100,8 @@ public class UserInfoServlet extends HttpServlet {
     String phone = "";
     String zipcode = "";
     String country = "";
+    Float lat = null;
+    Float lng = null;
     String nicknameInput = request.getParameter("nickname-input");
     String addressInput = request.getParameter("address-input");
     String phoneInput = request.getParameter("phone-input");
@@ -106,6 +109,15 @@ public class UserInfoServlet extends HttpServlet {
     String countryInput = request.getParameter("country-input");
     String email = userService.getCurrentUser().getEmail();
     String userId = userService.getCurrentUser().getUserId();
+
+    try {
+      lat = Float.parseFloat(request.getParameter("lat"));
+      lng = Float.parseFloat(request.getParameter("lng"));
+    } catch (NumberFormatException e) {
+      System.err.println("Invalid location coordinates");
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid location coordinates");
+    }
+    GeoPt location = new GeoPt(lat, lng);
 
     if (nicknameInput != null) nickname = nicknameInput.trim();
     if (addressInput != null) address = addressInput.trim();
@@ -135,6 +147,7 @@ public class UserInfoServlet extends HttpServlet {
       entity.setProperty("address", address);
       entity.setProperty("zipcode", "59715");
       entity.setProperty("country", "United States");
+      entity.setProperty("location", location);
       entity.setProperty("phone", phone);
       entity.setProperty("email", email);
       // "userId" now becomes obsolete as the entity
@@ -151,6 +164,7 @@ public class UserInfoServlet extends HttpServlet {
       entity.setProperty("phone", phone);
       entity.setProperty("country", country);
       entity.setProperty("zipcode", zipcode);
+      entity.setProperty("location", location);
     }
     datastore.put(entity);
 

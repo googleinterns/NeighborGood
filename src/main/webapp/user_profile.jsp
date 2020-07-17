@@ -209,6 +209,8 @@
                 </div>
                 <br/>
                 <input type="text" name="phone-input" id="edit-phone-number-input" required="true">
+                <input type="hidden" name="lat" id="lat-input">
+                <input type="hidden" name="lng" id="lng-input">
                 <br/>
                 <br/>
                 <input type="submit" />

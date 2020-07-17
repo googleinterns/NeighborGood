@@ -513,6 +513,8 @@ async function initMap() {
         // When the map is clicked, display a marker and fill out the address info
         map.addListener("click", function(event) {
             var marker = displayMarker(event.latLng);
+            document.getElementById("lat-input").value = event.latLng.lat();
+            document.getElementById("lng-input").value = event.latLng.lng();
             geocodeLatLng(geocoder, map, infowindow, event.latLng, marker);
         });
 
@@ -547,7 +549,17 @@ async function initMap() {
         });
 
         function onError() {
-            console.log("Unable to resolve the user's current location");
+            let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
+            const request = new Request(url, {method: "POST"});
+            fetch(request).then(response => {
+                if (response.status == 400 || response.status == 403 || response.status == 404) {
+                    console.log("Unable to resolve the user's current location");
+                } else {
+                    response.json().then(jsonresponse => {
+                        map.setCenter(jsonresponse["location"]);
+                    });
+                }
+            });
         }
 
         function onSuccess(geo) {
@@ -561,7 +573,7 @@ async function initMap() {
         }
 
         if (!navigator.geolocation) {
-            onError();
+            console.log("Unable to resolve the user's current location");
         } else {
             await navigator.geolocation.getCurrentPosition(onSuccess, onError);
         }

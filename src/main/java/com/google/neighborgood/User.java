@@ -15,6 +15,7 @@
 package com.google.neighborgood;
 
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.GeoPt;
 
 public final class User {
   private final String nickname;
@@ -25,6 +26,7 @@ public final class User {
   private final String email;
   private final String userId;
   private final long points;
+  private final GeoPt location;
   private boolean isCurrentUser;
 
   public User(Entity entity) {
@@ -37,6 +39,7 @@ public final class User {
     this.email = (String) entity.getProperty("email");
     this.userId = (String) entity.getProperty("userId");
     this.points = (Long) entity.getProperty("points");
+    this.location = (GeoPt) entity.getProperty("location");
     this.isCurrentUser = false;
   }
 
