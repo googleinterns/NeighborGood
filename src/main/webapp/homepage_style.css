@@ -24,13 +24,21 @@ body {
 }
 
 /* Header Styling */
+header {
+  top: 0;
+  width: 100%;
+  z-index: 15;
+  background-color: white;
+}
+
 nav {
   display: flex;
   justify-content: space-between;
   position: fixed;
   width: 100%;
   top: 0;
-  padding-bottom: 1em;
+  z-index: 15;
+  background-color: white;
 }
 
 #dashboard-icon-container {
@@ -42,7 +50,7 @@ nav {
   padding-right: 1em;
   padding-top: 0.8em;
   text-align: right;
-  width: 10vw;
+  width: calc(calc(100vw - 60em) / 2);
 }
 
 a {
@@ -71,9 +79,8 @@ i:hover {
 #title {
   font-size: 4em;
   text-align: center;
-  margin-top: 1em;
-  margin-bottom: 0.4em;
-  padding-top: 0.5em;
+  margin-top: 1.5em;
+  margin-bottom: 0;
 }
 
 .login-messages {
@@ -91,19 +98,21 @@ section {
 /* Styling for control bar (categories and add task) */
 #control-bar {
   display: flex;
+  margin: auto;
+  max-width: 55em;
   justify-content: space-between;
   padding-bottom: 1.5em;
 }
 
 #control-bar-message-wrapper {
-  width: 100%;
-  max-width: 55em;
-  z-index: 2;
   background-image: linear-gradient(to bottom, white 90%, transparent);
-  padding-bottom: 1em;
   padding-top: 1em;
+  position: sticky;
+  position: -webkit-sticky;
   top: 0;
-  transition: 0.3s;
+  width: 101%;
+  z-index: 15;
+  margin: -1px;
 }
 
 #categories {
@@ -165,6 +174,7 @@ section {
   border-right: solid 2px;
   border-left: solid 2px;
   transition: 0.5s;
+  margin-top: 0.5em;
 }
 
 .task {
@@ -189,6 +199,7 @@ section {
 .help-out {
   cursor: pointer;
   font-weight: bold;
+  text-align: right;
 }
 
 .help-out:hover {
@@ -335,14 +346,6 @@ td {
 }
 
 @media only screen and (max-width: 600px) {
-  header {
-    position: fixed;
-    z-index: 3;
-    width: 100%;
-    background-color: white;
-    top: 0;
-  }
-
   #title {
     font-size: 2.5em;
     padding-top: 0.8em;
@@ -367,9 +370,7 @@ td {
   }
 
   #control-bar-message-wrapper {
-    position: fixed;
-    top: 7.5em;
-    left: 0;
+    top: 70px;
     background-color: white;
     background-image: none;
   }
@@ -387,10 +388,6 @@ td {
 
   #addtaskbutton {
     font-size: 2.5em;
-  }
-
-  #tasks-list {
-    margin-top: 18.8em;
   }
 
   .results-message {
@@ -424,57 +421,11 @@ td {
 }
 
 @media only screen and (min-width: 600px) and (max-width: 1203px) {
-  #title {
-    padding-top: 0;
-    margin-bottom: 0;
-    margin-top: -3.4em;
-    z-index: 9;
-    position: fixed;
-    width: 100%;
-    background-color: white;
-  }
-
-  header {
-    position: fixed;
-    background-color: white;
-    z-index: 4;
-    width: 100%;
-  }
-
-  nav {
-    background-color: white;
-  }
-
-  #control-bar-message-wrapper {
-    position: fixed;
-    z-index: 4;
-    top: 9em;
-  }
-
-  #tasks-list {
-    margin-top: 18em;
-    width: 99%;
-    margin-right: auto;
-    margin-left: auto;
-  }
-
   #login-logout {
     width: auto;
   }
 
-  #control-bar {
-    max-width: 95vw;
+  #control-bar-message-wrapper{
+    top: 70px;
   }
-}
-
-#task-detail-container {
-  margin-bottom: 20px;
-}
-
-.task-content {
-  cursor: pointer;
-}
-
-.task-content:hover {
-  color: gray;
 }
