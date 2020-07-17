@@ -85,7 +85,7 @@ label {
   transition: all 0.5s ease;
   -webkit-appearance: none;
   width: 100%;
-  cursor: pointer;
+  cursor: not-allowed;
 }
 
 #submit-button:hover,
@@ -111,8 +111,4 @@ label {
 
 #place-input:focus {
   border-color: skyblue;
-}
-
-#submit-button {
-    cursor: not-allowed;
 }
