@@ -27,7 +27,7 @@ body {
 header {
   top: 0;
   width: 100%;
-  z-index: 15;
+  z-index: 2;
   background-color: white;
 }
 
@@ -37,8 +37,7 @@ nav {
   position: fixed;
   width: 100%;
   top: 0;
-  z-index: 15;
-  background-color: white;
+  z-index: 2;
 }
 
 #dashboard-icon-container {
@@ -79,7 +78,7 @@ i:hover {
 #title {
   font-size: 4em;
   text-align: center;
-  margin-top: 1.5em;
+  margin-top: 1.2em;
   margin-bottom: 0;
 }
 
@@ -111,8 +110,9 @@ section {
   position: -webkit-sticky;
   top: 0;
   width: 101%;
-  z-index: 15;
-  margin: -1px;
+  z-index: 2;
+  margin: -3px;
+  padding-bottom: 1em;
 }
 
 #categories {
@@ -170,26 +170,31 @@ section {
 
 #tasks-list {
   display: none;
-  border-top: solid 2px;
-  border-right: solid 2px;
-  border-left: solid 2px;
   transition: 0.5s;
-  margin-top: 0.5em;
 }
 
 .task {
-  border-bottom: solid 2px;
   position: relative;
+  margin-bottom: 1em;
+  box-shadow: 0px 0 2px 1px rgba(0, 0, 0, 0.25);
 }
 
-.task-container {
-  padding: 1em;
+.task:hover {
+    box-shadow: 0px 0 5px 1px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
 }
 
 .task-header {
   display: flex;
   padding-bottom: 1em;
   justify-content: space-between;
+  background-color: #eee;
+  padding: 0.8em 1em;
+  font-weight: bold;
+}
+
+.task-content {
+  padding: 1em;
 }
 
 .user-nickname {
@@ -198,7 +203,6 @@ section {
 
 .help-out {
   cursor: pointer;
-  font-weight: bold;
   text-align: right;
 }
 
@@ -212,17 +216,23 @@ section {
 
 .task-footer {
   font-style: italic;
-  padding-top: 1em;
   display: flex;
   justify-content: space-between;
+  padding-left: 1em;
+  padding-bottom: 1em;
+  padding-right: 1em;
+}
+
+.task-date-time {
+  color: gray;
+  font-style: normal;
 }
 
 .help-overlay {
   position: absolute;
   z-index: 1;
   display: none;
-  background: rgba(236, 236, 240, 0.85);
-  backdrop-filter: blur(4px);
+  background: #eee;
   width: 100%;
   height: 100%;
   text-align: center;
@@ -249,8 +259,8 @@ section {
 .modalWrapper {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
-  z-index: 4; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
+  z-index: 3; /* Sit on top */
+  padding-top: 200px; /* Location of the box */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -302,9 +312,8 @@ section {
   cursor: pointer;
 }
 
-/* Top Scores modal specific styling */
-#topScoresModalWrapper {
-  padding-top: 200px;
+#task-detail-container {
+    padding-bottom: 1em;
 }
 
 #topScoresModal {
@@ -373,6 +382,8 @@ td {
     top: 70px;
     background-color: white;
     background-image: none;
+    width: 102%;
+    margin-left: -5px;
   }
 
   .categories {
@@ -407,7 +418,7 @@ td {
     padding: 0 0.5em;
   }
 
-  #topScoresModal {
+  .modal {
     width: 80%;
   }
 
@@ -417,6 +428,7 @@ td {
 
   nav {
     padding-bottom: 0;
+    background-color: white;
   }
 }
 
@@ -427,5 +439,9 @@ td {
 
   #control-bar-message-wrapper{
     top: 70px;
+  }
+
+  nav {
+    background-color: white;
   }
 }
