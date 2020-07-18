@@ -176,17 +176,16 @@ section {
 .task {
   position: relative;
   margin-bottom: 1em;
-  box-shadow: 0px 0 2px 1px rgba(0, 0, 0, 0.25);
+  box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.25);
 }
 
 .task:hover {
-    box-shadow: 0px 0 5px 1px rgba(0, 0, 0, 0.25);
-    cursor: pointer;
+  box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
 }
 
 .task-header {
   display: flex;
-  padding-bottom: 1em;
   justify-content: space-between;
   background-color: #eee;
   padding: 0.8em 1em;
@@ -313,7 +312,7 @@ section {
 }
 
 #task-detail-container {
-    padding-bottom: 1em;
+  padding-bottom: 1em;
 }
 
 #topScoresModal {
@@ -437,7 +436,7 @@ td {
     width: auto;
   }
 
-  #control-bar-message-wrapper{
+  #control-bar-message-wrapper {
     top: 70px;
   }
 
