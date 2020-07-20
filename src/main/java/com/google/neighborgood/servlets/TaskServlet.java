@@ -50,6 +50,7 @@ public class TaskServlet extends HttpServlet {
     String userId = userLoggedIn ? userService.getCurrentUser().getUserId() : "null";
     Float lat = null;
     Float lng = null;
+    double mile_radius = UnitConversion.milesToMeters(5);
 
     if (request.getParameterMap().containsKey("lat")
         && request.getParameterMap().containsKey("lng")) {
@@ -65,10 +66,19 @@ public class TaskServlet extends HttpServlet {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Location coordinates are missing");
     }
 
+    if (request.getParameterMap().containsKey("miles")) {
+      double miles = 5;
+      try {
+        miles = Double.parseDouble(request.getParameter("miles"));
+      } catch (NumberFormatException e) {
+        System.err.println("Invalid miles input. Using 5 miles as default.");
+      }
+      mile_radius = UnitConversion.milesToMeters(miles);
+    }
+
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     GeoPt userLocation = new GeoPt(lat, lng);
-    double FIVE_MILE_RADIUS = UnitConversion.milesToMeters(5);
 
     Query query = new Query("Task").addSort("timestamp", SortDirection.DESCENDING);
 
@@ -76,7 +86,7 @@ public class TaskServlet extends HttpServlet {
     List<Query.Filter> filters = new ArrayList<Query.Filter>();
     filters.add(
         new Query.StContainsFilter(
-            "location", new Query.GeoRegion.Circle(userLocation, FIVE_MILE_RADIUS)));
+            "location", new Query.GeoRegion.Circle(userLocation, mile_radius)));
     filters.add(new Query.FilterPredicate("status", Query.FilterOperator.EQUAL, "OPEN"));
 
     // Applies a category filter, if any
