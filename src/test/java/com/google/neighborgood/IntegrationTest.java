@@ -79,12 +79,12 @@ public class IntegrationTest {
     // polling every second
     wait =
         new FluentWait<WebDriver>(driver)
-            .withTimeout(Duration.ofSeconds(10))
+            .withTimeout(Duration.ofSeconds(20))
             .pollingEvery(Duration.ofSeconds(1))
             .ignoring(NoSuchElementException.class);
 
     js = (JavascriptExecutor) driver;
-    clearAllDatastoreEntities();
+    // clearAllDatastoreEntities();
   }
 
   @AfterClass
