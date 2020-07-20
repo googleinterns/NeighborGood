@@ -37,6 +37,13 @@ import org.openqa.selenium.support.ui.Select;
 
 @RunWith(JUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+/**
+ * Due to how the interactions from one test build up onto the other as part of this integration
+ * test, the FixMethodOrder decorator is used to guarantee order of execution of tests. In a future,
+ * the setup required from previous tests will be done without the use of webdriver in an attempt to
+ * make each test independent of each other and thus eliminating the use of the FixMethodOrder
+ * decorator
+ */
 public class IntegrationTest {
 
   private static WebDriver driver;
@@ -73,7 +80,7 @@ public class IntegrationTest {
     // polling every second
     wait =
         new FluentWait<WebDriver>(driver)
-            .withTimeout(Duration.ofSeconds(60))
+            .withTimeout(Duration.ofSeconds(10))
             .pollingEvery(Duration.ofSeconds(1))
             .ignoring(NoSuchElementException.class);
 
@@ -737,16 +744,18 @@ public class IntegrationTest {
   private void loginUser(String email) {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     // clicks on login link element
-    wait.until(
-            new Function<WebDriver, WebElement>() {
-              public WebElement apply(WebDriver driver) {
-                return driver.findElement(By.id("loginLogoutMessage"));
-              }
-            })
-        .click();
-
-    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-
+    for (int i = 0; i < 3; i++) {
+      if (!driver.getCurrentUrl().contains("_ah/login")) {
+        wait.until(
+                new Function<WebDriver, WebElement>() {
+                  public WebElement apply(WebDriver driver) {
+                    return driver.findElement(By.id("loginLogoutMessage"));
+                  }
+                })
+            .click();
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+      }
+    }
     // enters user email
     js.executeScript("document.getElementById('email').value='" + email + "';");
 
@@ -765,29 +774,35 @@ public class IntegrationTest {
   private void backToHome() {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     // clicks on back to home button
-    wait.until(
-            new Function<WebDriver, WebElement>() {
-              public WebElement apply(WebDriver driver) {
-                return driver.findElement(By.id("backtohome"));
-              }
-            })
-        .click();
-    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+    for (int i = 0; i < 3; i++) {
+      if (!driver.getCurrentUrl().contains("index")) {
+        wait.until(
+                new Function<WebDriver, WebElement>() {
+                  public WebElement apply(WebDriver driver) {
+                    return driver.findElement(By.id("backtohome"));
+                  }
+                })
+            .click();
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+      }
+    }
   }
 
   /** Sends driver to User Page */
   private void goToUserPage() {
-    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-
     // clicks on userpage button
-    wait.until(
-            new Function<WebDriver, WebElement>() {
-              public WebElement apply(WebDriver driver) {
-                return driver.findElement(By.xpath("//div[@id='dashboard-icon-container']/a"));
-              }
-            })
-        .click();
-    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+    for (int i = 0; i < 3; i++) {
+      if (!driver.getCurrentUrl().contains("user_profile")) {
+        wait.until(
+                new Function<WebDriver, WebElement>() {
+                  public WebElement apply(WebDriver driver) {
+                    return driver.findElement(By.xpath("//div[@id='dashboard-icon-container']/a"));
+                  }
+                })
+            .click();
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+      }
+    }
   }
 
   /** Sends driver to the offer help table within the user page */
@@ -905,16 +920,19 @@ public class IntegrationTest {
 
   /** Logs out user - takes logout link id as a parameter */
   private void logOut(String logoutId) {
-    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     // clicks on logout button
-    wait.until(
-            new Function<WebDriver, WebElement>() {
-              public WebElement apply(WebDriver driver) {
-                return driver.findElement(By.id(logoutId));
-              }
-            })
-        .click();
-    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+    for (int i = 0; i < 3; i++) {
+      if (!driver.getCurrentUrl().contains("index")) {
+        wait.until(
+                new Function<WebDriver, WebElement>() {
+                  public WebElement apply(WebDriver driver) {
+                    return driver.findElement(By.id(logoutId));
+                  }
+                })
+            .click();
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+      }
+    }
   }
 
   /**
@@ -993,9 +1011,10 @@ public class IntegrationTest {
 
   /** Attempts to auto refresh the page if the page is lagging */
   private void ifLaggingThenRefresh() {
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     while (js.executeScript("return document.readyState").equals("loading")) {
-      driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
       driver.navigate().refresh();
+      driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     }
   }
 
