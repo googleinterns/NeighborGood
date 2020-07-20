@@ -33,7 +33,6 @@ import org.junit.runners.MethodSorters;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Select;
 
 @RunWith(JUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -85,7 +84,7 @@ public class IntegrationTest {
             .ignoring(NoSuchElementException.class);
 
     js = (JavascriptExecutor) driver;
-    clearAllDatastoreEntities(driver);
+    clearAllDatastoreEntities();
   }
 
   @AfterClass
@@ -507,23 +506,18 @@ public class IntegrationTest {
   }
 
   /** Clears entities from Datastore so `mvn clean` isn't necessary before test class */
-  private static void clearAllDatastoreEntities(WebDriver driver) {
+  private static void clearAllDatastoreEntities() {
     driver.get("http://localhost:8080/_ah/admin");
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-    WebElement entityKindSelect =
-        wait.until(
-            new Function<WebDriver, WebElement>() {
-              public WebElement apply(WebDriver driver) {
-                return driver.findElement(By.id("kind_input"));
-              }
-            });
+
     // Retrieves number of Entity Kind select options to iterate through them
-    Select kindSelect = new Select(entityKindSelect);
-    List<WebElement> allEntityKinds = kindSelect.getOptions();
+    Long numOfSelectOptions =
+        (Long) js.executeScript("return document.getElementById('kind_input').options.length;");
+    System.out.println("\n\n" + numOfSelectOptions);
     WebElement listButtonElement;
     WebElement allKeysElement;
     WebElement deleteButtonElement;
-    for (int j = 1; j < allEntityKinds.size(); j++) {
+    for (int j = 0; j < numOfSelectOptions; j++) {
       // clicks on list button
       wait.until(
               new Function<WebDriver, WebElement>() {
@@ -921,18 +915,14 @@ public class IntegrationTest {
   /** Logs out user - takes logout link id as a parameter */
   private void logOut(String logoutId) {
     // clicks on logout button
-    for (int i = 0; i < 3; i++) {
-      if (!driver.getCurrentUrl().contains("index")) {
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.id(logoutId));
-                  }
-                })
-            .click();
-        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-      }
-    }
+    wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id(logoutId));
+              }
+            })
+        .click();
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
   /**
@@ -1050,7 +1040,7 @@ public class IntegrationTest {
               }
             })
         .click();
-    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
     return taskDetail;
   }
