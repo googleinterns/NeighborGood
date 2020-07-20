@@ -18,6 +18,48 @@ const GOOGLE_KIRKLAND_LAT = 47.669846;
 const GOOGLE_KIRKLAND_LNG = -122.1996099;
 const MAPSKEY = config.MAPS_KEY;
 
+function validateTaskForm(id) {
+    var result = true;
+    var form = document.getElementById(id);
+    var inputName = ["task-overview", "task-detail", "reward", "category", "lat", "lng"];
+    for (var i = 0; i < inputName.length; i++) {
+        var name = inputName[i];
+        var inputField = form[name.concat("-input")].value.trim();
+        if (inputField === "") {
+            result = false;
+            form[name.concat("-input")].classList.add("highlight");
+        } else {
+            form[name.concat("-input")].classList.remove("highlight");
+        }
+    }
+    if (!result) {
+        alert("All fields are required. Please fill out all fields with non-empty input and mark your personal address on the map.");
+        return false;
+    }
+    return true;
+}
+
+function validateInfoForm(id) {
+    var result = true;
+    var form = document.getElementById(id);
+    var inputName = ["nickname", "address", "zipcode", "country", "phone"];
+    for (var i = 0; i < inputName.length; i++) {
+        var name = inputName[i];
+        var inputField = form[name.concat("-input")].value.trim();
+        if (inputField === "") {
+            result = false;
+            form[name.concat("-input")].classList.add("highlight");
+        } else {
+            form[name.concat("-input")].classList.remove("highlight");
+        }
+    }
+    if (!result) {
+        alert("All fields are required. Please fill out all fields with non-empty input.");
+        return false;
+    }
+    return true;
+}
+
 async function getTaskInfo(keyString) {
     const queryURL = "/tasks/info?key=" + keyString;
     const request = new Request(queryURL, {method: "GET"});

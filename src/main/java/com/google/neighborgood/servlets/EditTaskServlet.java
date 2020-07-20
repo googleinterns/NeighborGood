@@ -117,10 +117,9 @@ public class EditTaskServlet extends HttpServlet {
       taskDetail = input.trim();
     }
 
-    // If input task detail is empty, reject the request to edit and send a 400 error.
+    // If input task detail is empty, reject the request to edit.
     if (taskDetail.equals("")) {
       System.err.println("The input task detail is empty");
-      response.sendRedirect("/400.html");
       return;
     }
 
@@ -133,18 +132,16 @@ public class EditTaskServlet extends HttpServlet {
       taskOverview = input.trim();
     }
 
-    // If input task overview is empty, reject the request to edit and send a 400 error.
+    // If input task overview is empty, reject the request to edit.
     if (taskOverview.equals("")) {
       System.err.println("The input task overview is empty");
-      response.sendRedirect("/400.html");
       return;
     }
 
     // Get task category from the form input
-    String taskCategory = request.getParameter("edit-category-input");
+    String taskCategory = request.getParameter("category-input");
     if (taskCategory == null || taskCategory.isEmpty()) {
       System.err.println("The task must have a category");
-      response.sendRedirect("/400.html");
       return;
     }
 
