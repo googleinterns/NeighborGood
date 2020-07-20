@@ -85,7 +85,6 @@ label {
   transition: all 0.5s ease;
   -webkit-appearance: none;
   width: 100%;
-  cursor: not-allowed;
 }
 
 #submit-button:hover,
@@ -94,7 +93,6 @@ label {
 }
 
 #map {
-  border: thin solid black;
   height: 400px;
   max-width: 100%;
   color: black;

@@ -118,8 +118,8 @@ public class UserInfoServlet extends HttpServlet {
     String userId = userService.getCurrentUser().getUserId();
 
     try {
-      lat = Float.parseFloat(request.getParameter("lat"));
-      lng = Float.parseFloat(request.getParameter("lng"));
+      lat = Float.parseFloat(request.getParameter("lat-input"));
+      lng = Float.parseFloat(request.getParameter("lng-input"));
     } catch (NumberFormatException e) {
       System.err.println("Invalid location coordinates");
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid location coordinates");
@@ -183,13 +183,13 @@ public class UserInfoServlet extends HttpServlet {
     Query query = new Query("UserInfo").addSort("points", SortDirection.DESCENDING);
 
     // Adds additional filters for the nearby neighbors board
-    if (request.getParameterMap().containsKey("lat")
-        && request.getParameterMap().containsKey("lng")) {
+    if (request.getParameterMap().containsKey("lat-input")
+        && request.getParameterMap().containsKey("lng-input")) {
       Float lat = null;
       Float lng = null;
       try {
-        lat = Float.parseFloat(request.getParameter("lat"));
-        lng = Float.parseFloat(request.getParameter("lng"));
+        lat = Float.parseFloat(request.getParameter("lat-input"));
+        lng = Float.parseFloat(request.getParameter("lng-input"));
       } catch (NumberFormatException e) {
         System.err.println("Invalid location coordinates");
         throw new IllegalArgumentException("Could not convert lat and/or lng to float");

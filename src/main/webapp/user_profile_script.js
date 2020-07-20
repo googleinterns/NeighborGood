@@ -21,28 +21,7 @@ const MAPSKEY = config.MAPS_KEY;
 function validateTaskForm(id) {
     var result = true;
     var form = document.getElementById(id);
-    var inputName = ["task-overview", "task-detail", "reward", "category", "lat", "lng"];
-    for (var i = 0; i < inputName.length; i++) {
-        var name = inputName[i];
-        var inputField = form[name.concat("-input")].value.trim();
-        if (inputField === "") {
-            result = false;
-            form[name.concat("-input")].classList.add("highlight");
-        } else {
-            form[name.concat("-input")].classList.remove("highlight");
-        }
-    }
-    if (!result) {
-        alert("All fields are required. Please fill out all fields with non-empty input and mark your personal address on the map.");
-        return false;
-    }
-    return true;
-}
-
-function validateInfoForm(id) {
-    var result = true;
-    var form = document.getElementById(id);
-    var inputName = ["nickname", "address", "zipcode", "country", "phone"];
+    var inputName = ["task-overview", "task-detail", "reward", "category"];
     for (var i = 0; i < inputName.length; i++) {
         var name = inputName[i];
         var inputField = form[name.concat("-input")].value.trim();
@@ -55,6 +34,33 @@ function validateInfoForm(id) {
     }
     if (!result) {
         alert("All fields are required. Please fill out all fields with non-empty input.");
+        return false;
+    }
+    return true;
+}
+
+function validateInfoForm(id) {
+    var result = true;
+    var form = document.getElementById(id);
+    var inputName = ["nickname", "address", "zipcode", "country", "phone", "lat", "lng"];
+    for (var i = 0; i < inputName.length; i++) {
+        var name = inputName[i];
+        var inputField = form[name.concat("-input")].value.trim();
+        if (inputField === "") {
+            result = false;
+            form[name.concat("-input")].classList.add("highlight");
+            if (inputName[i] === "lat" || inputName[i] === "lng") {
+                document.getElementById("map").classList.add("highlight");
+            }
+        } else {
+            form[name.concat("-input")].classList.remove("highlight");
+            if (inputName[i] === "lat" || inputName[i] === "lng") {
+                document.getElementById("map").classList.remove("highlight");
+            }
+        }
+    }
+    if (!result) {
+        alert("All fields are required. Please fill out all fields with non-empty input and mark your personal address on the map.");
         return false;
     }
     return true;
@@ -652,12 +658,6 @@ function displayMarker(position) {
     document.getElementById("lat-input").value = position.lat();
     document.getElementById("lng-input").value = position.lng();
 
-    // Enables user submit form if a marker has been set
-    let submitUserFormButton = document.getElementById("submit-button");
-    submitUserFormButton.disabled = false;
-    submitUserFormButton.style.cursor = "pointer";
-    submitUserFormButton.removeAttribute("title");
-
     return marker;
 }
 
@@ -673,12 +673,6 @@ function deleteMarker(latitude, longitude) {
     });
     document.getElementById("lat-input").value = '';
     document.getElementById("lng-input").value = '';
-
-    // Disables user submit form if a marker hasn't been set
-    let submitUserFormButton = document.getElementById("submit-button");
-    submitUserFormButton.disabled = true;
-    submitUserFormButton.style.cursor = "not-allowed";
-    submitUserFormButton.setAttribute("title", "You must mark your personal address on the map");
 }
 
 function geocodeLatLng(geocoder, map, infowindow, position, marker) {
