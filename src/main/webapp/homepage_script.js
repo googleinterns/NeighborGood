@@ -168,7 +168,7 @@ function validateTaskForm(id) {
     return true;
 }
 
-/* Function that calls the loadTopScorersBy functions
+/* Function that calls the loadTopScorers functions
    and then shows the top scores modal */
 function showTopScoresModal() {
     loadTopScorers("world");
