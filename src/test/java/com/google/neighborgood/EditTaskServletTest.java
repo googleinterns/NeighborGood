@@ -90,6 +90,7 @@ public final class EditTaskServletTest {
 
     taskEntity = new Entity("Task", userEntity.getKey());
     taskEntity.setProperty("detail", "Test task");
+    taskEntity.setProperty("overview", "Test task overview");
     taskEntity.setProperty("timestamp", 123);
     taskEntity.setProperty("reward", 50);
     taskEntity.setProperty("status", "IN PROGRESS");
@@ -105,6 +106,7 @@ public final class EditTaskServletTest {
 
     openEntity = new Entity("Task", userEntity.getKey());
     openEntity.setProperty("detail", "Open test task");
+    taskEntity.setProperty("overview", "Open Test task overview");
     openEntity.setProperty("timestamp", 123);
     openEntity.setProperty("reward", 50);
     openEntity.setProperty("status", "OPEN");
@@ -183,7 +185,8 @@ public final class EditTaskServletTest {
     when(request.getParameter("task-id")).thenReturn(keyString);
     when(request.getParameter("reward-input")).thenReturn("150");
     when(request.getParameter("task-detail-input")).thenReturn("Edit Test Task");
-    when(request.getParameter("edit-category-input")).thenReturn("Misc");
+    when(request.getParameter("task-overview-input")).thenReturn("Edit Test Task Overview");
+    when(request.getParameter("category-input")).thenReturn("Misc");
 
     // Send a POST request, which will change the task detail, reward and category
     new EditTaskServlet().doPost(request, response);
@@ -204,7 +207,8 @@ public final class EditTaskServletTest {
     when(request.getParameter("task-id")).thenReturn(keyString);
     when(request.getParameter("reward-input")).thenReturn("abcdef");
     when(request.getParameter("task-detail-input")).thenReturn("Edit Test Task");
-    when(request.getParameter("edit-category-input")).thenReturn("Misc");
+    when(request.getParameter("task-overview-input")).thenReturn("Edit Test Task Overview");
+    when(request.getParameter("category-input")).thenReturn("Misc");
 
     StringWriter stringWriter = new StringWriter();
     PrintWriter writer = new PrintWriter(stringWriter);
@@ -242,7 +246,8 @@ public final class EditTaskServletTest {
     when(request.getParameter("task-id")).thenReturn(keyString);
     when(request.getParameter("reward-input")).thenReturn("150");
     when(request.getParameter("task-detail-input")).thenReturn("");
-    when(request.getParameter("edit-category-input")).thenReturn("Misc");
+    when(request.getParameter("task-overview-input")).thenReturn("Edit Test Task Overview");
+    when(request.getParameter("category-input")).thenReturn("Misc");
 
     // Try to catch the error message sent by the EditTaskServlet
     System.setErr(new PrintStream(errContent));
@@ -262,7 +267,7 @@ public final class EditTaskServletTest {
     when(request.getParameter("task-id")).thenReturn(keyString);
     when(request.getParameter("reward-input")).thenReturn("150");
     when(request.getParameter("task-detail-input")).thenReturn("Edit Test Task");
-    when(request.getParameter("edit-category-input")).thenReturn("");
+    when(request.getParameter("category-input")).thenReturn("");
 
     // Try to catch the error message sent by the EditTaskServlet
     System.setErr(new PrintStream(errContent));
