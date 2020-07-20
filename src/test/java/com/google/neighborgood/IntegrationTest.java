@@ -84,7 +84,7 @@ public class IntegrationTest {
             .ignoring(NoSuchElementException.class);
 
     js = (JavascriptExecutor) driver;
-    // clearAllDatastoreEntities();
+    clearAllDatastoreEntities();
   }
 
   @AfterClass
