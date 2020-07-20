@@ -168,10 +168,8 @@ async function disapproveTask(keyString) {
     }
 }
 
-async function startRecognizing() {
+async function startSpeaking() {
     const response = await fetch("/speech");
-    const text = await response.text();
-    document.getElementById("task-detail-input").value = text;
 }
 
 async function showTaskInfo(keyString) {

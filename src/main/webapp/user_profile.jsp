@@ -103,16 +103,14 @@
             <form id="new-task-form" action="/tasks" method="POST" onsubmit="return validateTaskForm('new-task-form')">
                 <h1>CREATE A NEW TASK: </h1>
                 <div>
-                    <label for="task-overview-input">Task Overview<span class="req">*</span>
-                        <span class="mic-container"><i class="fa fa-microphone" onclick="startRecognizing()"></i></span></label>
+                    <label for="task-overview-input">Task Overview<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
                 <textarea name="task-overview-input" id="task-overview-input" placeholder="Briefly describe your task here:"></textarea>
                 <br/><br/>
                 <div>
-                    <label for="task-detail-input">Task Detail<span class="req">*</span>
-                        <span class="mic-container"><i class="fa fa-microphone" onclick="startRecognizing()"></i></span></label>
+                    <label for="task-detail-input">Task Detail<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
@@ -220,8 +218,9 @@
     <div class="modalWrapper" id="taskInfoModalWrapper">
         <div class="modal" id="taskInfoModal">
             <span class="close-button" id="task-info-close-button" onclick="closeTaskInfoModal()">&times;</span>
-            <h1>Task Detail: </h1>
+            <h1>Task Detail: <span class="voice-container"><i class="fa fa-volume-up" onclick="startSpeaking()"></i></span></h1>
             <div id="task-detail-container"></div>
+            <div id="audio-container"></div>
         </div>
     </div>
   </body>
