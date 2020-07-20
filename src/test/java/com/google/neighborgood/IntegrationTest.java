@@ -38,10 +38,10 @@ import org.openqa.selenium.support.ui.FluentWait;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 /**
  * Due to how the interactions from one test build up onto the other as part of this integration
- * test, the FixMethodOrder decorator is used to guarantee order of execution of tests. In a future,
- * the setup required from previous tests will be done without the use of webdriver in an attempt to
- * make each test independent of each other and thus eliminating the use of the FixMethodOrder
- * decorator
+ * test, the FixMethodOrder decorator is used to guarantee order of execution of tests. In the
+ * future, the setup required from previous tests will be done without the use of webdriver in an
+ * attempt to make each test independent of each other and thus eliminating the use of the
+ * FixMethodOrder decorator
  */
 public class IntegrationTest {
 
