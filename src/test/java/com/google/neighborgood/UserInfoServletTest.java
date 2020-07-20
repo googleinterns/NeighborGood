@@ -102,8 +102,8 @@ public final class UserInfoServletTest {
     when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
     when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
     when(request.getParameter("country-input")).thenReturn("United States");
-    when(request.getParameter("lat")).thenReturn("40.440836");
-    when(request.getParameter("lng")).thenReturn("-79.958306");
+    when(request.getParameter("lat-input")).thenReturn("40.440836");
+    when(request.getParameter("lng-input")).thenReturn("-79.958306");
 
     new UserInfoServlet().doPost(request, response);
 
@@ -184,8 +184,8 @@ public final class UserInfoServletTest {
     when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
     when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
     when(request.getParameter("country-input")).thenReturn("United States");
-    when(request.getParameter("lat")).thenReturn("42.440836");
-    when(request.getParameter("lng")).thenReturn("-76.958306");
+    when(request.getParameter("lat-input")).thenReturn("42.440836");
+    when(request.getParameter("lng-input")).thenReturn("-76.958306");
 
     new UserInfoServlet().doPost(request, response);
 
@@ -258,8 +258,8 @@ public final class UserInfoServletTest {
     when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
     when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
     when(request.getParameter("country-input")).thenReturn("United States");
-    when(request.getParameter("lat")).thenReturn("42.440836");
-    when(request.getParameter("lng")).thenReturn("-76.958306");
+    when(request.getParameter("lat-input")).thenReturn("42.440836");
+    when(request.getParameter("lng-input")).thenReturn("-76.958306");
 
     // Try to catch the error message sent by the UserInfoServlet
     System.setErr(new PrintStream(errContent));

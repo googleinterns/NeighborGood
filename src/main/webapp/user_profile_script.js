@@ -391,7 +391,7 @@ async function displayOfferHelpCompleteTasks() {
     }
 }
 
-/* Calls showNeedHelp, initMap, and alertUserMarkerRequired once page has loaded */
+/* Calls showNeedHelp and initMap once page has loaded */
 if (document.readyState === 'loading') {
     // adds on load event listeners if document hasn't yet loaded
     document.addEventListener('DOMContentLoaded', initMap);
