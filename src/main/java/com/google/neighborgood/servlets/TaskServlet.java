@@ -45,12 +45,13 @@ public class TaskServlet extends HttpServlet {
   @Override
   // doGet method retrieves tasks from datastore and responds with the HTML for each task fetched
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    final double DEFAULT_FIVE_MILES_RADIUS = 5;
     UserService userService = UserServiceFactory.getUserService();
     boolean userLoggedIn = userService.isUserLoggedIn();
     String userId = userLoggedIn ? userService.getCurrentUser().getUserId() : "null";
     Float lat = null;
     Float lng = null;
-    double mile_radius = UnitConversion.milesToMeters(5);
+    Double radiusInMeters = UnitConversion.milesToMeters(DEFAULT_FIVE_MILES_RADIUS);
 
     if (request.getParameterMap().containsKey("lat")
         && request.getParameterMap().containsKey("lng")) {
@@ -67,13 +68,12 @@ public class TaskServlet extends HttpServlet {
     }
 
     if (request.getParameterMap().containsKey("miles")) {
-      double miles = 5;
       try {
-        miles = Double.parseDouble(request.getParameter("miles"));
+        radiusInMeters =
+            UnitConversion.milesToMeters(Double.parseDouble(request.getParameter("miles")));
       } catch (NumberFormatException e) {
         System.err.println("Invalid miles input. Using 5 miles as default.");
       }
-      mile_radius = UnitConversion.milesToMeters(miles);
     }
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -86,7 +86,7 @@ public class TaskServlet extends HttpServlet {
     List<Query.Filter> filters = new ArrayList<Query.Filter>();
     filters.add(
         new Query.StContainsFilter(
-            "location", new Query.GeoRegion.Circle(userLocation, mile_radius)));
+            "location", new Query.GeoRegion.Circle(userLocation, radiusInMeters)));
     filters.add(new Query.FilterPredicate("status", Query.FilterOperator.EQUAL, "OPEN"));
 
     // Applies a category filter, if any
