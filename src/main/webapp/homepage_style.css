@@ -153,22 +153,45 @@ section {
 }
 
 .pagination-icon {
-    cursor: not-allowed;
-    font-size: 2em;
-    font-weight: bold;
-    line-height: 0.8em;
-    padding: 0 0.5em;
+  cursor: not-allowed;
+  font-size: 2em;
+  font-weight: bold;
+  line-height: 0.8em;
+  padding: 0 0.2em;
 }
 
 .pagination-icon:hover {
-    color: gray;
+  color: gray;
+}
+
+.page-number {
+    font-weight: normal;
+}
+
+#current-page {
+    font-weight: bold;
+    cursor: default;
+}
+
+#current-page:hover {
+    color: #222;
 }
 
 #pagination-wrapper {
-    display: flex;
-    justify-content: space-between;
-    width: fit-content;
-    margin: auto;
+  display: flex;
+  justify-content: space-between;
+  width: fit-content;
+  margin: auto;
+}
+
+#page-numbers-wrapper {
+  display: flex;
+  justify-content: space-between;
+  line-height: 1.7em;
+}
+
+.page-number {
+  margin: 0 0.5em;
 }
 
 /* Tasks Styling */

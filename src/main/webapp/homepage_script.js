@@ -18,6 +18,7 @@ let currentCategory = "all";
 let currentMiles = 5;
 let currentPage = 1;
 let taskPagesCache = null;
+let currentPageNumberNode = null;
 
 //window.onscroll = stickyControlBar;
 
@@ -98,6 +99,7 @@ function prevPage() {
             nextPageButton.style.cursor = "pointer";
             nextPageButton.removeAttribute("title");
         }
+        displayPaginationUI();
     } 
 }
 
@@ -113,6 +115,7 @@ function nextPage() {
             nextPageButton.style.cursor = "not-allowed";
             nextPageButton.setAttribute("title", "You are already on the last page");
         }
+        displayPaginationUI();
     }
 }
 
@@ -365,10 +368,26 @@ function fetchTasks(category, miles) {
 /* Displays the tasks received from the server response */
 function displayTasks(response) {
 
-    // If a response is passed, the the taskPagesCache is updated along with the next and prev page button styles
+    // If a response is passed, the the taskPagesCache is updated along with the next and prev page buttons 
     if (response !== undefined) {
         taskPagesCache = response;
-        let nextPageButton = document.getElementById("next-page");
+        displayPaginationUI();
+    }
+    if (taskPagesCache !== null && taskPagesCache.taskCount > 0) {
+        document.getElementById("no-tasks-message").style.display = "none";
+        document.getElementById("tasks-message").style.display = "block";
+        document.getElementById("tasks-list").innerHTML = taskPagesCache.taskPages[currentPage - 1];
+        document.getElementById("tasks-list").style.display = "block";
+        addTasksClickHandlers();
+    } else {
+        document.getElementById("no-tasks-message").style.display = "block";
+        document.getElementById("tasks-message").style.display = "none";
+        document.getElementById("tasks-list").style.display = "none";
+    }
+}
+
+function displayPaginationUI() {
+    let nextPageButton = document.getElementById("next-page");
         let prevPageButton = document.getElementById("prev-page");
         if (taskPagesCache.pageCount > 1) {
             nextPageButton.style.cursor = "pointer";
@@ -388,18 +407,66 @@ function displayTasks(response) {
             prevPageButton.style.cursor = "not-allowed";
             prevPageButton.setAttribute("title", "You are already on the first page");
         }
-    }
-    if (taskPagesCache !== null && taskPagesCache.taskCount > 0) {
-        document.getElementById("no-tasks-message").style.display = "none";
-        document.getElementById("tasks-message").style.display = "block";
-        document.getElementById("tasks-list").innerHTML = taskPagesCache.taskPages[currentPage - 1];
-        document.getElementById("tasks-list").style.display = "block";
-        addTasksClickHandlers();
+
+    let pageNumbersWrapper = document.getElementById("page-numbers-wrapper");
+    pageNumbersWrapper.innerHTML = "";
+    if (taskPagesCache.pageCount <= 5 || (window.innerWidth >= 375)) {
+        for (let i = 1; i <= taskPagesCache.pageCount; i++) {
+            let pageNumber = document.createElement("a");
+            pageNumber.classList.add("page-number");
+            if (i === currentPage) pageNumber.setAttribute("id", "current-page");
+            pageNumber.innerText = i;
+            pageNumber.addEventListener("click", function() {
+                currentPageNumberNode.removeAttribute("id");
+                currentPageNumberNode = pageNumber;
+                currentPage = i;
+                pageNumber.setAttribute("id", "current-page");
+                displayTasks();
+            });
+            pageNumbersWrapper.appendChild(pageNumber);
+        }
     } else {
-        document.getElementById("no-tasks-message").style.display = "block";
-        document.getElementById("tasks-message").style.display = "none";
-        document.getElementById("tasks-list").style.display = "none";
+        let pageNumberSpacing = document.createElement("div");
+        pageNumberSpacing.classList.add("page-number-spacing");
+        pageNumberSpacing.innerText = "...";
+
+        if (currentPage !== 1) {
+            let firstPageNumber = document.createElement("a");
+            firstPageNumber.classList.add("page-number");
+            firstPageNumber.innerText = 1;
+            firstPageNumber.addEventListener("click", function() {
+                    currentPageNumberNode.removeAttribute("id");
+                    currentPageNumberNode = pageNumber;
+                    currentPage = 1;
+                    pageNumber.setAttribute("id", "current-page");
+                    displayTasks();
+                });
+            pageNumbersWrapper.appendChild(firstPageNumber);
+            pageNumbersWrapper.appendChild(pageNumberSpacing);
+        }
+
+        let currentPageNumber = document.createElement("a");
+        currentPageNumber.classList.add("page-number");
+        currentPageNumber.setAttribute("id", "current-page");
+        currentPageNumber.innerText = currentPage;
+        pageNumbersWrapper.appendChild(currentPageNumber);
+
+        if (currentPage != taskPagesCache.pageCount) {
+            pageNumbersWrapper.appendChild(pageNumberSpacing.cloneNode(true));
+            let lastPageNumber = document.createElement("a");
+            lastPageNumber.classList.add("page-number");
+            lastPageNumber.innerText = taskPagesCache.pageCount;
+            lastPageNumber.addEventListener("click", function() {
+                    currentPageNumberNode.removeAttribute("id");
+                    currentPageNumberNode = lastPageNumber;
+                    lastPageNumber.setAttribute("id", "current-page");
+                    currentPage = taskPagesCache.pageCount;
+                    displayTasks();
+                });
+            pageNumbersWrapper.appendChild(lastPageNumber);
+        }
     }
+    currentPageNumberNode = document.getElementById("current-page");
 }
 
 /* Function adds all the necessary tasks 'click' event listeners*/
