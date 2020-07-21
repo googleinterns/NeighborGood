@@ -152,6 +152,14 @@ section {
   font-size: 3.5em;
 }
 
+.pagination-icon {
+    cursor: pointer;
+}
+
+#prev-page {
+    cursor: not-allowed;
+}
+
 /* Tasks Styling */
 .results-message {
   display: none;

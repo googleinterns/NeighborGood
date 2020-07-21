@@ -14,6 +14,7 @@
 
 package com.google.neighborgood.servlets;
 
+import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -24,20 +25,22 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import com.google.neighborgood.helper.RetrieveUserInfo;
 import com.google.neighborgood.helper.RewardingPoints;
+import com.google.neighborgood.helper.TaskList;
 import com.google.neighborgood.helper.UnitConversion;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /** Servlet that creates new task entity and fetch saved tasks. */
 @WebServlet("/tasks")
@@ -98,73 +101,42 @@ public class TaskServlet extends HttpServlet {
     // Applies filters to query
     query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, filters));
 
-    // limits results to the 20 most recent tasks
-    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(20));
+    // limits results to 10 tasks per page
+    FetchOptions fetchOptions = FetchOptions.Builder.withLimit(10);
 
-    StringBuilder out = new StringBuilder();
+    HttpSession session = request.getSession();
+    String startCursor = (String) session.getAttribute("taskListCursor");
+    if (startCursor != null) {
+      fetchOptions.cursor(Cursor.fromWebSafeString(startCursor));
+    }
 
-    // Stores task owner's user info to prevent querying multiple
-    // times in datastore for the same user's info
-    HashMap<String, String> usersNicknames = new HashMap<String, String>();
+    QueryResultList<Entity> results = datastore.prepare(query).asQueryResultList(fetchOptions);
+
+    TaskList taskList = new TaskList();
+    Integer pageCount = (Integer) session.getAttribute("pageCount");
+    if (pageCount != null) {
+      pageCount++;
+      session.setAttribute("pageCount", pageCount);
+      taskList.setPageCount(pageCount);
+    } else {
+      session.setAttribute("pageCount", 1);
+    }
 
     // Builds and stores HTML for each task
     for (Entity entity : results) {
-      out.append("<div class='task' data-key='")
-          .append(KeyFactory.keyToString(entity.getKey()))
-          .append("'>");
-      if (userLoggedIn) {
-        out.append("<div class='help-overlay'>");
-        out.append("<div class='exit-help'><a>&times</a></div>");
-        out.append("<a class='confirm-help'>CONFIRM</a>");
-        out.append("</div>");
-      }
-      out.append("<div class='task-container'>");
-      out.append("<div class='task-header'>");
-      out.append("<div class='user-nickname'>");
-
-      // Checks if tasks's user nickname has already been retrieved,
-      // otherwise retrieves it and temporarily stores it
-      String taskOwner = (String) entity.getProperty("Owner");
-      if (usersNicknames.containsKey(taskOwner)) {
-        out.append(usersNicknames.get(taskOwner));
-      } else {
-        Key taskOwnerKey = entity.getParent();
-        try {
-          Entity userEntity = datastore.get(taskOwnerKey);
-          String userNickname = (String) userEntity.getProperty("nickname");
-          usersNicknames.put(taskOwner, userNickname);
-          out.append(userNickname);
-        } catch (EntityNotFoundException e) {
-          System.err.println(
-              "Unable to find the task's owner info to retrieve the owner's nickname. Setting a default nickname.");
-          out.append("Neighbor");
-        }
-      }
-      out.append("</div>");
-      if (userLoggedIn) {
-        // changes the Help Button div if the current user is the owner of the task
-        if (!userId.equals(taskOwner)) {
-          out.append("<div class='help-out'>HELP OUT</div>");
-        } else {
-          out.append(
-              "<div class='help-out disable-help' title='This is your own task'>HELP OUT</div>");
-        }
-      }
-      out.append("</div>");
-      out.append(
-              "<div class='task-content' onclick='showTaskInfo(\""
-                  + KeyFactory.keyToString(entity.getKey())
-                  + "\")'>")
-          .append((String) entity.getProperty("overview"))
-          .append("</div>");
-      out.append("<div class='task-footer'><div class='task-category'>#")
-          .append((String) entity.getProperty("category"))
-          .append("</div></div>");
-      out.append("</div></div>");
+      taskList.addTask(entity);
     }
 
+    // Checks to see if this is the last page of results
+    if (results.size() < 10) {
+      taskList.setEndOfResults();
+    }
+
+    String cursorString = results.getCursor().toWebSafeString();
+    session.setAttribute("taskListCursor", cursorString);
+
     Gson gson = new Gson();
-    String json = gson.toJson(out.toString());
+    String json = gson.toJson(taskList);
     response.setContentType("application/json;");
     response.getWriter().println(json);
   }

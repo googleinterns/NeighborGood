@@ -112,6 +112,8 @@
               </div>
               <div id="tasks-message" class="results-message">
                   These are the 20 (or less) most recent tasks in your neighborhood:
+                  <div id="tasks-list-wrapper">
+                  <div id="prev-page" class="pagination-icon">&#8249;</div>
                   <!-- Distance Options -->
                   <div id="distance-radius-div">
                         <label for="distance-radius">Show results within a radius of:</label>
@@ -125,6 +127,8 @@
                             <option value="50">50 miles</option>
                         </select>
                   </div>
+                  <div id="next-page" class="pagination-icon">&#8250;</div>
+                  </div
               </div>
               <div id="no-tasks-message" class="results-message">
                   Sorry, there are currently no tasks within your neighborhood for you to help with.

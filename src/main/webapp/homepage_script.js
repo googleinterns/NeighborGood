@@ -16,6 +16,8 @@ const MAPSKEY = config.MAPS_KEY
 let userLocation = null;
 let currentCategory = "all";
 let currentMiles = 5;
+let currentPage = 1;
+let taskListPagesCache = new Map();
 
 window.onscroll = stickyControlBar;
 
@@ -75,7 +77,23 @@ function addUIClickHandlers() {
         fetchTasks(currentCategory, e.target.value)
             .then(response => displayTasks(response));
     });
+
+    // adds nextPage and prevPage click events
+    document.getElementById("prev-page").addEventListener("click", prevPage);
+    //document.getElementById("next-page").addEventListener("click", nextPage);
 }
+
+/* Function loads previous page of tasks */
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        if (taskListPagesCache.has(currentPage - 1)) {
+            displayTasks(taskListPagesCache.get(currentPage - 1));
+        } 
+    }
+}
+
+/* Function loads next page of tasks */
 
 /* Function filters tasks by categories and styles selected categories */
 function filterTasksBy(category) {
@@ -321,24 +339,23 @@ function fetchTasks(category, miles) {
     if (category !== undefined && category != "all") {
         url += "&category=" + category;
     }
-    return fetch(url);
+    return fetch(url).then(response => response.json());
 }
 
 /* Displays the tasks received from the server response */
-function displayTasks(response) {
-    response.json().then(html => {
-        if (html){
-            document.getElementById("no-tasks-message").style.display = "none";
-            document.getElementById("tasks-message").style.display = "block";
-            document.getElementById("tasks-list").innerHTML = html;
-            document.getElementById("tasks-list").style.display = "block";
-            addTasksClickHandlers();
-        } else {
-            document.getElementById("no-tasks-message").style.display = "block";
-            document.getElementById("tasks-message").style.display = "none";
-            document.getElementById("tasks-list").style.display = "none";
-        }
-    });
+function displayTasks(taskList) {
+    if (taskList.taskListString) {
+        document.getElementById("no-tasks-message").style.display = "none";
+        document.getElementById("tasks-message").style.display = "block";
+        document.getElementById("tasks-list").innerHTML = taskList.taskListString;
+        document.getElementById("tasks-list").style.display = "block";
+        addTasksClickHandlers();
+    } else {
+        document.getElementById("no-tasks-message").style.display = "block";
+        document.getElementById("tasks-message").style.display = "none";
+        document.getElementById("tasks-list").style.display = "none";
+    }
+    
 }
 
 /* Function adds all the necessary tasks 'click' event listeners*/
