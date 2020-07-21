@@ -17,9 +17,9 @@ let userLocation = null;
 let currentCategory = "all";
 let currentMiles = 5;
 let currentPage = 1;
-let taskListPagesCache = new Map();
+let taskPagesCache = null;
 
-window.onscroll = stickyControlBar;
+//window.onscroll = stickyControlBar;
 
 /* Scroll function so that the control bar sticks to the top of the page */
 function stickyControlBar() {
@@ -80,20 +80,41 @@ function addUIClickHandlers() {
 
     // adds nextPage and prevPage click events
     document.getElementById("prev-page").addEventListener("click", prevPage);
-    //document.getElementById("next-page").addEventListener("click", nextPage);
+    document.getElementById("next-page").addEventListener("click", nextPage);
 }
 
 /* Function loads previous page of tasks */
 function prevPage() {
     if (currentPage > 1) {
         currentPage--;
-        if (taskListPagesCache.has(currentPage - 1)) {
-            displayTasks(taskListPagesCache.get(currentPage - 1));
-        } 
-    }
+        displayTasks(); 
+        if (currentPage === 1) {
+            let prevPageButton = document.getElementById("prev-page");
+            prevPageButton.style.cursor = "not-allowed";
+            prevPageButton.setAttribute("title", "You are already on the first page");
+        }
+        if (currentPage < taskPagesCache.pageCount) {
+            let nextPageButton = document.getElementById("next-page");
+            nextPageButton.style.cursor = "pointer";
+            nextPageButton.removeAttribute("title");
+        }
+    } 
 }
 
 /* Function loads next page of tasks */
+function nextPage() {
+    if (currentPage < taskPagesCache.pageCount) {
+        currentPage++;
+        displayTasks();
+        document.getElementById("prev-page").style.cursor = "pointer";
+        document.getElementById("prev-page").removeAttribute("title");
+        if (currentPage === taskPagesCache.pageCount) {
+            let nextPageButton = document.getElementById("next-page");
+            nextPageButton.style.cursor = "not-allowed";
+            nextPageButton.setAttribute("title", "You are already on the last page");
+        }
+    }
+}
 
 /* Function filters tasks by categories and styles selected categories */
 function filterTasksBy(category) {
@@ -292,7 +313,7 @@ function getUserNeighborhood() {
     // fetchTasks and displayTasks
 	window.initialize = function () {
         getUserLocation().then(() => fetchTasks(currentCategory, currentMiles))
-            .then((response) => displayTasks(response))
+            .then(jsonresponse => displayTasks(jsonresponse))
             .catch(() => {
                 console.error("User location and/or neighborhood could not be retrieved");
                 document.getElementById("location-missing-message").style.display = "block";
@@ -343,11 +364,33 @@ function fetchTasks(category, miles) {
 }
 
 /* Displays the tasks received from the server response */
-function displayTasks(taskList) {
-    if (taskList.taskListString) {
+function displayTasks(response) {
+    if (response !== undefined) {
+        taskPagesCache = response;
+        let nextPageButton = document.getElementById("next-page");
+        let prevPageButton = document.getElementById("prev-page");
+        if (taskPagesCache.pageCount > 1) {
+            nextPageButton.style.cursor = "pointer";
+            nextPageButton.removeAttribute("title");
+        } else {
+            nextPageButton.style.cursor = "not-allowed";
+            nextPageButton.setAttribute("title", "You are already on the last page");
+        }
+        if (currentPage > taskPagesCache.pageCount) {
+            currentPage = 1;
+        }
+        if (currentPage > 1) {
+            prevPageButton.style.cursor = "pointer";
+            prevPageButton.removeAttribute("title");
+        } else {
+            prevPageButton.style.cursor = "not-allowed";
+            prevPageButton.setAttribute("title", "You are already on the first page");
+        }
+    }
+    if (taskPagesCache !== null && taskPagesCache.taskCount > 0) {
         document.getElementById("no-tasks-message").style.display = "none";
         document.getElementById("tasks-message").style.display = "block";
-        document.getElementById("tasks-list").innerHTML = taskList.taskListString;
+        document.getElementById("tasks-list").innerHTML = taskPagesCache.taskPages[currentPage - 1];
         document.getElementById("tasks-list").style.display = "block";
         addTasksClickHandlers();
     } else {
@@ -355,7 +398,6 @@ function displayTasks(taskList) {
         document.getElementById("tasks-message").style.display = "none";
         document.getElementById("tasks-list").style.display = "none";
     }
-    
 }
 
 /* Function adds all the necessary tasks 'click' event listeners*/

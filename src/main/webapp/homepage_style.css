@@ -153,11 +153,22 @@ section {
 }
 
 .pagination-icon {
-    cursor: pointer;
+    cursor: not-allowed;
+    font-size: 2em;
+    font-weight: bold;
+    line-height: 0.8em;
+    padding: 0 0.5em;
 }
 
-#prev-page {
-    cursor: not-allowed;
+.pagination-icon:hover {
+    color: gray;
+}
+
+#pagination-wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: fit-content;
+    margin: auto;
 }
 
 /* Tasks Styling */

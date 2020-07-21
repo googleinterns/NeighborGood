@@ -112,8 +112,6 @@
               </div>
               <div id="tasks-message" class="results-message">
                   These are the 20 (or less) most recent tasks in your neighborhood:
-                  <div id="tasks-list-wrapper">
-                  <div id="prev-page" class="pagination-icon">&#8249;</div>
                   <!-- Distance Options -->
                   <div id="distance-radius-div">
                         <label for="distance-radius">Show results within a radius of:</label>
@@ -127,7 +125,10 @@
                             <option value="50">50 miles</option>
                         </select>
                   </div>
-                  <div id="next-page" class="pagination-icon">&#8250;</div>
+                  <div id="pagination-wrapper">
+                  <div id="prev-page" class="pagination-icon" title="You are already on the first page">&#8249;</div>
+                  <div id="page-numbers"></div>
+                  <div id="next-page" class="pagination-icon" title="You are already on the last page">&#8250;</div>
                   </div
               </div>
               <div id="no-tasks-message" class="results-message">

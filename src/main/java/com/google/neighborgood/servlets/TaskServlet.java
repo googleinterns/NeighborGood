@@ -14,7 +14,6 @@
 
 package com.google.neighborgood.servlets;
 
-import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -25,13 +24,12 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
-import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import com.google.neighborgood.helper.RetrieveUserInfo;
 import com.google.neighborgood.helper.RewardingPoints;
-import com.google.neighborgood.helper.TaskList;
+import com.google.neighborgood.helper.TaskPages;
 import com.google.neighborgood.helper.UnitConversion;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,7 +38,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /** Servlet that creates new task entity and fetch saved tasks. */
 @WebServlet("/tasks")
@@ -101,42 +98,24 @@ public class TaskServlet extends HttpServlet {
     // Applies filters to query
     query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, filters));
 
-    // limits results to 10 tasks per page
-    FetchOptions fetchOptions = FetchOptions.Builder.withLimit(10);
+    // limits results to the 100 most recent tasks that will be queried once and distributed among
+    // 10 pages.
+    // Ideally 10 results would be queried each time there was a page change using Cursors, however
+    // cursors are not
+    // supported with geo-spatial queries.
+    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(100));
 
-    HttpSession session = request.getSession();
-    String startCursor = (String) session.getAttribute("taskListCursor");
-    if (startCursor != null) {
-      fetchOptions.cursor(Cursor.fromWebSafeString(startCursor));
-    }
-
-    QueryResultList<Entity> results = datastore.prepare(query).asQueryResultList(fetchOptions);
-
-    TaskList taskList = new TaskList();
-    Integer pageCount = (Integer) session.getAttribute("pageCount");
-    if (pageCount != null) {
-      pageCount++;
-      session.setAttribute("pageCount", pageCount);
-      taskList.setPageCount(pageCount);
-    } else {
-      session.setAttribute("pageCount", 1);
-    }
+    TaskPages taskPages = new TaskPages();
 
     // Builds and stores HTML for each task
     for (Entity entity : results) {
-      taskList.addTask(entity);
+      taskPages.addTask(entity);
     }
 
-    // Checks to see if this is the last page of results
-    if (results.size() < 10) {
-      taskList.setEndOfResults();
-    }
-
-    String cursorString = results.getCursor().toWebSafeString();
-    session.setAttribute("taskListCursor", cursorString);
+    taskPages.addLastPage();
 
     Gson gson = new Gson();
-    String json = gson.toJson(taskList);
+    String json = gson.toJson(taskPages);
     response.setContentType("application/json;");
     response.getWriter().println(json);
   }
