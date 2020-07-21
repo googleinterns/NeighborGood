@@ -305,6 +305,11 @@ table button:hover i {
 }
 
 .sentByOthers {
+  float: left;
+  clear: both;
+  max-width: 40%;
+  word-wrap: normal;
+  overflow-wrap: break-word;
   border: 2px solid #dedede;
   background-color: #f1f1f1;
   border-radius: 5px;
@@ -313,10 +318,14 @@ table button:hover i {
 }
 
 .sentByMe {
+  float: right;
+  clear: both;
+  max-width: 40%;
+  word-wrap: normal;
+  overflow-wrap: break-word;
   color: white;
   background-color: #0c0;
   border: 2px solid #0c0;
-  text-align: right;
   border-radius: 5px;
   padding: 10px;
   margin: 10px 10px;
