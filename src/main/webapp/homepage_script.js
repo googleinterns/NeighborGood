@@ -42,15 +42,15 @@ function stickyControlBar() {
     }
 }
 
-/* Calls addUIClickHandlers and getUserNeighborhood once page has loaded */
+/* Calls addUIClickHandlers and getTasksForUserLocation once page has loaded */
 if (document.readyState === 'loading') {
     // adds on load event listeners if document hasn't yet loaded
     document.addEventListener('DOMContentLoaded', addUIClickHandlers);
-    document.addEventListener('DOMContentLoaded', getUserNeighborhood);
+    document.addEventListener('DOMContentLoaded', getTasksForUserLocation);
 } else {
     // if DOMContentLoaded has already fired, it simply calls the functions
     addUIClickHandlers();
-    getUserNeighborhood();
+    getTasksForUserLocation();
 }
 
 /* Function adds all the necessary UI 'click' event listeners*/
@@ -120,8 +120,8 @@ function nextPage() {
 function filterTasksBy(category) {
     currentCategory = category;
 
-    // only fetches tasks if user's neighborhood has been retrieved
-    if (userNeighborhoodIsKnown()) {
+    // only fetches tasks if user's location has been retrieved
+    if (userLocationIsKnown()) {
         fetchTasks(category, currentMiles)
             .then(response => displayTasks(response));
     }
@@ -170,8 +170,8 @@ function confirmHelp(element) {
                 ("We're sorry, but the task you're trying to help with has already been claimed by another user.");
             window.location.href = '/';
         }
-        // fetches tasks again if user's current neighborhood was successfully retrieved and stored
-        else if (userNeighborhoodIsKnown()) {
+        // fetches tasks again if user's current location was successfully retrieved and stored
+        else if (userLocationIsKnown()) {
             fetchTasks(currentCategory, currentMiles).then(response => displayTasks(response));
         }
     });
@@ -218,7 +218,7 @@ function validateTaskForm(id) {
    and then shows the top scores modal */
 function showTopScoresModal() {
     loadTopScorers("world");
-    if (userNeighborhoodIsKnown()){
+    if (userLocationIsKnown()){
       loadTopScorers("nearby");
     }
     document.getElementById("topScoresModalWrapper").style.display = "block";
@@ -298,8 +298,8 @@ function closeTaskInfoModal() {
 }
 
 /* Function dynamically adds Maps API and
-begins the processes of retrieving the user's neighborhood*/
-function getUserNeighborhood() {
+begins the processes of retrieving the user's location*/
+function getTasksForUserLocation() {
     const script = document.createElement("script");
     script.type = "text/javascript";
     script.src =  "https://maps.googleapis.com/maps/api/js?key=" + MAPSKEY + "&callback=initialize&language=en";
@@ -308,14 +308,13 @@ function getUserNeighborhood() {
     document.head.appendChild(script);
 	
     // Once the Maps API script has dynamically loaded it gets the user location,
-    // waits until it gets an answer and then calls toNeighborhood passing the location
-    // as an argument, updates the global neighborhood variable and then calls
+    // waits until it gets an answer updates the global userLoaction variable and then calls
     // fetchTasks and displayTasks
 	window.initialize = function () {
         getUserLocation().then(() => fetchTasks(currentCategory, currentMiles))
             .then(jsonresponse => displayTasks(jsonresponse))
             .catch(() => {
-                console.error("User location and/or neighborhood could not be retrieved");
+                console.error("User location could not be retrieved");
                 document.getElementById("location-missing-message").style.display = "block";
             });
 	}
@@ -354,7 +353,7 @@ function locationByIPSuccesful() {
     });
 }
 
-/* Fetches tasks from servlet by neighborhood and category */
+/* Fetches tasks from servlet by location and category */
 function fetchTasks(category, miles) {
     let url = "/tasks?lat=" + userLocation.lat + "&lng=" + userLocation.lng + "&miles=" + miles;
     if (category !== undefined && category != "all") {
@@ -365,6 +364,8 @@ function fetchTasks(category, miles) {
 
 /* Displays the tasks received from the server response */
 function displayTasks(response) {
+
+    // If a response is passed, the the taskPagesCache is updated along with the next and prev page button styles
     if (response !== undefined) {
         taskPagesCache = response;
         let nextPageButton = document.getElementById("next-page");
@@ -376,6 +377,7 @@ function displayTasks(response) {
             nextPageButton.style.cursor = "not-allowed";
             nextPageButton.setAttribute("title", "You are already on the last page");
         }
+        // If displayTasks is called and the result has less pages than the page user was last at, the currentPage will get reset to 1
         if (currentPage > taskPagesCache.pageCount) {
             currentPage = 1;
         }
@@ -429,7 +431,7 @@ function addTasksClickHandlers() {
         }
 }
 
-/* Helper function that determines if the current user's neighborhood is known */
-function userNeighborhoodIsKnown() {
+/* Helper function that determines if the current user's location is known */
+function userLocationIsKnown() {
   return (userLocation !== null);
 }
