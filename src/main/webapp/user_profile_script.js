@@ -73,7 +73,6 @@ function validateMessage() {
 }
 
 async function loadMessages(keyString) {
-    console.log("Start loading");
     const queryURL = "/messages?key=" + keyString;
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
@@ -88,6 +87,9 @@ async function loadMessages(keyString) {
         newMessage.appendChild(document.createTextNode(msg.message)); 
         msgContainer.appendChild(newMessage);
     }
+
+    // Keep message container scrolled to bottom at the beginning
+    msgContainer.scrollTop = msgContainer.scrollHeight;
 }
 
 async function getTaskInfo(keyString) {
