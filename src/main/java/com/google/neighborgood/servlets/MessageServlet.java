@@ -34,45 +34,34 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /** Servlet that loads and records new message entities. */
 @WebServlet("/messages")
 public class MessageServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    HttpSession session = request.getSession();
     String taskId = request.getParameter("key");
     if (taskId == null) {
       System.err.println("No task id provided");
     }
 
+    // Make sure that the user has already logged into his account
+    UserService userService = UserServiceFactory.getUserService();
+    if (!userService.isUserLoggedIn()) {
+      response.sendRedirect(userService.createLoginURL("/account.jsp"));
+      return;
+    }
+
+    Filter filter = new FilterPredicate("taskId", FilterOperator.EQUAL, taskId);
+    Query query =
+        new Query("Message").setFilter(filter).addSort("sentTime", SortDirection.ASCENDING);
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    PreparedQuery results = datastore.prepare(query);
+
     List<Message> messages = new ArrayList<>();
-
-    // If the current session has not included the messages related with the query task, create
-    // a new attribute with key equals to taskId and value equals to a list of messages
-    if (session.getAttribute(taskId) == null) {
-      // Make sure that the user has already logged into his account
-      UserService userService = UserServiceFactory.getUserService();
-      if (!userService.isUserLoggedIn()) {
-        response.sendRedirect(userService.createLoginURL("/account.jsp"));
-        return;
-      }
-
-      Filter filter = new FilterPredicate("taskId", FilterOperator.EQUAL, taskId);
-      Query query =
-          new Query("Message").setFilter(filter).addSort("sentTime", SortDirection.ASCENDING);
-
-      DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-      PreparedQuery results = datastore.prepare(query);
-
-      for (Entity entity : results.asIterable()) {
-        messages.add(new Message(entity));
-      }
-
-      session.setAttribute(taskId, messages);
-    } else {
-      messages = (List<Message>) session.getAttribute(taskId);
+    for (Entity entity : results.asIterable()) {
+      messages.add(new Message(entity));
     }
 
     Gson gson = new Gson();
@@ -114,19 +103,7 @@ public class MessageServlet extends HttpServlet {
     msgEntity.setProperty("sender", userService.getCurrentUser().getUserId());
     msgEntity.setProperty("sentTime", System.currentTimeMillis());
 
-    // Update the attribute stored in session
-    HttpSession session = request.getSession();
-    if (session.getAttribute(taskId) == null) {
-      System.err.println("Illegal state of sending a message");
-    } else {
-      List<Message> messages = (List<Message>) session.getAttribute(taskId);
-      messages.add(new Message(msgEntity));
-      session.setAttribute(taskId, messages);
-
-      // After updating the session, store the message in datastore
-      datastore.put(msgEntity);
-    }
-
+    datastore.put(msgEntity);
     response.sendRedirect(request.getHeader("Referer"));
   }
 }
