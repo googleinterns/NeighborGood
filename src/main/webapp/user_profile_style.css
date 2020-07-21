@@ -296,7 +296,8 @@ table button:hover i {
 }
 
 #message-container {
-  max-height: 20%;
+  height: 250px;
+  max-height: 250px;
   overflow-y: auto;
   border: 4px solid black;
   border-radius: 2px;
@@ -313,8 +314,8 @@ table button:hover i {
 
 .sentByMe {
   color: white;
-  background-color: #1aff1a;
-  border: 2px solid #1aff1a;
+  background-color: #00cc00;
+  border: 2px solid #00cc00;
   text-align: right;
   border-radius: 5px;
   padding: 10px;

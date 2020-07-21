@@ -60,6 +60,18 @@ function validateInfoForm(id) {
     return true;
 }
 
+function validateMessage() {
+    var msgField = document.getElementById("msg-input").value.trim();
+    if (msgField === "") {
+        document.getElementById("msg-input").classList.add("highlight");
+        alert("You cannot send an empty message.");
+        return false;
+    } else {
+        document.getElementById("msg-input").classList.remove("highlight");
+        return true;
+    }
+}
+
 async function loadMessages(keyString) {
     console.log("Start loading");
     const queryURL = "/messages?key=" + keyString;
