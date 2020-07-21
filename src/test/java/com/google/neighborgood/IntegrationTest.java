@@ -768,35 +768,27 @@ public class IntegrationTest {
   private void backToHome() {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     // clicks on back to home button
-    for (int i = 0; i < 3; i++) {
-      if (!driver.getCurrentUrl().contains("index")) {
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.id("backtohome"));
-                  }
-                })
-            .click();
-        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-      }
-    }
+    wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("backtohome"));
+              }
+            })
+        .click();
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
   /** Sends driver to User Page */
   private void goToUserPage() {
     // clicks on userpage button
-    for (int i = 0; i < 3; i++) {
-      if (!driver.getCurrentUrl().contains("user_profile")) {
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath("//div[@id='dashboard-icon-container']/a"));
-                  }
-                })
-            .click();
-        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-      }
-    }
+    wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.xpath("//div[@id='dashboard-icon-container']/a"));
+              }
+            })
+        .click();
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
   /** Sends driver to the offer help table within the user page */
