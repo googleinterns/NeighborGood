@@ -143,7 +143,7 @@
       <!--Create Tasks Modal-->
       <div class="modalWrapper" id="createTaskModalWrapper">
         <div class="modal" id="createTaskModal">
-            <span class="close-button" id="close-addtask-button" onclick="closeCreateTaskModal()">&times;</span>
+            <span class="close-button" id="close-addtask-button">&times;</span>
             <form id="new-task-form" action="/tasks" method="POST" onsubmit="return validateTaskForm('new-task-form')">
                 <h1>CREATE A NEW TASK: </h1>
                 <div>

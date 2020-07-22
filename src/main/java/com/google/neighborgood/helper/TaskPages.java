@@ -22,6 +22,8 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -105,16 +107,19 @@ public class TaskPages {
       }
     }
     page.append("</div>");
-    page.append(
-            "<div class='task-content' onclick='showTaskInfo(\""
-                + KeyFactory.keyToString(entity.getKey())
-                + "\")'>")
+    page.append("<div class='task-content'>")
         .append((String) entity.getProperty("overview"))
         .append("</div>");
     page.append("<div class='task-footer'><div class='task-category'>#")
         .append((String) entity.getProperty("category"))
-        .append("</div></div>");
-    page.append("</div></div>");
+        .append("</div>");
+
+    Timestamp timestamp = new Timestamp((Long) entity.getProperty("timestamp"));
+    SimpleDateFormat timestampFormat = new SimpleDateFormat("HH:mm MM-dd-yyyy");
+
+    page.append("<div class='task-date-time'>")
+        .append((String) timestampFormat.format(timestamp))
+        .append("</div></div></div></div>");
 
     this.taskCount++;
   }
