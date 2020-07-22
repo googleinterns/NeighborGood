@@ -99,10 +99,8 @@ public class TaskServlet extends HttpServlet {
     query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, filters));
 
     // limits results to the 100 most recent tasks that will be queried once and distributed among
-    // 10 pages.
-    // Ideally 10 results would be queried each time there was a page change using Cursors, however
-    // cursors are not
-    // supported with geo-spatial queries.
+    // 10 pages. Ideally 10 results would be queried each time there was a page change using
+    // Cursors, however cursors are not supported with geo-spatial queries.
     List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(100));
 
     TaskPages taskPages = new TaskPages();
