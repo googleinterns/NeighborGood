@@ -126,10 +126,10 @@
                         </select>
                   </div>
                   <div id="pagination-wrapper">
-                  <div id="prev-page" class="pagination-icon" title="You are already on the first page">&#8249;</div>
-                  <div id="page-numbers-wrapper"></div>
-                  <div id="next-page" class="pagination-icon" title="You are already on the last page">&#8250;</div>
-                  </div
+                        <div id="prev-page" class="pagination-icon" title="You are already on the first page">&#8249;</div>
+                        <div id="page-numbers-wrapper"></div>
+                        <div id="next-page" class="pagination-icon" title="You are already on the last page">&#8250;</div>
+                  </div>
               </div>
               <div id="no-tasks-message" class="results-message">
                   Sorry, there are currently no tasks within your neighborhood for you to help with.

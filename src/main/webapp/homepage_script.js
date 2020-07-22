@@ -21,6 +21,7 @@ let taskPagesCache = null;
 let currentPageNumberNode = null;
 
 window.addEventListener("resize", displayPaginationUI);
+window.addEventListener("resize", window.onscroll);
 
 window.onscroll = function() {
     if (window.innerWidth >= 1204) {
