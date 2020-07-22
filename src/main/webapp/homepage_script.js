@@ -15,6 +15,7 @@
 const MAPSKEY = config.MAPS_KEY
 let userLocation = null;
 let currentCategory = "all";
+let currentMiles = 5;
 
 window.onscroll = function() {
     if (window.innerWidth >= 1204) {
@@ -56,6 +57,12 @@ function addUIClickHandlers() {
     document.getElementById("topscore-button").addEventListener("click", showTopScoresModal);
     document.getElementById("close-topscore-button").addEventListener("click", closeTopScoresModal);
     
+    // adds distance radius change event
+    document.getElementById("distance-radius").addEventListener("change", function(e) {
+        fetchTasks(currentCategory, e.target.value)
+            .then(response => displayTasks(response));
+    });
+
     // adds closeTaskInfoModal click event
     document.getElementById("task-info-close-button").addEventListener("click", closeTaskInfoModal);
 }
@@ -66,7 +73,7 @@ function filterTasksBy(category) {
 
     // only fetches tasks if user's neighborhood has been retrieved
     if (userNeighborhoodIsKnown()) {
-        fetchTasks(category)
+        fetchTasks(category, currentMiles)
             .then(response => displayTasks(response));
     }
 	// Unhighlights and resets styling for all category buttons
@@ -116,7 +123,7 @@ function confirmHelp(element) {
         }
         // fetches tasks again if user's current neighborhood was successfully retrieved and stored
         else if (userNeighborhoodIsKnown()) {
-            fetchTasks(currentCategory).then(response => displayTasks(response));
+            fetchTasks(currentCategory, currentMiles).then(response => displayTasks(response));
         }
     });
 }
@@ -257,7 +264,7 @@ function getUserNeighborhood() {
     // as an argument, updates the global neighborhood variable and then calls
     // fetchTasks and displayTasks
 	window.initialize = function () {
-        getUserLocation().then(() => fetchTasks())
+        getUserLocation().then(() => fetchTasks(currentCategory, currentMiles))
             .then((response) => displayTasks(response))
             .catch(() => {
                 console.error("User location and/or neighborhood could not be retrieved");
@@ -300,8 +307,8 @@ function locationByIPSuccesful() {
 }
 
 /* Fetches tasks from servlet by neighborhood and category */
-function fetchTasks(category) {
-    let url = "/tasks?lat=" + userLocation.lat + "&lng=" + userLocation.lng;
+function fetchTasks(category, miles) {
+    let url = "/tasks?lat=" + userLocation.lat + "&lng=" + userLocation.lng + "&miles=" + miles;
     if (category !== undefined && category != "all") {
         url += "&category=" + category;
     }
