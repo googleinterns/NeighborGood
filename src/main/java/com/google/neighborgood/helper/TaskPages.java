@@ -120,9 +120,10 @@ public class TaskPages {
   }
 
   /**
-   * If there are no more tasks to add, it adds the current/last page onto the taskPages ArrayList
+   * If there are no more tasks to add, this method can be used to add the current/last page onto
+   * the taskPages ArrayList
    */
-  public void addLastPage() {
+  public void endPages() {
     this.taskPages.add(page.toString());
     this.pageCount++;
   }

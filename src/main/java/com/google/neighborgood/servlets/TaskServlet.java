@@ -110,7 +110,7 @@ public class TaskServlet extends HttpServlet {
       taskPages.addTask(entity);
     }
 
-    taskPages.addLastPage();
+    taskPages.endPages();
 
     Gson gson = new Gson();
     String json = gson.toJson(taskPages);
