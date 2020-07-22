@@ -57,7 +57,6 @@ public class TaskPages {
   public void addTask(Entity entity) {
 
     // adds current page to taskPages and starts new page if task count for current page reached 10
-    // already
     if (this.taskCount % 10 == 0 && this.taskCount != 0) {
       this.taskPages.add(page.toString());
       this.page = new StringBuilder();
