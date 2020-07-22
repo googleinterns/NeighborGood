@@ -13,7 +13,7 @@
 // limitations under the License.
 
 const MAPSKEY = config.MAPS_KEY
-let neighborhood = [null , null];
+let userLocation = null;
 let currentCategory = "all";
 
 window.onscroll = function() {
@@ -29,7 +29,7 @@ window.onscroll = function() {
 /* Calls addUIClickHandlers and getUserNeighborhood once page has loaded */
 if (document.readyState === 'loading') {
     // adds on load event listeners if document hasn't yet loaded
-    document.addEventListener('DOMContentLoaded', addUIClickHandlers)
+    document.addEventListener('DOMContentLoaded', addUIClickHandlers);
     document.addEventListener('DOMContentLoaded', getUserNeighborhood);
 } else {
     // if DOMContentLoaded has already fired, it simply calls the functions
@@ -158,12 +158,12 @@ function validateTaskForm(id) {
     return true;
 }
 
-/* Function that calls the loadTopScorersBy functions
+/* Function that calls the loadTopScorers functions
    and then shows the top scores modal */
 function showTopScoresModal() {
-    loadTopScorersBy("world");
+    loadTopScorers("world");
     if (userNeighborhoodIsKnown()){
-      loadTopScorersBy("neighborhood");
+      loadTopScorers("nearby");
     }
     document.getElementById("topScoresModalWrapper").style.display = "block";
 }
@@ -174,10 +174,10 @@ function closeTopScoresModal() {
 }
 
 /* Function loads the data for the top scorers table */
-function loadTopScorersBy(location) {
+function loadTopScorers(location) {
     let url = "/account?action=topscorers";
-    if (location === "neighborhood") {
-      url += "&zipcode=" + neighborhood[0] + "&country=" + neighborhood[1];
+    if (location === "nearby") {
+      url += "&lat=" + userLocation.lat + "&lng=" + userLocation.lng;
     }
     fetch(url)
       .then(response => response.json())
@@ -257,8 +257,7 @@ function getUserNeighborhood() {
     // as an argument, updates the global neighborhood variable and then calls
     // fetchTasks and displayTasks
 	window.initialize = function () {
-        getUserLocation().then(location => toNeighborhood(location))
-        	.then(() => fetchTasks())
+        getUserLocation().then(() => fetchTasks())
             .then((response) => displayTasks(response))
             .catch(() => {
                 console.error("User location and/or neighborhood could not be retrieved");
@@ -272,60 +271,37 @@ function getUserLocation() {
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
-                var location = {lat: position.coords.latitude, lng: position.coords.longitude};
-                resolve(location);
-            }, function(err) {
-                let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
-                const request = new Request(url, {method: "POST"});
-                fetch(request).then(response => {
-                    if (response.status == 400 || response.status == 403 || response.status == 404) {
-                        reject("User location failed");
-                    } else {
-                        response.json().then(jsonresponse => {
-                            resolve(jsonresponse["location"]);
-                        });
-                    }
-                });
+                userLocation = {lat: position.coords.latitude, lng: position.coords.longitude};
+                resolve(userLocation);
+            }, function() {
+                if (locationByIPSuccesful()) resolve(userLocation);
+                else reject("User location failed");
             });
         } else {
-            reject("User location is not supported by this browser");
+            if (locationByIPSuccesful()) resolve(userLocation);
+            else reject("User location failed");
         }
     });
 }
-       
 
-/* Function that returns a promise to return a neighborhood
-array that includes the postal code and country */
-function toNeighborhood(latlng) {
-	return new Promise((resolve, reject) => {
-        const geocoder = new google.maps.Geocoder;
-        geocoder.geocode({"location": latlng}, function(results, status) {
-            if (status == "OK") {
-                if (results[0]) {
-                    const result = results[0]
-                    let zipCode = "";
-                    let country ="";
-                    for (let i = result.address_components.length - 1; i >= 0; i--) {
-                        let component = result.address_components[i];
-                        if ((zipCode == "") && (component.types.indexOf("postal_code") >= 0 )) {
-                            zipCode = component.long_name;
-                        }
-                        if ((country == "") && (component.types.indexOf("country") >= 0 )) {
-                            country = component.long_name;
-                        }
-                        if (zipCode != "" && country != "") break;
-                    }
-                    neighborhood = [zipCode, country];
-                    resolve([zipCode, country]);
-                } else reject("Couldn't get neighborhood");
-            } else reject("Couldn't get neighborhood");
-        });
+function locationByIPSuccesful() {
+    let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
+    const request = new Request(url, {method: "POST"});
+    fetch(request).then(response => {
+        if (response.status == 400 || response.status == 403 || response.status == 404) {
+            return false;
+        } else {
+            response.json().then(jsonresponse => {
+                userLocation = jsonresponse["location"];
+                return true;
+            });
+        }
     });
 }
 
 /* Fetches tasks from servlet by neighborhood and category */
 function fetchTasks(category) {
-    let url = "/tasks?zipcode=" + neighborhood[0]+ "&country=" + neighborhood[1];
+    let url = "/tasks?lat=" + userLocation.lat + "&lng=" + userLocation.lng;
     if (category !== undefined && category != "all") {
         url += "&category=" + category;
     }
@@ -400,5 +376,5 @@ function addTasksClickHandlers() {
 
 /* Helper function that determines if the current user's neighborhood is known */
 function userNeighborhoodIsKnown() {
-  return (neighborhood[0] !== null && neighborhood[1] !== null);
+  return (userLocation !== null);
 }

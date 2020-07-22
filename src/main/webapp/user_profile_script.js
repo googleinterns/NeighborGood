@@ -42,19 +42,25 @@ function validateTaskForm(id) {
 function validateInfoForm(id) {
     var result = true;
     var form = document.getElementById(id);
-    var inputName = ["nickname", "address", "zipcode", "country", "phone"];
+    var inputName = ["nickname", "address", "zipcode", "country", "phone", "lat", "lng"];
     for (var i = 0; i < inputName.length; i++) {
         var name = inputName[i];
         var inputField = form[name.concat("-input")].value.trim();
         if (inputField === "") {
             result = false;
             form[name.concat("-input")].classList.add("highlight");
+            if (inputName[i] === "lat" || inputName[i] === "lng") {
+                document.getElementById("map").classList.add("highlight");
+            }
         } else {
             form[name.concat("-input")].classList.remove("highlight");
+            if (inputName[i] === "lat" || inputName[i] === "lng") {
+                document.getElementById("map").classList.remove("highlight");
+            }
         }
     }
     if (!result) {
-        alert("All fields are required. Please fill out all fields with non-empty input.");
+        alert("All fields are required. Please fill out all fields with non-empty input and mark your personal address on the map.");
         return false;
     }
     return true;
@@ -623,7 +629,17 @@ async function initMap() {
         });
 
         function onError() {
-            console.log("Unable to resolve the user's current location");
+            let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
+            const request = new Request(url, {method: "POST"});
+            fetch(request).then(response => {
+                if (response.status == 400 || response.status == 403 || response.status == 404) {
+                    console.log("Unable to resolve the user's current location");
+                } else {
+                    response.json().then(jsonresponse => {
+                        map.setCenter(jsonresponse["location"]);
+                    });
+                }
+            });
         }
 
         function onSuccess(geo) {
@@ -637,7 +653,7 @@ async function initMap() {
         }
 
         if (!navigator.geolocation) {
-            onError();
+            console.log("Unable to resolve the user's current location");
         } else {
             await navigator.geolocation.getCurrentPosition(onSuccess, onError);
         }
@@ -669,9 +685,13 @@ function displayMarker(position) {
     // There is at most one marker displayed on the map
     if (markers.length > 0) {
         markers[0].setMap(null);
-    }
+    } 
     markers = [];
     markers.push(marker);
+
+    document.getElementById("lat-input").value = position.lat();
+    document.getElementById("lng-input").value = position.lng();
+
     return marker;
 }
 
@@ -685,6 +705,8 @@ function deleteMarker(latitude, longitude) {
             return false;
         }
     });
+    document.getElementById("lat-input").value = '';
+    document.getElementById("lng-input").value = '';
 }
 
 function geocodeLatLng(geocoder, map, infowindow, position, marker) {

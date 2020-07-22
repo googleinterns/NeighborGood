@@ -19,6 +19,7 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.GeoPt;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
@@ -28,6 +29,7 @@ import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import com.google.neighborgood.helper.RetrieveUserInfo;
 import com.google.neighborgood.helper.RewardingPoints;
+import com.google.neighborgood.helper.UnitConversion;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -48,27 +50,35 @@ public class TaskServlet extends HttpServlet {
     UserService userService = UserServiceFactory.getUserService();
     boolean userLoggedIn = userService.isUserLoggedIn();
     String userId = userLoggedIn ? userService.getCurrentUser().getUserId() : "null";
-    String zipcode = "";
-    String country = "";
+    Float lat = null;
+    Float lng = null;
 
-    if (request.getParameterMap().containsKey("zipcode")
-        && request.getParameterMap().containsKey("country")) {
-      zipcode = request.getParameter("zipcode");
-      country = request.getParameter("country");
+    if (request.getParameterMap().containsKey("lat")
+        && request.getParameterMap().containsKey("lng")) {
+      try {
+        lat = Float.parseFloat(request.getParameter("lat"));
+        lng = Float.parseFloat(request.getParameter("lng"));
+      } catch (NumberFormatException e) {
+        System.err.println("Invalid location coordinates");
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid location coordinates");
+      }
     } else {
-      System.err.println("Zipcode and Country details are missing");
-      response.sendError(
-          HttpServletResponse.SC_BAD_REQUEST, "Zipcode and Country details are missing");
+      System.err.println("Location coordinates are missing");
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Location coordinates are missing");
     }
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    GeoPt userLocation = new GeoPt(lat, lng);
+    double FIVE_MILE_RADIUS = UnitConversion.milesToMeters(5);
 
     Query query = new Query("Task").addSort("timestamp", SortDirection.DESCENDING);
 
     // Creates list of filters
     List<Query.Filter> filters = new ArrayList<Query.Filter>();
-    filters.add(new Query.FilterPredicate("zipcode", Query.FilterOperator.EQUAL, zipcode));
-    filters.add(new Query.FilterPredicate("country", Query.FilterOperator.EQUAL, country));
+    filters.add(
+        new Query.StContainsFilter(
+            "location", new Query.GeoRegion.Circle(userLocation, FIVE_MILE_RADIUS)));
     filters.add(new Query.FilterPredicate("status", Query.FilterOperator.EQUAL, "OPEN"));
 
     // Applies a category filter, if any
@@ -240,6 +250,7 @@ public class TaskServlet extends HttpServlet {
     String formattedAddress = (String) userEntity.getProperty("address");
     String country = (String) userEntity.getProperty("country");
     String zipcode = (String) userEntity.getProperty("zipcode");
+    GeoPt location = (GeoPt) userEntity.getProperty("location");
 
     // Create an Entity that stores the input comment
     Entity taskEntity = new Entity("Task", userEntity.getKey());
@@ -253,6 +264,7 @@ public class TaskServlet extends HttpServlet {
     taskEntity.setProperty("Address", formattedAddress);
     taskEntity.setProperty("zipcode", zipcode);
     taskEntity.setProperty("country", country);
+    taskEntity.setProperty("location", location);
     taskEntity.setProperty("category", taskCategory);
 
     datastore.put(taskEntity);
