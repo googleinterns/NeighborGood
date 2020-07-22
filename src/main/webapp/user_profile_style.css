@@ -293,3 +293,39 @@ table button:hover i {
   margin: 2px;
   color: red;
 }
+
+#message-container {
+  height: 250px;
+  max-height: 250px;
+  overflow-y: auto;
+  border: 4px solid black;
+  border-radius: 2px;
+  margin-bottom: 5px;
+}
+
+.sentByOthers {
+  float: left;
+  clear: both;
+  max-width: 40%;
+  word-wrap: normal;
+  overflow-wrap: break-word;
+  border: 2px solid #dedede;
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 10px;
+}
+
+.sentByMe {
+  float: right;
+  clear: both;
+  max-width: 40%;
+  word-wrap: normal;
+  overflow-wrap: break-word;
+  color: white;
+  background-color: #0c0;
+  border: 2px solid #0c0;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 10px;
+}
