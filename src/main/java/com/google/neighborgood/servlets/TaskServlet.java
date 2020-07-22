@@ -29,12 +29,10 @@ import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import com.google.neighborgood.helper.RetrieveUserInfo;
 import com.google.neighborgood.helper.RewardingPoints;
+import com.google.neighborgood.helper.TaskPages;
 import com.google.neighborgood.helper.UnitConversion;
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -100,76 +98,22 @@ public class TaskServlet extends HttpServlet {
     // Applies filters to query
     query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, filters));
 
-    // limits results to the 20 most recent tasks
-    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(20));
+    // limits results to the 100 most recent tasks that will be queried once and distributed among
+    // 10 pages. Ideally 10 results would be queried each time there was a page change using
+    // Cursors, however cursors are not supported with geo-spatial queries.
+    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(100));
 
-    StringBuilder out = new StringBuilder();
-
-    // Stores task owner's user info to prevent querying multiple
-    // times in datastore for the same user's info
-    HashMap<String, String> usersNicknames = new HashMap<String, String>();
+    TaskPages taskPages = new TaskPages();
 
     // Builds and stores HTML for each task
     for (Entity entity : results) {
-      out.append("<div class='task' data-key='")
-          .append(KeyFactory.keyToString(entity.getKey()))
-          .append("'>");
-      if (userLoggedIn) {
-        out.append("<div class='help-overlay'>");
-        out.append("<div class='exit-help'><a>&times</a></div>");
-        out.append("<a class='confirm-help'>CONFIRM</a>");
-        out.append("</div>");
-      }
-      out.append("<div class='task-container'>");
-      out.append("<div class='task-header'>");
-      out.append("<div class='user-nickname'>");
-
-      // Checks if tasks's user nickname has already been retrieved,
-      // otherwise retrieves it and temporarily stores it
-      String taskOwner = (String) entity.getProperty("Owner");
-      if (usersNicknames.containsKey(taskOwner)) {
-        out.append(usersNicknames.get(taskOwner));
-      } else {
-        Key taskOwnerKey = entity.getParent();
-        try {
-          Entity userEntity = datastore.get(taskOwnerKey);
-          String userNickname = (String) userEntity.getProperty("nickname");
-          usersNicknames.put(taskOwner, userNickname);
-          out.append(userNickname);
-        } catch (EntityNotFoundException e) {
-          System.err.println(
-              "Unable to find the task's owner info to retrieve the owner's nickname. Setting a default nickname.");
-          out.append("Neighbor");
-        }
-      }
-      out.append("</div>");
-      if (userLoggedIn) {
-        // changes the Help Button div if the current user is the owner of the task
-        if (!userId.equals(taskOwner)) {
-          out.append("<div class='help-out'>HELP OUT</div>");
-        } else {
-          out.append(
-              "<div class='help-out disable-help' title='This is your own task'>HELP OUT</div>");
-        }
-      }
-      out.append("</div>");
-      out.append("<div class='task-content'>")
-          .append((String) entity.getProperty("overview"))
-          .append("</div>");
-      out.append("<div class='task-footer'><div class='task-category'>#")
-          .append((String) entity.getProperty("category"))
-          .append("</div>");
-
-      Timestamp timestamp = new Timestamp((Long) entity.getProperty("timestamp"));
-      SimpleDateFormat timestampFormat = new SimpleDateFormat("HH:mm MM-dd-yyyy");
-
-      out.append("<div class='task-date-time'>")
-          .append((String) timestampFormat.format(timestamp))
-          .append("</div></div></div></div>");
+      taskPages.addTask(entity);
     }
 
+    taskPages.endPages();
+
     Gson gson = new Gson();
-    String json = gson.toJson(out.toString());
+    String json = gson.toJson(taskPages);
     response.setContentType("application/json;");
     response.getWriter().println(json);
   }
