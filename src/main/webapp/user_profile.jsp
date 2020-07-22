@@ -224,16 +224,12 @@
             <h1>Chat: </h1>
             <div id="message-container"></div>
             <form id="chat-box" action="/messages" method="POST" onsubmit="return validateMessage()">
-                <div>
-                    <label for="msg">Message</label>
-                    <br/>
-                </div>
                 <br/>
                 <textarea name="msg" id="msg-input" placeholder="Type message.."></textarea>
                 <input type="hidden" name="task-id" id="chat-id-input">
                 <br/>
                 <br/>
-                <input type="submit" />
+                <button type="submit" form="chat-box" id="send-button"><i class="fa fa-paper-plane fa-2x"></i></button>
             </form>
         </div>
     </div>
