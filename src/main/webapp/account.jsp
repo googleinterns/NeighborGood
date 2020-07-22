@@ -62,6 +62,21 @@
                 <input type="text" name="phone-input" id="phone-input" placeholder="Input your phone number here:">
                 <input type="hidden" name="lat-input" id="lat-input">
                 <input type="hidden" name="lng-input" id="lng-input">
+                <!-- If account.jsp was loaded after being forwarded from /tasks, we pass on the task parameters as well -->
+                <%
+                if (request.getAttribute("javax.servlet.forward.request_uri") != null && request.getAttribute("javax.servlet.forward.request_uri").equals("/tasks")) {
+                    String overview = request.getParameter("task-overview-input");
+                    String detail = request.getParameter("task-detail-input");
+                    String reward = request.getParameter("reward-input");
+                    String category = request.getParameter("category-input");
+                %>
+                    <input type="hidden" name="task-overview-input" value="<%=overview%>">
+                    <input type="hidden" name="task-detail-input" value="<%=detail%>">
+                    <input type="hidden" name="reward-input" value="<%=reward%>">
+                    <input type="hidden" name="category-input" value="<%=category%>">
+                <%     
+                }
+                %>
                 <br/><br/>
                 <button type="submit" id="submit-button"/>GET STARTED</button>
                 <br/><br/>

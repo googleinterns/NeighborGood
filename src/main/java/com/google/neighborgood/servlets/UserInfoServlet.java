@@ -32,6 +32,8 @@ import com.google.neighborgood.helper.UnitConversion;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -95,7 +97,8 @@ public class UserInfoServlet extends HttpServlet {
   }
 
   @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doPost(HttpServletRequest request, HttpServletResponse response)
+      throws IOException, ServletException {
     UserService userService = UserServiceFactory.getUserService();
     if (!userService.isUserLoggedIn()) {
       response.sendRedirect(userService.createLoginURL("/account.jsp"));
@@ -174,6 +177,12 @@ public class UserInfoServlet extends HttpServlet {
     }
     datastore.put(entity);
 
+    // If task details were forwarded, then forward this request back to /tasks
+    if (request.getParameterMap().containsKey("task-overview-input")) {
+      RequestDispatcher rd = request.getRequestDispatcher("/tasks");
+      rd.forward(request, response);
+      return;
+    }
     response.sendRedirect("/user_profile.jsp");
   }
 
