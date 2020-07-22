@@ -25,14 +25,20 @@ import com.google.appengine.api.users.UserServiceFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Helper class that stores the HTML depiction of tasks in groups of 10 per ArrayList index to
+ * assist with pagination
+ */
 public class TaskPages {
-  private static HashMap<String, String> usersNicknames;
+  private static HashMap<String, String>
+      usersNicknames; // Stores task owner's user info to prevent querying multiple times in
+  // datastore for the same user's info
   private static DatastoreService datastore;
   private final boolean userLoggedIn;
   private final String userId;
   private int pageCount;
   private int taskCount;
-  private StringBuilder page;
+  private StringBuilder page; // String-like representation of a page's worth of tasks
   private ArrayList<String> taskPages;
 
   public TaskPages() {
@@ -47,9 +53,11 @@ public class TaskPages {
     this.pageCount = 0;
   }
 
+  /** addTask method adds a single task HTML string to the page variable */
   public void addTask(Entity entity) {
 
-    // starts new page if task count for current page reached 10 already
+    // adds current page to taskPages and starts new page if task count for current page reached 10
+    // already
     if (this.taskCount % 10 == 0 && this.taskCount != 0) {
       this.taskPages.add(page.toString());
       this.page = new StringBuilder();
@@ -112,6 +120,9 @@ public class TaskPages {
     this.taskCount++;
   }
 
+  /**
+   * If there are no more tasks to add, it adds the current/last page onto the taskPages ArrayList
+   */
   public void addLastPage() {
     this.taskPages.add(page.toString());
     this.pageCount++;
