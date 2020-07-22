@@ -20,6 +20,8 @@ let currentPage = 1;
 let taskPagesCache = null;
 let currentPageNumberNode = null;
 
+window.addEventListener("resize", displayPaginationUI);
+
 //window.onscroll = stickyControlBar;
 
 /* Scroll function so that the control bar sticks to the top of the page */
@@ -76,7 +78,10 @@ function addUIClickHandlers() {
     // adds distance radius change event
     document.getElementById("distance-radius").addEventListener("change", function(e) {
         fetchTasks(currentCategory, e.target.value)
-            .then(response => displayTasks(response));
+            .then(response => {
+                    displayTasks(response);
+                    displayPaginationUI();
+                });
     });
 
     // adds nextPage and prevPage click events
@@ -89,16 +94,6 @@ function prevPage() {
     if (currentPage > 1) {
         currentPage--;
         displayTasks(); 
-        if (currentPage === 1) {
-            let prevPageButton = document.getElementById("prev-page");
-            prevPageButton.style.cursor = "not-allowed";
-            prevPageButton.setAttribute("title", "You are already on the first page");
-        }
-        if (currentPage < taskPagesCache.pageCount) {
-            let nextPageButton = document.getElementById("next-page");
-            nextPageButton.style.cursor = "pointer";
-            nextPageButton.removeAttribute("title");
-        }
         displayPaginationUI();
     } 
 }
@@ -108,13 +103,6 @@ function nextPage() {
     if (currentPage < taskPagesCache.pageCount) {
         currentPage++;
         displayTasks();
-        document.getElementById("prev-page").style.cursor = "pointer";
-        document.getElementById("prev-page").removeAttribute("title");
-        if (currentPage === taskPagesCache.pageCount) {
-            let nextPageButton = document.getElementById("next-page");
-            nextPageButton.style.cursor = "not-allowed";
-            nextPageButton.setAttribute("title", "You are already on the last page");
-        }
         displayPaginationUI();
     }
 }
@@ -126,7 +114,10 @@ function filterTasksBy(category) {
     // only fetches tasks if user's location has been retrieved
     if (userLocationIsKnown()) {
         fetchTasks(category, currentMiles)
-            .then(response => displayTasks(response));
+            .then(response => {
+                    displayTasks(response);
+                    displayPaginationUI();
+                });
     }
 	// Unhighlights and resets styling for all category buttons
     const categoryButtons = document.getElementsByClassName("categories");
@@ -175,7 +166,10 @@ function confirmHelp(element) {
         }
         // fetches tasks again if user's current location was successfully retrieved and stored
         else if (userLocationIsKnown()) {
-            fetchTasks(currentCategory, currentMiles).then(response => displayTasks(response));
+            fetchTasks(currentCategory, currentMiles).then(response => {
+                    displayTasks(response);
+                    displayPaginationUI();
+                });
         }
     });
 }
@@ -315,7 +309,10 @@ function getTasksForUserLocation() {
     // fetchTasks and displayTasks
 	window.initialize = function () {
         getUserLocation().then(() => fetchTasks(currentCategory, currentMiles))
-            .then(jsonresponse => displayTasks(jsonresponse))
+            .then(response => {
+                    displayTasks(response);
+                    displayPaginationUI();
+                })
             .catch(() => {
                 console.error("User location could not be retrieved");
                 document.getElementById("location-missing-message").style.display = "block";
@@ -341,6 +338,7 @@ function getUserLocation() {
     });
 }
 
+/* Function used as a fallback to retrieve the user's location by IP address */
 function locationByIPSuccesful() {
     let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
     const request = new Request(url, {method: "POST"});
@@ -367,11 +365,13 @@ function fetchTasks(category, miles) {
 
 /* Displays the tasks received from the server response */
 function displayTasks(response) {
-
     // If a response is passed, the the taskPagesCache is updated along with the next and prev page buttons 
     if (response !== undefined) {
         taskPagesCache = response;
-        displayPaginationUI();
+        // If displayTasks is called and the result has less pages than the page user was last at, the currentPage will get reset to 1
+        if (currentPage > taskPagesCache.pageCount) {
+            currentPage = 1;
+        }
     }
     if (taskPagesCache !== null && taskPagesCache.taskCount > 0) {
         document.getElementById("no-tasks-message").style.display = "none";
@@ -386,87 +386,81 @@ function displayTasks(response) {
     }
 }
 
+/** Function loads and displays all the pagination UI components (page numbers and buttons) */
 function displayPaginationUI() {
-    let nextPageButton = document.getElementById("next-page");
-        let prevPageButton = document.getElementById("prev-page");
-        if (taskPagesCache.pageCount > 1) {
-            nextPageButton.style.cursor = "pointer";
-            nextPageButton.removeAttribute("title");
-        } else {
-            nextPageButton.style.cursor = "not-allowed";
-            nextPageButton.setAttribute("title", "You are already on the last page");
-        }
-        // If displayTasks is called and the result has less pages than the page user was last at, the currentPage will get reset to 1
-        if (currentPage > taskPagesCache.pageCount) {
-            currentPage = 1;
-        }
-        if (currentPage > 1) {
-            prevPageButton.style.cursor = "pointer";
-            prevPageButton.removeAttribute("title");
-        } else {
-            prevPageButton.style.cursor = "not-allowed";
-            prevPageButton.setAttribute("title", "You are already on the first page");
-        }
-
+    updatePageButtonStyling();
     let pageNumbersWrapper = document.getElementById("page-numbers-wrapper");
     pageNumbersWrapper.innerHTML = "";
-    if (taskPagesCache.pageCount <= 5 || (window.innerWidth >= 375)) {
-        for (let i = 1; i <= taskPagesCache.pageCount; i++) {
-            let pageNumber = document.createElement("a");
-            pageNumber.classList.add("page-number");
-            if (i === currentPage) pageNumber.setAttribute("id", "current-page");
-            pageNumber.innerText = i;
-            pageNumber.addEventListener("click", function() {
-                currentPageNumberNode.removeAttribute("id");
-                currentPageNumberNode = pageNumber;
-                currentPage = i;
-                pageNumber.setAttribute("id", "current-page");
-                displayTasks();
-            });
-            pageNumbersWrapper.appendChild(pageNumber);
-        }
-    } else {
+
+    // Page numbers displayed for smaller screens with several pages should
+    // show only the first, current, and last page
+    if (taskPagesCache.pageCount >= 5 && (window.innerWidth < 375)) {
         let pageNumberSpacing = document.createElement("div");
         pageNumberSpacing.classList.add("page-number-spacing");
         pageNumberSpacing.innerText = "...";
 
+        // Only displays first page if the current page isn't already the first page
         if (currentPage !== 1) {
-            let firstPageNumber = document.createElement("a");
-            firstPageNumber.classList.add("page-number");
-            firstPageNumber.innerText = 1;
-            firstPageNumber.addEventListener("click", function() {
-                    currentPageNumberNode.removeAttribute("id");
-                    currentPageNumberNode = pageNumber;
-                    currentPage = 1;
-                    pageNumber.setAttribute("id", "current-page");
-                    displayTasks();
-                });
+            let firstPageNumber = createPageNumberElement(1);
             pageNumbersWrapper.appendChild(firstPageNumber);
             pageNumbersWrapper.appendChild(pageNumberSpacing);
         }
 
-        let currentPageNumber = document.createElement("a");
-        currentPageNumber.classList.add("page-number");
-        currentPageNumber.setAttribute("id", "current-page");
-        currentPageNumber.innerText = currentPage;
+        let currentPageNumber = createPageNumberElement(currentPage);
         pageNumbersWrapper.appendChild(currentPageNumber);
 
+        // Only displays last page if the current page isn't already the last page
         if (currentPage != taskPagesCache.pageCount) {
             pageNumbersWrapper.appendChild(pageNumberSpacing.cloneNode(true));
-            let lastPageNumber = document.createElement("a");
-            lastPageNumber.classList.add("page-number");
-            lastPageNumber.innerText = taskPagesCache.pageCount;
-            lastPageNumber.addEventListener("click", function() {
-                    currentPageNumberNode.removeAttribute("id");
-                    currentPageNumberNode = lastPageNumber;
-                    lastPageNumber.setAttribute("id", "current-page");
-                    currentPage = taskPagesCache.pageCount;
-                    displayTasks();
-                });
+            let lastPageNumber = createPageNumberElement(taskPagesCache.pageCount);
             pageNumbersWrapper.appendChild(lastPageNumber);
+        }
+
+    // Displays all page numbers if less than 5 pages or if the screen is big enough
+    } else {
+        for (let i = 1; i <= taskPagesCache.pageCount; i++) {
+            let pageNumber = createPageNumberElement(i);
+            pageNumbersWrapper.appendChild(pageNumber);
         }
     }
     currentPageNumberNode = document.getElementById("current-page");
+}
+
+/** Helper function that creates a page number element when provided with the page number */
+function createPageNumberElement(number) {
+    let pageNumber = document.createElement("a");
+    pageNumber.classList.add("page-number");
+    pageNumber.innerText = number;
+    if (currentPage === number) pageNumber.setAttribute("id", "current-page");
+    pageNumber.addEventListener("click", function() {
+            currentPageNumberNode.removeAttribute("id");
+            currentPageNumberNode = pageNumber;
+            currentPage = number;
+            pageNumber.setAttribute("id", "current-page");
+            displayPaginationUI();
+            displayTasks();
+        });
+    return pageNumber;
+}
+
+/** Function Updates the attributes and styles of the next and prev page buttons upon page changes */
+function updatePageButtonStyling() {
+    let nextPageButton = document.getElementById("next-page");
+    let prevPageButton = document.getElementById("prev-page");
+    if (currentPage === taskPagesCache.pageCount) {
+        nextPageButton.style.cursor = "not-allowed";
+        nextPageButton.setAttribute("title", "You are already on the last page");
+    } else {
+        nextPageButton.style.cursor = "pointer";
+        nextPageButton.removeAttribute("title");
+    }
+    if (currentPage === 1) {
+        prevPageButton.style.cursor = "not-allowed";
+        prevPageButton.setAttribute("title", "You are already on the first page");
+    } else {
+        prevPageButton.style.cursor = "pointer";
+        prevPageButton.removeAttribute("title");
+    }
 }
 
 /* Function adds all the necessary tasks 'click' event listeners*/
