@@ -26,6 +26,7 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.GeoPt;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.users.UserService;
@@ -102,6 +103,8 @@ public final class UserInfoServletTest {
     when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
     when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
     when(request.getParameter("country-input")).thenReturn("United States");
+    when(request.getParameter("lat-input")).thenReturn("40.440836");
+    when(request.getParameter("lng-input")).thenReturn("-79.958306");
 
     new UserInfoServlet().doPost(request, response);
 
@@ -121,6 +124,8 @@ public final class UserInfoServletTest {
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
     assertEquals("1234567890", entity.getKey().getName());
+    assertEquals(
+        new GeoPt((float) 40.440836, (float) -79.958306), (GeoPt) entity.getProperty("location"));
     assertEquals(0, (long) entity.getProperty("points"));
 
     when(request.getParameter("nickname-input")).thenReturn("Leo");
@@ -143,6 +148,8 @@ public final class UserInfoServletTest {
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
     assertEquals("1234567890", entity.getKey().getName());
+    assertEquals(
+        new GeoPt((float) 40.440836, (float) -79.958306), (GeoPt) entity.getProperty("location"));
     assertEquals(0, (long) entity.getProperty("points"));
   }
 
@@ -159,6 +166,8 @@ public final class UserInfoServletTest {
     dummy.setProperty("phone", "xxx");
     dummy.setProperty("email", "test@example.com");
     dummy.setProperty("points", 0);
+    dummy.setProperty("location", new GeoPt((float) 41.440836, (float) -78.958306));
+
     ds.put(dummy);
     Entity dummy_2 = new Entity("UserInfo", "12345");
     dummy_2.setProperty("nickname", "Leonar");
@@ -166,6 +175,7 @@ public final class UserInfoServletTest {
     dummy_2.setProperty("phone", "xxx");
     dummy_2.setProperty("email", "test2@example.com");
     dummy_2.setProperty("points", 50);
+    dummy.setProperty("location", new GeoPt((float) 40.440836, (float) -77.958306));
     ds.put(dummy_2);
 
     when(request.getParameter("nickname-input")).thenReturn("Leonard");
@@ -173,6 +183,8 @@ public final class UserInfoServletTest {
     when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
     when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
     when(request.getParameter("country-input")).thenReturn("United States");
+    when(request.getParameter("lat-input")).thenReturn("42.440836");
+    when(request.getParameter("lng-input")).thenReturn("-76.958306");
 
     new UserInfoServlet().doPost(request, response);
 
@@ -198,6 +210,8 @@ public final class UserInfoServletTest {
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
     assertEquals("1234567890", entity.getKey().getName());
+    assertEquals(
+        new GeoPt((float) 42.440836, (float) -76.958306), (GeoPt) entity.getProperty("location"));
     assertEquals(0, (long) entity.getProperty("points"));
 
     when(request.getParameter("nickname-input")).thenReturn("Leo");
@@ -223,6 +237,8 @@ public final class UserInfoServletTest {
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
     assertEquals("1234567890", entity.getKey().getName());
+    assertEquals(
+        new GeoPt((float) 42.440836, (float) -76.958306), (GeoPt) entity.getProperty("location"));
     assertEquals(0, (long) entity.getProperty("points"));
   }
 
@@ -242,6 +258,8 @@ public final class UserInfoServletTest {
     when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
     when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
     when(request.getParameter("country-input")).thenReturn("United States");
+    when(request.getParameter("lat-input")).thenReturn("42.440836");
+    when(request.getParameter("lng-input")).thenReturn("-76.958306");
 
     // Try to catch the error message sent by the UserInfoServlet
     System.setErr(new PrintStream(errContent));
@@ -317,6 +335,8 @@ public final class UserInfoServletTest {
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
     assertEquals("1234567890", entity.getKey().getName());
+    assertEquals(
+        new GeoPt((float) 42.440836, (float) -76.958306), (GeoPt) entity.getProperty("location"));
     assertEquals(0, (long) entity.getProperty("points"));
   }
 
@@ -337,6 +357,7 @@ public final class UserInfoServletTest {
     dummy.setProperty("points", 0);
     dummy.setProperty("zipcode", "xxxxx");
     dummy.setProperty("country", "US");
+    dummy.setProperty("location", new GeoPt((float) 42.440836, (float) -76.958306));
     ds.put(dummy);
 
     StringWriter stringWriter = new StringWriter();

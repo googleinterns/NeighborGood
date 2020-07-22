@@ -210,7 +210,7 @@ table button:hover i {
 .modal textarea {
   width: 50%;
   box-sizing: border-box;
-  border: 4px solid rgb(97, 245, 195);
+  border: 4px solid gray;
   border-radius: 4px;
   font-size: 16px;
   padding: 10px 20px 10px 20px;
@@ -219,7 +219,7 @@ table button:hover i {
 
 .modal textarea:focus {
   width: 100%;
-  border: 4px solid lightcyan;
+  border: 4px solid black;
 }
 
 .modal label {
@@ -254,7 +254,6 @@ table button:hover i {
 }
 
 #map {
-  border: thin solid black;
   height: 400px;
   max-width: 100%;
 }
@@ -283,4 +282,50 @@ table button:hover i {
 .task-overview:hover {
   color: blue;
   text-decoration: underline;
+}
+
+.highlight {
+  box-shadow: 0 0 5px rgba(255, 0, 0, 1);
+  border: 4px solid rgb(255, 0, 0);
+}
+
+.req {
+  margin: 2px;
+  color: red;
+}
+
+#message-container {
+  height: 250px;
+  max-height: 250px;
+  overflow-y: auto;
+  border: 4px solid black;
+  border-radius: 2px;
+  margin-bottom: 5px;
+}
+
+.sentByOthers {
+  float: left;
+  clear: both;
+  max-width: 40%;
+  word-wrap: normal;
+  overflow-wrap: break-word;
+  border: 2px solid #dedede;
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 10px;
+}
+
+.sentByMe {
+  float: right;
+  clear: both;
+  max-width: 40%;
+  word-wrap: normal;
+  overflow-wrap: break-word;
+  color: white;
+  background-color: #0c0;
+  border: 2px solid #0c0;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 10px;
 }

@@ -24,13 +24,20 @@ body {
 }
 
 /* Header Styling */
+header {
+  top: 0;
+  width: 100%;
+  z-index: 2;
+  background-color: white;
+}
+
 nav {
   display: flex;
   justify-content: space-between;
   position: fixed;
   width: 100%;
   top: 0;
-  padding-bottom: 1em;
+  z-index: 2;
 }
 
 #dashboard-icon-container {
@@ -42,6 +49,7 @@ nav {
   padding-right: 1em;
   padding-top: 0.8em;
   text-align: right;
+  width: calc(calc(100vw - 60em) / 2);
 }
 
 a {
@@ -70,9 +78,8 @@ i:hover {
 #title {
   font-size: 4em;
   text-align: center;
-  margin-top: 1em;
-  margin-bottom: 0.4em;
-  padding-top: 0.5em;
+  margin-top: 1.2em;
+  margin-bottom: 0;
 }
 
 .login-messages {
@@ -90,19 +97,22 @@ section {
 /* Styling for control bar (categories and add task) */
 #control-bar {
   display: flex;
+  margin: auto;
+  max-width: 55em;
   justify-content: space-between;
   padding-bottom: 1.5em;
 }
 
 #control-bar-message-wrapper {
-  width: 100%;
-  max-width: 55em;
-  z-index: 2;
   background-image: linear-gradient(to bottom, white 90%, transparent);
-  padding-bottom: 1em;
   padding-top: 1em;
+  position: sticky;
+  position: -webkit-sticky;
   top: 0;
-  transition: 0.3s;
+  width: 101%;
+  z-index: 2;
+  margin: -3px;
+  padding-bottom: 1em;
 }
 
 #categories {
@@ -160,25 +170,30 @@ section {
 
 #tasks-list {
   display: none;
-  border-top: solid 2px;
-  border-right: solid 2px;
-  border-left: solid 2px;
   transition: 0.5s;
 }
 
 .task {
-  border-bottom: solid 2px;
   position: relative;
+  margin-bottom: 1em;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.25);
 }
 
-.task-container {
-  padding: 1em;
+.task:hover {
+  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
 }
 
 .task-header {
   display: flex;
-  padding-bottom: 1em;
   justify-content: space-between;
+  background-color: #eee;
+  padding: 0.8em 1em;
+  font-weight: bold;
+}
+
+.task-content {
+  padding: 1em;
 }
 
 .user-nickname {
@@ -187,7 +202,7 @@ section {
 
 .help-out {
   cursor: pointer;
-  font-weight: bold;
+  text-align: right;
 }
 
 .help-out:hover {
@@ -200,17 +215,23 @@ section {
 
 .task-footer {
   font-style: italic;
-  padding-top: 1em;
   display: flex;
   justify-content: space-between;
+  padding-left: 1em;
+  padding-bottom: 1em;
+  padding-right: 1em;
+}
+
+.task-date-time {
+  color: gray;
+  font-style: normal;
 }
 
 .help-overlay {
   position: absolute;
   z-index: 1;
   display: none;
-  background: rgba(236, 236, 240, 0.85);
-  backdrop-filter: blur(4px);
+  background: #eee;
   width: 100%;
   height: 100%;
   text-align: center;
@@ -238,7 +259,7 @@ section {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 3; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
+  padding-top: 200px; /* Location of the box */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -259,7 +280,7 @@ section {
 .modal textarea {
   width: 50%;
   box-sizing: border-box;
-  border: 4px solid rgb(97, 245, 195);
+  border: 4px solid gray;
   border-radius: 4px;
   font-size: 16px;
   padding: 10px 20px 10px 20px;
@@ -268,7 +289,7 @@ section {
 
 .modal textarea:focus {
   width: 100%;
-  border: 4px solid lightcyan;
+  border: 4px solid black;
 }
 
 .modal label {
@@ -290,9 +311,8 @@ section {
   cursor: pointer;
 }
 
-/* Top Scores modal specific styling */
-#topScoresModalWrapper {
-  padding-top: 200px;
+#task-detail-container {
+  padding-bottom: 1em;
 }
 
 #topScoresModal {
@@ -336,11 +356,18 @@ td {
 @media only screen and (max-width: 600px) {
   #title {
     font-size: 2.5em;
-    padding-top: 1.5em;
+    padding-top: 0.8em;
+  }
+
+  #login-logout {
+    width: auto;
   }
 
   #control-bar {
     display: block;
+    width: 95%;
+    margin: auto;
+    padding-bottom: 0.7em;
   }
 
   #categories {
@@ -348,6 +375,14 @@ td {
     flex-wrap: wrap;
     justify-content: center;
     width: 100%;
+  }
+
+  #control-bar-message-wrapper {
+    top: 70px;
+    background-color: white;
+    background-image: none;
+    width: 102%;
+    margin-left: -5px;
   }
 
   .categories {
@@ -358,10 +393,16 @@ td {
   #add-task {
     text-align: right;
     padding-right: 0.5em;
+    margin-top: -1em;
   }
 
   #addtaskbutton {
     font-size: 2.5em;
+  }
+
+  .results-message {
+    width: 95%;
+    margin: auto;
   }
 
   .fa-3x {
@@ -376,19 +417,40 @@ td {
     padding: 0 0.5em;
   }
 
+  .modal {
+    width: 80%;
+  }
+
   #topScoresTitle {
     font-size: 1.5em;
   }
+
+  nav {
+    padding-bottom: 0;
+    background-color: white;
+  }
 }
 
-#task-detail-container {
-  margin-bottom: 20px;
+@media only screen and (min-width: 600px) and (max-width: 1203px) {
+  #login-logout {
+    width: auto;
+  }
+
+  #control-bar-message-wrapper {
+    top: 70px;
+  }
+
+  nav {
+    background-color: white;
+  }
 }
 
-.task-content {
-  cursor: pointer;
+.highlight {
+  box-shadow: 0 0 5px rgba(255, 0, 0, 1);
+  border: 4px solid rgb(255, 0, 0);
 }
 
-.task-content:hover {
-  color: gray;
+.req {
+  margin: 2px;
+  color: red;
 }

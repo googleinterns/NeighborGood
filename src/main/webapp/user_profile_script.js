@@ -18,6 +18,86 @@ const GOOGLE_KIRKLAND_LAT = 47.669846;
 const GOOGLE_KIRKLAND_LNG = -122.1996099;
 const MAPSKEY = config.MAPS_KEY;
 
+function validateTaskForm(id) {
+    var result = true;
+    var form = document.getElementById(id);
+    var inputName = ["task-overview", "task-detail", "reward", "category"];
+    for (var i = 0; i < inputName.length; i++) {
+        var name = inputName[i];
+        var inputField = form[name.concat("-input")].value.trim();
+        if (inputField === "") {
+            result = false;
+            form[name.concat("-input")].classList.add("highlight");
+        } else {
+            form[name.concat("-input")].classList.remove("highlight");
+        }
+    }
+    if (!result) {
+        alert("All fields are required. Please fill out all fields with non-empty input.");
+        return false;
+    }
+    return true;
+}
+
+function validateInfoForm(id) {
+    var result = true;
+    var form = document.getElementById(id);
+    var inputName = ["nickname", "address", "zipcode", "country", "phone", "lat", "lng"];
+    for (var i = 0; i < inputName.length; i++) {
+        var name = inputName[i];
+        var inputField = form[name.concat("-input")].value.trim();
+        if (inputField === "") {
+            result = false;
+            form[name.concat("-input")].classList.add("highlight");
+            if (inputName[i] === "lat" || inputName[i] === "lng") {
+                document.getElementById("map").classList.add("highlight");
+            }
+        } else {
+            form[name.concat("-input")].classList.remove("highlight");
+            if (inputName[i] === "lat" || inputName[i] === "lng") {
+                document.getElementById("map").classList.remove("highlight");
+            }
+        }
+    }
+    if (!result) {
+        alert("All fields are required. Please fill out all fields with non-empty input and mark your personal address on the map.");
+        return false;
+    }
+    return true;
+}
+
+function validateMessage() {
+    var msgField = document.getElementById("msg-input").value.trim();
+    if (msgField === "") {
+        document.getElementById("msg-input").classList.add("highlight");
+        alert("You cannot send an empty message.");
+        return false;
+    } else {
+        document.getElementById("msg-input").classList.remove("highlight");
+        return true;
+    }
+}
+
+async function loadMessages(keyString) {
+    const queryURL = "/messages?key=" + keyString;
+    const request = new Request(queryURL, {method: "GET"});
+    const response = await fetch(request);
+    const msgResponse = await response.json();
+
+    const msgContainer = document.getElementById("message-container");
+    msgContainer.innerHTML = "";
+    for (var index = 0; index < msgResponse.length; index++) {
+        var msg = msgResponse[index];
+        var newMessage = document.createElement("div");
+        newMessage.className = msg.className;
+        newMessage.appendChild(document.createTextNode(msg.message)); 
+        msgContainer.appendChild(newMessage);
+    }
+
+    // Keep message container scrolled to bottom at the beginning
+    msgContainer.scrollTop = msgContainer.scrollHeight;
+}
+
 async function getTaskInfo(keyString) {
     const queryURL = "/tasks/info?key=" + keyString;
     const request = new Request(queryURL, {method: "GET"});
@@ -131,8 +211,10 @@ async function showTaskInfo(keyString) {
     var detailContainer = document.getElementById("task-detail-container");
     detailContainer.innerHTML = "";
     detailContainer.appendChild(document.createTextNode(info.detail));
+    document.getElementById("chat-id-input").value = keyString;
     var modal = document.getElementById("taskInfoModalWrapper");
     modal.style.display = "block";
+    loadMessages(keyString);
 }
 
 function showNeedHelp() {
@@ -547,7 +629,17 @@ async function initMap() {
         });
 
         function onError() {
-            console.log("Unable to resolve the user's current location");
+            let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
+            const request = new Request(url, {method: "POST"});
+            fetch(request).then(response => {
+                if (response.status == 400 || response.status == 403 || response.status == 404) {
+                    console.log("Unable to resolve the user's current location");
+                } else {
+                    response.json().then(jsonresponse => {
+                        map.setCenter(jsonresponse["location"]);
+                    });
+                }
+            });
         }
 
         function onSuccess(geo) {
@@ -561,7 +653,7 @@ async function initMap() {
         }
 
         if (!navigator.geolocation) {
-            onError();
+            console.log("Unable to resolve the user's current location");
         } else {
             await navigator.geolocation.getCurrentPosition(onSuccess, onError);
         }
@@ -593,9 +685,13 @@ function displayMarker(position) {
     // There is at most one marker displayed on the map
     if (markers.length > 0) {
         markers[0].setMap(null);
-    }
+    } 
     markers = [];
     markers.push(marker);
+
+    document.getElementById("lat-input").value = position.lat();
+    document.getElementById("lng-input").value = position.lng();
+
     return marker;
 }
 
@@ -609,6 +705,8 @@ function deleteMarker(latitude, longitude) {
             return false;
         }
     });
+    document.getElementById("lat-input").value = '';
+    document.getElementById("lng-input").value = '';
 }
 
 function geocodeLatLng(geocoder, map, infowindow, position, marker) {

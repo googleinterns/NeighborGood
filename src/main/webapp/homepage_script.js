@@ -13,29 +13,24 @@
 // limitations under the License.
 
 const MAPSKEY = config.MAPS_KEY
-let neighborhood = [null , null];
+let userLocation = null;
 let currentCategory = "all";
+let currentMiles = 5;
 
-window.onscroll = stickyControlBar;
-
-/* Scroll function so that the control bar sticks to the top of the page */
-function stickyControlBar() {
-    let controlBarWrapper = document.getElementById("control-bar-message-wrapper");
-    let taskListDiv = document.getElementById("tasks-list");
-    const OFFSET = 165;
-    if (window.pageYOffset >= OFFSET || document.body.scrollTop >= OFFSET || document.documentElement.scrollTop >= OFFSET) {
-        controlBarWrapper.style.position = "fixed";
-        taskListDiv.style.marginTop = "165px";
-    } else {
-        controlBarWrapper.style.position = "static";
-        taskListDiv.style.marginTop = "auto";
+window.onscroll = function() {
+    if (window.innerWidth >= 1204) {
+        const navbar = document.getElementsByTagName("nav")[0];
+        OFFSET = 180; // approx distance from top of page to top of control (categories) bar
+        if (window.pageYOffset >= OFFSET || document.body.scrollTop >= OFFSET || document.documentElement.scrollTop >= OFFSET) {
+            navbar.style.backgroundColor = "white";
+        } else navbar.style.backgroundColor = "transparent";
     }
 }
 
 /* Calls addUIClickHandlers and getUserNeighborhood once page has loaded */
 if (document.readyState === 'loading') {
     // adds on load event listeners if document hasn't yet loaded
-    document.addEventListener('DOMContentLoaded', addUIClickHandlers)
+    document.addEventListener('DOMContentLoaded', addUIClickHandlers);
     document.addEventListener('DOMContentLoaded', getUserNeighborhood);
 } else {
     // if DOMContentLoaded has already fired, it simply calls the functions
@@ -61,6 +56,15 @@ function addUIClickHandlers() {
     // adds showTopScoresModal click event 
     document.getElementById("topscore-button").addEventListener("click", showTopScoresModal);
     document.getElementById("close-topscore-button").addEventListener("click", closeTopScoresModal);
+    
+    // adds distance radius change event
+    document.getElementById("distance-radius").addEventListener("change", function(e) {
+        fetchTasks(currentCategory, e.target.value)
+            .then(response => displayTasks(response));
+    });
+
+    // adds closeTaskInfoModal click event
+    document.getElementById("task-info-close-button").addEventListener("click", closeTaskInfoModal);
 }
 
 /* Function filters tasks by categories and styles selected categories */
@@ -69,7 +73,7 @@ function filterTasksBy(category) {
 
     // only fetches tasks if user's neighborhood has been retrieved
     if (userNeighborhoodIsKnown()) {
-        fetchTasks(category)
+        fetchTasks(category, currentMiles)
             .then(response => displayTasks(response));
     }
 	// Unhighlights and resets styling for all category buttons
@@ -119,7 +123,7 @@ function confirmHelp(element) {
         }
         // fetches tasks again if user's current neighborhood was successfully retrieved and stored
         else if (userNeighborhoodIsKnown()) {
-            fetchTasks(currentCategory).then(response => displayTasks(response));
+            fetchTasks(currentCategory, currentMiles).then(response => displayTasks(response));
         }
     });
 }
@@ -134,17 +138,39 @@ function showCreateTaskModal() {
     var modal = document.getElementById("createTaskModalWrapper");
     modal.style.display = "block";
 }
+
 function closeCreateTaskModal() {
     var modal = document.getElementById("createTaskModalWrapper");
     modal.style.display = "none";
 }
 
-/* Function that calls the loadTopScorersBy functions
+function validateTaskForm(id) {
+    var result = true;
+    var form = document.getElementById(id);
+    var inputName = ["task-overview", "task-detail", "reward", "category"];
+    for (var i = 0; i < inputName.length; i++) {
+        var name = inputName[i];
+        var inputField = form[name.concat("-input")].value.trim();
+        if (inputField === "") {
+            result = false;
+            form[name.concat("-input")].classList.add("highlight");
+        } else {
+            form[name.concat("-input")].classList.remove("highlight");
+        }
+    }
+    if (!result) {
+        alert("All fields are required. Please fill out all fields with non-empty input.");
+        return false;
+    }
+    return true;
+}
+
+/* Function that calls the loadTopScorers functions
    and then shows the top scores modal */
 function showTopScoresModal() {
-    loadTopScorersBy("world");
+    loadTopScorers("world");
     if (userNeighborhoodIsKnown()){
-      loadTopScorersBy("neighborhood");
+      loadTopScorers("nearby");
     }
     document.getElementById("topScoresModalWrapper").style.display = "block";
 }
@@ -155,10 +181,10 @@ function closeTopScoresModal() {
 }
 
 /* Function loads the data for the top scorers table */
-function loadTopScorersBy(location) {
+function loadTopScorers(location) {
     let url = "/account?action=topscorers";
-    if (location === "neighborhood") {
-      url += "&zipcode=" + neighborhood[0] + "&country=" + neighborhood[1];
+    if (location === "nearby") {
+      url += "&lat=" + userLocation.lat + "&lng=" + userLocation.lng;
     }
     fetch(url)
       .then(response => response.json())
@@ -181,6 +207,7 @@ function loadTopScorersBy(location) {
         }
     });
 }
+
 // If the user clicks outside of the modals, closes the modals directly
 window.onclick = function(event) {
     var createTaskModal = document.getElementById("createTaskModalWrapper");
@@ -207,8 +234,9 @@ async function getTaskInfo(keyString) {
     return info;
 }
 
-async function showTaskInfo(keyString) {
-    const info = await getTaskInfo(keyString);
+async function showTaskInfo(element) {
+    const task = element.closest(".task");
+    const info = await getTaskInfo(task.dataset.key);
     var detailContainer = document.getElementById("task-detail-container");
     detailContainer.innerHTML = "";
     detailContainer.appendChild(document.createTextNode(info.detail));
@@ -236,8 +264,7 @@ function getUserNeighborhood() {
     // as an argument, updates the global neighborhood variable and then calls
     // fetchTasks and displayTasks
 	window.initialize = function () {
-        getUserLocation().then(location => toNeighborhood(location))
-        	.then(() => fetchTasks())
+        getUserLocation().then(() => fetchTasks(currentCategory, currentMiles))
             .then((response) => displayTasks(response))
             .catch(() => {
                 console.error("User location and/or neighborhood could not be retrieved");
@@ -251,60 +278,37 @@ function getUserLocation() {
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
-                var location = {lat: position.coords.latitude, lng: position.coords.longitude};
-                resolve(location);
-            }, function(err) {
-                let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
-                const request = new Request(url, {method: "POST"});
-                fetch(request).then(response => {
-                    if (response.status == 400 || response.status == 403 || response.status == 404) {
-                        reject("User location failed");
-                    } else {
-                        response.json().then(jsonresponse => {
-                            resolve(jsonresponse["location"]);
-                        });
-                    }
-                });
+                userLocation = {lat: position.coords.latitude, lng: position.coords.longitude};
+                resolve(userLocation);
+            }, function() {
+                if (locationByIPSuccesful()) resolve(userLocation);
+                else reject("User location failed");
             });
         } else {
-            reject("User location is not supported by this browser");
+            if (locationByIPSuccesful()) resolve(userLocation);
+            else reject("User location failed");
         }
     });
 }
-       
 
-/* Function that returns a promise to return a neighborhood
-array that includes the postal code and country */
-function toNeighborhood(latlng) {
-	return new Promise((resolve, reject) => {
-        const geocoder = new google.maps.Geocoder;
-        geocoder.geocode({"location": latlng}, function(results, status) {
-            if (status == "OK") {
-                if (results[0]) {
-                    const result = results[0]
-                    let zipCode = "";
-                    let country ="";
-                    for (let i = result.address_components.length - 1; i >= 0; i--) {
-                        let component = result.address_components[i];
-                        if ((zipCode == "") && (component.types.indexOf("postal_code") >= 0 )) {
-                            zipCode = component.long_name;
-                        }
-                        if ((country == "") && (component.types.indexOf("country") >= 0 )) {
-                            country = component.long_name;
-                        }
-                        if (zipCode != "" && country != "") break;
-                    }
-                    neighborhood = [zipCode, country];
-                    resolve([zipCode, country]);
-                } else reject("Couldn't get neighborhood");
-            } else reject("Couldn't get neighborhood");
-        });
+function locationByIPSuccesful() {
+    let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
+    const request = new Request(url, {method: "POST"});
+    fetch(request).then(response => {
+        if (response.status == 400 || response.status == 403 || response.status == 404) {
+            return false;
+        } else {
+            response.json().then(jsonresponse => {
+                userLocation = jsonresponse["location"];
+                return true;
+            });
+        }
     });
 }
 
 /* Fetches tasks from servlet by neighborhood and category */
-function fetchTasks(category) {
-    let url = "/tasks?zipcode=" + neighborhood[0]+ "&country=" + neighborhood[1];
+function fetchTasks(category, miles) {
+    let url = "/tasks?lat=" + userLocation.lat + "&lng=" + userLocation.lng + "&miles=" + miles;
     if (category !== undefined && category != "all") {
         url += "&category=" + category;
     }
@@ -336,6 +340,7 @@ function addTasksClickHandlers() {
     for (let i = 0; i < confirmHelpButtons.length; i++){
         confirmHelpButtons[i].addEventListener("click", function(e) {
             confirmHelp(e.target);
+            e.stopPropagation();
         });
         
     }
@@ -344,20 +349,39 @@ function addTasksClickHandlers() {
     for (let i = 0; i < exitHelpButtons.length; i++) {
         exitHelpButtons[i].addEventListener("click", function(e) {
             exitHelp(e.target);
+            e.stopPropagation();
         });
     }
+
     // adds helpOut click event listener to help out buttons
     const helpOutButtons = document.getElementsByClassName("help-out");
-        for (let i = 0; i < helpOutButtons.length; i++) {
-            if (!helpOutButtons[i].classList.contains("disable-help")) {
-                helpOutButtons[i].addEventListener("click", function(e) {
-                    helpOut(e.target);
-                });
-            }
+    for (let i = 0; i < helpOutButtons.length; i++) {
+        if (!helpOutButtons[i].classList.contains("disable-help")) {
+            helpOutButtons[i].addEventListener("click", function(e) {
+                helpOut(e.target);
+                e.stopPropagation();
+            });
         }
+    }
+
+    // adds stopPropagation on help overlay to prevent opening task details when clicking on it
+    const helpOverlays = document.getElementsByClassName("help-overlay");
+    for (let i = 0; i < helpOverlays.length; i++) {
+        helpOverlays[i].addEventListener("click", function(e) {
+            e.stopPropagation();
+        });
+    }
+    
+    // adds task click event listener to open up task details
+    const tasks = document.getElementsByClassName("task");
+    for (let i = 0; i < tasks.length; i++) {
+        tasks[i].addEventListener("click", function(e) {
+            showTaskInfo(e.target);
+        });
+    }
 }
 
 /* Helper function that determines if the current user's neighborhood is known */
 function userNeighborhoodIsKnown() {
-  return (neighborhood[0] !== null && neighborhood[1] !== null);
+  return (userLocation !== null);
 }

@@ -18,7 +18,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
     <title>NeighborGood</title>
     <link rel="stylesheet" href="homepage_style.css">
     <script type='text/javascript' src='config.js'></script>
@@ -32,9 +32,7 @@
   <% UserService userService = UserServiceFactory.getUserService(); 
   boolean userLoggedIn = userService.isUserLoggedIn();
   String categoriesClass = userLoggedIn ? "notFullWidth" : "fullWidth";
-  if (userLoggedIn) 
   %>
-
   <body>
       <!--Site Header-->
       <header>
@@ -107,17 +105,32 @@
                   }
                   %>
               </div>
-              
+
               <!--Results Messages-->
               <div id="location-missing-message" class="results-message">
                   We could not retrieve your location to display your neighborhood tasks.
               </div>
               <div id="tasks-message" class="results-message">
                   These are the 20 (or less) most recent tasks in your neighborhood:
+                  <!-- Distance Options -->
+                  <div id="distance-radius-div">
+                        <label for="distance-radius">Show results within a radius of:</label>
+                        <select name="distance-radius" id="distance-radius">
+                            <option value="1">1 mile</option>
+                            <option value="3">3 miles</option>
+                            <option value="5" selected>5 miles</option>
+                            <option value="10">10 miles</option>
+                            <option value="15">15 miles</option>
+                            <option value="30">30 miles</option>
+                            <option value="50">50 miles</option>
+                        </select>
+                  </div>
               </div>
               <div id="no-tasks-message" class="results-message">
                   Sorry, there are currently no tasks within your neighborhood for you to help with.
               </div>
+
+
           </div>
           <!--Listed Tasks Container-->
           <div id="tasks-list"></div>
@@ -125,27 +138,27 @@
       <!--Create Tasks Modal-->
       <div class="modalWrapper" id="createTaskModalWrapper">
         <div class="modal" id="createTaskModal">
-            <span class="close-button" id="close-addtask-button">&times;</span>
-            <form id="new-task-form" action="/tasks" method="POST">
+            <span class="close-button" id="close-addtask-button" onclick="closeCreateTaskModal()">&times;</span>
+            <form id="new-task-form" action="/tasks" method="POST" onsubmit="return validateTaskForm('new-task-form')">
                 <h1>CREATE A NEW TASK: </h1>
                 <div>
-                    <label for="task-overview-input">Task Overview:</label>
+                    <label for="task-overview-input">Task Overview<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
-                <textarea name="task-overview-input" id="task-overview-input" required="true" placeholder="Briefly describe your task here:"></textarea>
+                <textarea name="task-overview-input" id="task-overview-input" placeholder="Briefly describe your task here:"></textarea>
                 <br/><br/>
                 <div>
-                    <label for="task-detail-input">Task Detail:</label>
+                    <label for="task-detail-input">Task Detail<span class="req">*</span></label>
                     <br/>
                 </div>
                 <br/>
-                <textarea name="task-detail-input" id="task-detail-input" required="true" placeholder="Describe your task here:"></textarea>
+                <textarea name="task-detail-input" id="task-detail-input" placeholder="Describe your task here:"></textarea>
                 <br/><br/>
-                <label for="rewarding-point-input">Rewarding Points:</label>
-                <input type="number" id="rewarding-point-input" name="reward-input" required="true" min="0" max="200" value="50">
+                <label for="rewarding-point-input">Rewarding Points<span class="req">*</span></label>
+                <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50">
                 <br/><br/>
-                <label for="category-input">Task Category:</label>
+                <label for="category-input">Task Category<span class="req">*</span></label>
                 <select name="category-input" id="category-input" form="new-task-form">
                   <option value="garden">Garden</option>
                   <option value="shopping">Shopping</option>
@@ -184,12 +197,12 @@
                 </table>
               </div> 
               <!--Neighborhood Top Scorers-->
-              <div id="neighborhood-topscore" class="topScoresDiv">
-                <h2>Nearby Neighbors</h2>
+              <div id="nearby-topscore" class="topScoresDiv">
+                <h2>Near You</h2>
                 <table class="topScoresTable">
                 <%
                 for (int rank = 1; rank <= 10; rank++) {
-                  String rowId = "neighborhood" + rank;
+                  String rowId = "nearby" + rank;
                 %> 
                   <tr id="<%=rowId%>">
                     <td class="topscore-rank topscores"><%=rank%>.</td>
@@ -206,7 +219,7 @@
     </div>
     <div class="modalWrapper" id="taskInfoModalWrapper">
         <div class="modal" id="taskInfoModal">
-            <span class="close-button" id="task-info-close-button" onclick="closeTaskInfoModal()">&times;</span>
+            <span class="close-button" id="task-info-close-button"">&times;</span>
             <h1>Task Detail: </h1>
             <div id="task-detail-container"></div>
         </div>
