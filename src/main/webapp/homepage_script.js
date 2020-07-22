@@ -365,7 +365,7 @@ function fetchTasks(category, miles) {
 
 /* Displays the tasks received from the server response */
 function displayTasks(response) {
-    // If a response is passed, the the taskPagesCache is updated along with the next and prev page buttons 
+    // If a response is passed, the the taskPagesCache is updated
     if (response !== undefined) {
         taskPagesCache = response;
         // If displayTasks is called and the result has less pages than the page user was last at, the currentPage will get reset to 1
