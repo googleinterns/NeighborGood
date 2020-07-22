@@ -219,7 +219,7 @@
     </div>
     <div class="modalWrapper" id="taskInfoModalWrapper">
         <div class="modal" id="taskInfoModal">
-            <span class="close-button" id="task-info-close-button" onclick="closeTaskInfoModal()">&times;</span>
+            <span class="close-button" id="task-info-close-button"">&times;</span>
             <h1>Task Detail: </h1>
             <div id="task-detail-container"></div>
         </div>

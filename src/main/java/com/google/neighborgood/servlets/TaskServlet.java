@@ -31,6 +31,8 @@ import com.google.neighborgood.helper.RetrieveUserInfo;
 import com.google.neighborgood.helper.RewardingPoints;
 import com.google.neighborgood.helper.UnitConversion;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -151,16 +153,19 @@ public class TaskServlet extends HttpServlet {
         }
       }
       out.append("</div>");
-      out.append(
-              "<div class='task-content' onclick='showTaskInfo(\""
-                  + KeyFactory.keyToString(entity.getKey())
-                  + "\")'>")
+      out.append("<div class='task-content'>")
           .append((String) entity.getProperty("overview"))
           .append("</div>");
       out.append("<div class='task-footer'><div class='task-category'>#")
           .append((String) entity.getProperty("category"))
-          .append("</div></div>");
-      out.append("</div></div>");
+          .append("</div>");
+
+      Timestamp timestamp = new Timestamp((Long) entity.getProperty("timestamp"));
+      SimpleDateFormat timestampFormat = new SimpleDateFormat("HH:mm MM-dd-yyyy");
+
+      out.append("<div class='task-date-time'>")
+          .append((String) timestampFormat.format(timestamp))
+          .append("</div></div></div></div>");
     }
 
     Gson gson = new Gson();
