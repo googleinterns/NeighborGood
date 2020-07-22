@@ -174,16 +174,17 @@ section {
 }
 
 .page-number {
-    font-weight: normal;
+  font-weight: normal;
+  margin: 0 0.5em;
 }
 
 #current-page {
-    font-weight: bold;
-    cursor: default;
+  font-weight: bold;
+  cursor: default;
 }
 
 #current-page:hover {
-    color: #222;
+  color: #222;
 }
 
 #pagination-wrapper {
@@ -197,10 +198,6 @@ section {
   display: flex;
   justify-content: space-between;
   line-height: 1.7em;
-}
-
-.page-number {
-  margin: 0 0.5em;
 }
 
 /* Tasks Styling */
