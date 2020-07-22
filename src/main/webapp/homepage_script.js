@@ -16,26 +16,13 @@ const MAPSKEY = config.MAPS_KEY
 let userLocation = null;
 let currentCategory = "all";
 
-window.onscroll = stickyControlBar;
-
-/* Scroll function so that the control bar sticks to the top of the page */
-function stickyControlBar() {
-    let controlBarWrapper = document.getElementById("control-bar-message-wrapper");
-    let taskListDiv = document.getElementById("tasks-list");
-
-    // Scrolling behavior in screens smaller than 1204 will result in overlapping DOM elements
-    // therefore this scrolling function only applies to screens as big or bigger than that
+window.onscroll = function() {
     if (window.innerWidth >= 1204) {
-        const OFFSET = 190; //Distance from top of page to top of control (categories) bar
+        const navbar = document.getElementsByTagName("nav")[0];
+        OFFSET = 180; // approx distance from top of page to top of control (categories) bar
         if (window.pageYOffset >= OFFSET || document.body.scrollTop >= OFFSET || document.documentElement.scrollTop >= OFFSET) {
-            controlBarWrapper.style.position = "fixed";
-            // adjust task list container so it appears like it's in the same position
-            // after controlBarWrapper's position is changed to 'fixed' 
-            taskListDiv.style.marginTop = "165px"; 
-        } else {
-            controlBarWrapper.style.position = "relative";
-            taskListDiv.style.marginTop = "auto";
-        }
+            navbar.style.backgroundColor = "white";
+        } else navbar.style.backgroundColor = "transparent";
     }
 }
 
@@ -68,6 +55,9 @@ function addUIClickHandlers() {
     // adds showTopScoresModal click event 
     document.getElementById("topscore-button").addEventListener("click", showTopScoresModal);
     document.getElementById("close-topscore-button").addEventListener("click", closeTopScoresModal);
+    
+    // adds closeTaskInfoModal click event
+    document.getElementById("task-info-close-button").addEventListener("click", closeTaskInfoModal);
 }
 
 /* Function filters tasks by categories and styles selected categories */
@@ -237,8 +227,9 @@ async function getTaskInfo(keyString) {
     return info;
 }
 
-async function showTaskInfo(keyString) {
-    const info = await getTaskInfo(keyString);
+async function showTaskInfo(element) {
+    const task = element.closest(".task");
+    const info = await getTaskInfo(task.dataset.key);
     var detailContainer = document.getElementById("task-detail-container");
     detailContainer.innerHTML = "";
     detailContainer.appendChild(document.createTextNode(info.detail));
@@ -342,6 +333,7 @@ function addTasksClickHandlers() {
     for (let i = 0; i < confirmHelpButtons.length; i++){
         confirmHelpButtons[i].addEventListener("click", function(e) {
             confirmHelp(e.target);
+            e.stopPropagation();
         });
         
     }
@@ -350,17 +342,36 @@ function addTasksClickHandlers() {
     for (let i = 0; i < exitHelpButtons.length; i++) {
         exitHelpButtons[i].addEventListener("click", function(e) {
             exitHelp(e.target);
+            e.stopPropagation();
         });
     }
+
     // adds helpOut click event listener to help out buttons
     const helpOutButtons = document.getElementsByClassName("help-out");
-        for (let i = 0; i < helpOutButtons.length; i++) {
-            if (!helpOutButtons[i].classList.contains("disable-help")) {
-                helpOutButtons[i].addEventListener("click", function(e) {
-                    helpOut(e.target);
-                });
-            }
+    for (let i = 0; i < helpOutButtons.length; i++) {
+        if (!helpOutButtons[i].classList.contains("disable-help")) {
+            helpOutButtons[i].addEventListener("click", function(e) {
+                helpOut(e.target);
+                e.stopPropagation();
+            });
         }
+    }
+
+    // adds stopPropagation on help overlay to prevent opening task details when clicking on it
+    const helpOverlays = document.getElementsByClassName("help-overlay");
+    for (let i = 0; i < helpOverlays.length; i++) {
+        helpOverlays[i].addEventListener("click", function(e) {
+            e.stopPropagation();
+        });
+    }
+    
+    // adds task click event listener to open up task details
+    const tasks = document.getElementsByClassName("task");
+    for (let i = 0; i < tasks.length; i++) {
+        tasks[i].addEventListener("click", function(e) {
+            showTaskInfo(e.target);
+        });
+    }
 }
 
 /* Helper function that determines if the current user's neighborhood is known */
