@@ -20,6 +20,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -45,7 +46,7 @@ import org.openqa.selenium.support.ui.FluentWait;
  */
 public class IntegrationTest {
 
-  private static WebDriver driver;
+  private static ChromeDriver driver;
   private static FluentWait<WebDriver> wait;
   private static JavascriptExecutor js;
 
@@ -54,7 +55,7 @@ public class IntegrationTest {
   private final String USER_EMAIL = "123456@example.com";
   private final String USER_EMAIL_HELPER = "helper@example.com";
   private final String USER_ADDRESS = "123 Street Name, City, ST";
-  private final String USER_ZIPCODE = "59715";
+  private final String USER_ZIPCODE = "90036";
   private final String USER_COUNTRY = "United States";
   private final String USER_PHONE = "1231231234";
   private final String TASK_DETAIL =
@@ -75,6 +76,15 @@ public class IntegrationTest {
   public static void setupClass() {
     WebDriverManager.chromedriver().setup();
     driver = new ChromeDriver();
+    Map coordinates =
+        new HashMap() {
+          {
+            put("latitude", 34.080634);
+            put("longitude", -118.356463);
+            put("accuracy", 1);
+          }
+        };
+    driver.executeCdpCommand("Emulation.setGeolocationOverride", coordinates);
     // FluentWait set to timeout after 60 seconds of waiting for a WebElement to be returned and
     // polling every second
     wait =
