@@ -223,19 +223,21 @@
             <h1>Task Detail: </h1>
             <div id="task-detail-container"></div>
             <hr/>
-            <h1>Chat: </h1>
+            <div>
+                <h1 id="chat-title">Chat: </h1>
+                <button onclick="refresh()" id="refresh-button"><i class="fa fa-refresh fa-2x"></i></button>
+            </div>
+            <div class="empty"></div>
             <div id="message-container"></div>
-            <form id="chat-box" action="/messages" method="POST" onsubmit="return validateMessage()">
+            <form id="chat-box" action="/messages" method="POST" onsubmit="return sendMessage()">
+                <br/>
                 <div>
-                    <label for="msg">Message</label>
+                    <textarea name="msg" id="msg-input" placeholder="Type message.."></textarea>
+                    <input type="hidden" name="task-id" id="chat-id-input">
                     <br/>
+                    <br/>
+                    <button type="submit" id="send-button"><i class="fa fa-paper-plane fa-2x"></i></button>
                 </div>
-                <br/>
-                <textarea name="msg" id="msg-input" placeholder="Type message.."></textarea>
-                <input type="hidden" name="task-id" id="chat-id-input">
-                <br/>
-                <br/>
-                <input type="submit" />
             </form>
         </div>
     </div>

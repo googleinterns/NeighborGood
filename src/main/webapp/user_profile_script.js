@@ -66,16 +66,27 @@ function validateInfoForm(id) {
     return true;
 }
 
-function validateMessage() {
+function sendMessage() {
     var msgField = document.getElementById("msg-input").value.trim();
     if (msgField === "") {
         document.getElementById("msg-input").classList.add("highlight");
         alert("You cannot send an empty message.");
-        return false;
     } else {
         document.getElementById("msg-input").classList.remove("highlight");
-        return true;
+        var form = document.getElementById("chat-box");
+        const queryURL = "/messages?task-id=" + form["task-id"].value 
+                        + "&msg=" + encodeURIComponent(form["msg"].value);
+        const request = new Request(queryURL, {method: "POST"});
+        fetch(request).then((response) => {
+            loadMessages(form["task-id"].value);
+        });
+        form["msg"].value = "";
     }
+    return false;
+}
+
+async function refresh() {
+    loadMessages(document.getElementById("chat-id-input").value);
 }
 
 async function loadMessages(keyString) {
