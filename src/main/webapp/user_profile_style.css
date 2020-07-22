@@ -339,6 +339,7 @@ table button:hover i {
   overflow: hidden;
   outline: none;
   float: right;
+  margin-bottom: 50px;
 }
 
 #send-button:hover {
@@ -370,4 +371,23 @@ table button:hover i {
 
 #msg-input:focus {
   border-color: black;
+}
+
+#chat-title {
+  float: left;
+}
+
+#refresh-button {
+  margin-top: 30px;
+  background-color: Transparent;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+  float: right;
+}
+
+#refresh-button:hover {
+  color: #0c0;
 }
