@@ -161,6 +161,19 @@ section {
   font-size: 3.5em;
 }
 
+#pagination-wrapper {
+  display: flex;
+  justify-content: space-between;
+  width: fit-content;
+  margin: auto;
+}
+
+#page-numbers-wrapper {
+  display: flex;
+  justify-content: space-between;
+  line-height: 1.7em;
+}
+
 .pagination-icon {
   cursor: not-allowed;
   font-size: 2em;
@@ -185,19 +198,6 @@ section {
 
 #current-page:hover {
   color: #222;
-}
-
-#pagination-wrapper {
-  display: flex;
-  justify-content: space-between;
-  width: fit-content;
-  margin: auto;
-}
-
-#page-numbers-wrapper {
-  display: flex;
-  justify-content: space-between;
-  line-height: 1.7em;
 }
 
 /* Tasks Styling */
