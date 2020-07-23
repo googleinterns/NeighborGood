@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
@@ -71,6 +72,7 @@ public final class AdminPageTest {
     helper.setUp();
     userService = UserServiceFactory.getUserService();
     ds = DatastoreServiceFactory.getDatastoreService();
+    System.setErr(new PrintStream(errContent));
     request = mock(HttpServletRequest.class);
     response = mock(HttpServletResponse.class);
     userEntity = new Entity("UserInfo", "1234567890");
@@ -104,6 +106,7 @@ public final class AdminPageTest {
 
   @After
   public void tearDown() {
+    System.setErr(originalErr);
     helper.tearDown();
   }
 
@@ -129,7 +132,7 @@ public final class AdminPageTest {
   }
 
   @Test
-  public void checkSubmitPost() throws IOException {
+  public void testSubmitPost() throws IOException {
     // Check whether the datastore contains the single entity
     assertEquals(1, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
 
@@ -154,5 +157,60 @@ public final class AdminPageTest {
     assertEquals("Can someone buy me groceries?", (String) entity.getProperty("detail"));
     assertEquals("shopping", (String) entity.getProperty("category"));
     assertEquals(200, (long) entity.getProperty("reward"));
+  }
+
+  @Test
+  public void testSubmitPostDetails() throws IOException, EntityNotFoundException {
+    // test when tasks detail input is empty
+    when(request.getParameter("task-id")).thenReturn(keyString);
+    when(request.getParameter("reward-input")).thenReturn("150");
+    when(request.getParameter("task-detail-input")).thenReturn("");
+    when(request.getParameter("edit-category-input")).thenReturn("Misc");
+
+    new AdminPage().doPost(request, response);
+    assertEquals("The input task detail is empty\n", errContent.toString());
+  }
+
+  @Test
+  public void testSubmitPostCategory() throws IOException, EntityNotFoundException {
+    // test when tasks detail input is empty
+    when(request.getParameter("task-id")).thenReturn(keyString);
+    when(request.getParameter("reward-input")).thenReturn("150");
+    when(request.getParameter("task-detail-input")).thenReturn("Random text over here");
+    when(request.getParameter("edit-category-input")).thenReturn("");
+
+    new AdminPage().doPost(request, response);
+    assertEquals("The task must have a category\n", errContent.toString());
+  }
+
+  @Test
+  public void testSubmitPostReward() throws IOException, EntityNotFoundException {
+    // test when tasks detail input is empty
+    when(request.getParameter("task-id")).thenReturn(keyString);
+    when(request.getParameter("reward-input")).thenReturn("words");
+    when(request.getParameter("task-detail-input")).thenReturn("Random text over here");
+    when(request.getParameter("category-input")).thenReturn("shopping");
+
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    new AdminPage().doPost(request, response);
+    writer.flush();
+    assertEquals(stringWriter.toString(), "Please enter a valid integer in the range of 0-200\n");
+
+    // test bounds of reward
+    when(request.getParameter("reward-input")).thenReturn("201");
+    stringWriter.getBuffer().setLength(0);
+    new AdminPage().doPost(request, response);
+    writer.flush();
+    assertEquals(stringWriter.toString(), "Please enter a valid integer in the range of 0-200\n");
+
+    when(request.getParameter("reward-input")).thenReturn("-1");
+    stringWriter.getBuffer().setLength(0);
+
+    new AdminPage().doPost(request, response);
+    writer.flush();
+    assertEquals(stringWriter.toString(), "Please enter a valid integer in the range of 0-200\n");
   }
 }
