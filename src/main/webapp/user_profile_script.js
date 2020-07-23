@@ -103,7 +103,7 @@ async function getTaskInfo(keyString) {
 async function deleteTask(keyString) {
     const info = await getTaskInfo(keyString);
     if (info.status !== "OPEN") {
-        window.alert("You can only delete an 'OPEN' task.")
+        window.alert("You can only delete an 'OPEN' task.");
     } else {
         if (confirm("Are you sure that you want to delete the task?")) {
             const queryURL = "/tasks?key=" + keyString;
@@ -214,7 +214,7 @@ async function showTaskInfo(keyString) {
 function showNeedHelp() {
     if (document.getElementById("need-help") == null) return;
     document.getElementById("need-help").style.display = "table";
-    document.getElementById("create").style.display = "block";
+    document.getElementById("create-task-button").style.display = "block";
     document.getElementById("offer-help").style.display = "none";
     document.getElementById("await-verif").style.display = "table";
     document.getElementById("complete-task").style.display = "none";
@@ -226,7 +226,7 @@ function showNeedHelp() {
 
 function showOfferHelp() {
     document.getElementById("need-help").style.display = "none";
-    document.getElementById("create").style.display = "none";
+    document.getElementById("create-task-button").style.display = "none";
     document.getElementById("offer-help").style.display = "table";
     document.getElementById("await-verif").style.display = "none";
     document.getElementById("complete-task").style.display = "table";
@@ -386,7 +386,7 @@ async function displayOfferHelpTasks() {
         var abandonBtn = document.createElement("button");
         abandonBtn.className = "abandon-task";
         abandonBtn.addEventListener("click", function () { abandonTask(keyStringCopy) });
-        abandonBtn.innerHTML = (task.status === "IN PROGRESS") ? '<i class="fa fa-times"></i>':'<i class="fa fa-ban"></i>';;
+        abandonBtn.innerHTML = (task.status === "IN PROGRESS") ? '<i class="fa fa-times"></i>':'<i class="fa fa-ban"></i>';
         abandonTd.appendChild(abandonBtn);
         tr.appendChild(completeTd);
         tr.appendChild(abandonTd);
