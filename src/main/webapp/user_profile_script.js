@@ -68,11 +68,17 @@ function sendMessage() {
     } else {
         document.getElementById("msg-input").classList.remove("highlight");
         var form = document.getElementById("chat-box");
+        var messageContent = form["msg"].value;
         const queryURL = "/messages?task-id=" + form["task-id"].value 
-                        + "&msg=" + encodeURIComponent(form["msg"].value);
+                        + "&msg=" + encodeURIComponent(messageContent);
         const request = new Request(queryURL, {method: "POST"});
         fetch(request).then((response) => {
-            loadMessages(form["task-id"].value);
+            const msgContainer = document.getElementById("message-container");
+            var newMessage = document.createElement("div");
+            newMessage.className = "sentByMe";
+            newMessage.appendChild(document.createTextNode(messageContent)); 
+            msgContainer.appendChild(newMessage);
+            msgContainer.scrollTop = msgContainer.scrollHeight;
         });
         form["msg"].value = "";
     }
