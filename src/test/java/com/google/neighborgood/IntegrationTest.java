@@ -670,13 +670,13 @@ public class IntegrationTest {
   private void verifyNewTaskHomepage() {
 
     // First task location in homepage
-    String taskXPath = "//div[@id='tasks-list']/div[1]/div[2]";
+    String taskXPath = "//div[@id='tasks-list']/div[1]";
 
     String taskOverviewActual =
         wait.until(
                 new Function<WebDriver, WebElement>() {
                   public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(taskXPath + "/div[2]"));
+                    return driver.findElement(By.xpath(taskXPath + "/div[2]/div[2]"));
                   }
                 })
             .getText();
@@ -686,7 +686,7 @@ public class IntegrationTest {
         wait.until(
                 new Function<WebDriver, WebElement>() {
                   public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(taskXPath + "/div[1]/div[1]"));
+                    return driver.findElement(By.xpath(taskXPath + "/div[2]/div[1]/div[1]"));
                   }
                 })
             .getText();
@@ -696,13 +696,13 @@ public class IntegrationTest {
         wait.until(
                 new Function<WebDriver, WebElement>() {
                   public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(taskXPath + "/div[3]/div[1]"));
+                    return driver.findElement(By.xpath(taskXPath + "/div[2]/div[3]/div[1]"));
                   }
                 })
             .getText();
     assertEquals(recentTask.get("category"), taskCategoryActual.substring(1));
     // Opens up task details modal to verify its contents
-    verifyTaskDetails(taskXPath + "/div[2]");
+    verifyTaskDetails(taskXPath);
     // Verifies the total number of tasks shown in the homepage against what they should be
     List<WebElement> tasks =
         wait.until(
@@ -858,7 +858,7 @@ public class IntegrationTest {
     assertEquals(recentTask.get("overview"), neighborTaskOverview);
 
     // Opens up task details modal to verify its contents
-    verifyTaskDetails(taskXPath + "/div[2]/div[2]");
+    verifyTaskDetails(taskXPath);
 
     // clicks on offer help button
     wait.until(
@@ -1011,16 +1011,16 @@ public class IntegrationTest {
   }
 
   /** clicks on task overview to open up task detail modal */
-  private void verifyTaskDetails(String taskOverviewXpath) {
-    String taskDetail = getTaskDetails(taskOverviewXpath);
+  private void verifyTaskDetails(String taskXpath) {
+    String taskDetail = getTaskDetails(taskXpath);
     assertEquals(recentTask.get("detail"), taskDetail);
   }
 
-  private String getTaskDetails(String taskOverviewXpath) {
+  private String getTaskDetails(String taskXpath) {
     wait.until(
             new Function<WebDriver, WebElement>() {
               public WebElement apply(WebDriver driver) {
-                return driver.findElement(By.xpath(taskOverviewXpath));
+                return driver.findElement(By.xpath(taskXpath));
               }
             })
         .click();
