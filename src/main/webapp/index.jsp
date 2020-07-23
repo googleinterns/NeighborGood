@@ -125,6 +125,11 @@
                             <option value="50">50 miles</option>
                         </select>
                   </div>
+                  <div id="pagination-wrapper">
+                        <div id="prev-page" class="pagination-icon" title="You are already on the first page">&#8249;</div>
+                        <div id="page-numbers-wrapper"></div>
+                        <div id="next-page" class="pagination-icon" title="You are already on the last page">&#8250;</div>
+                  </div>
               </div>
               <div id="no-tasks-message" class="results-message">
                   Sorry, there are currently no tasks within your neighborhood for you to help with.
@@ -138,7 +143,7 @@
       <!--Create Tasks Modal-->
       <div class="modalWrapper" id="createTaskModalWrapper">
         <div class="modal" id="createTaskModal">
-            <span class="close-button" id="close-addtask-button" onclick="closeCreateTaskModal()">&times;</span>
+            <span class="close-button" id="close-addtask-button">&times;</span>
             <form id="new-task-form" action="/tasks" method="POST" onsubmit="return validateTaskForm('new-task-form')">
                 <h1>CREATE A NEW TASK: </h1>
                 <div>
@@ -219,7 +224,7 @@
     </div>
     <div class="modalWrapper" id="taskInfoModalWrapper">
         <div class="modal" id="taskInfoModal">
-            <span class="close-button" id="task-info-close-button" onclick="closeTaskInfoModal()">&times;</span>
+            <span class="close-button" id="task-info-close-button"">&times;</span>
             <h1>Task Detail: </h1>
             <div id="task-detail-container"></div>
         </div>

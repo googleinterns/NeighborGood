@@ -222,6 +222,21 @@
             <span class="close-button" id="task-info-close-button" onclick="closeTaskInfoModal()">&times;</span>
             <h1>Task Detail: </h1>
             <div id="task-detail-container"></div>
+            <hr/>
+            <h1>Chat: </h1>
+            <div id="message-container"></div>
+            <form id="chat-box" action="/messages" method="POST" onsubmit="return validateMessage()">
+                <div>
+                    <label for="msg">Message</label>
+                    <br/>
+                </div>
+                <br/>
+                <textarea name="msg" id="msg-input" placeholder="Type message.."></textarea>
+                <input type="hidden" name="task-id" id="chat-id-input">
+                <br/>
+                <br/>
+                <input type="submit" />
+            </form>
         </div>
     </div>
   </body>

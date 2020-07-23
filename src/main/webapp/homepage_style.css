@@ -24,13 +24,20 @@ body {
 }
 
 /* Header Styling */
+header {
+  top: 0;
+  width: 100%;
+  z-index: 2;
+  background-color: white;
+}
+
 nav {
   display: flex;
   justify-content: space-between;
   position: fixed;
   width: 100%;
   top: 0;
-  padding-bottom: 1em;
+  z-index: 2;
 }
 
 #dashboard-icon-container {
@@ -42,7 +49,7 @@ nav {
   padding-right: 1em;
   padding-top: 0.8em;
   text-align: right;
-  width: 10vw;
+  width: calc(calc(100vw - 60em) / 2);
 }
 
 a {
@@ -71,9 +78,8 @@ i:hover {
 #title {
   font-size: 4em;
   text-align: center;
-  margin-top: 1em;
-  margin-bottom: 0.4em;
-  padding-top: 0.5em;
+  margin-top: 1.2em;
+  margin-bottom: 0;
 }
 
 .login-messages {
@@ -91,19 +97,22 @@ section {
 /* Styling for control bar (categories and add task) */
 #control-bar {
   display: flex;
+  margin: auto;
+  max-width: 55em;
   justify-content: space-between;
   padding-bottom: 1.5em;
 }
 
 #control-bar-message-wrapper {
-  width: 100%;
-  max-width: 55em;
-  z-index: 2;
   background-image: linear-gradient(to bottom, white 90%, transparent);
-  padding-bottom: 1em;
   padding-top: 1em;
+  position: sticky;
+  position: -webkit-sticky;
   top: 0;
-  transition: 0.3s;
+  width: 101%;
+  z-index: 2;
+  margin: -3px;
+  padding-bottom: 1em;
 }
 
 #categories {
@@ -152,6 +161,45 @@ section {
   font-size: 3.5em;
 }
 
+#pagination-wrapper {
+  display: flex;
+  justify-content: space-between;
+  width: fit-content;
+  margin: auto;
+}
+
+#page-numbers-wrapper {
+  display: flex;
+  justify-content: space-between;
+  line-height: 1.7em;
+}
+
+.pagination-icon {
+  cursor: not-allowed;
+  font-size: 2em;
+  font-weight: bold;
+  line-height: 0.8em;
+  padding: 0 0.2em;
+}
+
+.pagination-icon:hover {
+  color: gray;
+}
+
+.page-number {
+  font-weight: normal;
+  margin: 0 0.5em;
+}
+
+#current-page {
+  font-weight: bold;
+  cursor: default;
+}
+
+#current-page:hover {
+  color: #222;
+}
+
 /* Tasks Styling */
 .results-message {
   display: none;
@@ -161,25 +209,30 @@ section {
 
 #tasks-list {
   display: none;
-  border-top: solid 2px;
-  border-right: solid 2px;
-  border-left: solid 2px;
   transition: 0.5s;
 }
 
 .task {
-  border-bottom: solid 2px;
   position: relative;
+  margin-bottom: 1em;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.25);
 }
 
-.task-container {
-  padding: 1em;
+.task:hover {
+  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
 }
 
 .task-header {
   display: flex;
-  padding-bottom: 1em;
   justify-content: space-between;
+  background-color: #eee;
+  padding: 0.8em 1em;
+  font-weight: bold;
+}
+
+.task-content {
+  padding: 1em;
 }
 
 .user-nickname {
@@ -188,7 +241,7 @@ section {
 
 .help-out {
   cursor: pointer;
-  font-weight: bold;
+  text-align: right;
 }
 
 .help-out:hover {
@@ -201,17 +254,23 @@ section {
 
 .task-footer {
   font-style: italic;
-  padding-top: 1em;
   display: flex;
   justify-content: space-between;
+  padding-left: 1em;
+  padding-bottom: 1em;
+  padding-right: 1em;
+}
+
+.task-date-time {
+  color: gray;
+  font-style: normal;
 }
 
 .help-overlay {
   position: absolute;
   z-index: 1;
   display: none;
-  background: rgba(236, 236, 240, 0.85);
-  backdrop-filter: blur(4px);
+  background: #eee;
   width: 100%;
   height: 100%;
   text-align: center;
@@ -238,8 +297,8 @@ section {
 .modalWrapper {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
-  z-index: 4; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
+  z-index: 3; /* Sit on top */
+  padding-top: 200px; /* Location of the box */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -291,9 +350,8 @@ section {
   cursor: pointer;
 }
 
-/* Top Scores modal specific styling */
-#topScoresModalWrapper {
-  padding-top: 200px;
+#task-detail-container {
+  padding-bottom: 1em;
 }
 
 #topScoresModal {
@@ -334,15 +392,17 @@ td {
   padding-bottom: 2em;
 }
 
-@media only screen and (max-width: 600px) {
-  header {
-    position: fixed;
-    z-index: 3;
-    width: 100%;
-    background-color: white;
-    top: 0;
-  }
+.highlight {
+  box-shadow: 0 0 5px rgba(255, 0, 0, 1);
+  border: 4px solid rgb(255, 0, 0);
+}
 
+.req {
+  margin: 2px;
+  color: red;
+}
+
+@media only screen and (max-width: 600px) {
   #title {
     font-size: 2.5em;
     padding-top: 0.8em;
@@ -367,11 +427,11 @@ td {
   }
 
   #control-bar-message-wrapper {
-    position: fixed;
-    top: 7.5em;
-    left: 0;
+    top: 70px;
     background-color: white;
     background-image: none;
+    width: 102%;
+    margin-left: -5px;
   }
 
   .categories {
@@ -387,10 +447,6 @@ td {
 
   #addtaskbutton {
     font-size: 2.5em;
-  }
-
-  #tasks-list {
-    margin-top: 18.8em;
   }
 
   .results-message {
@@ -410,7 +466,7 @@ td {
     padding: 0 0.5em;
   }
 
-  #topScoresModal {
+  .modal {
     width: 80%;
   }
 
@@ -420,71 +476,20 @@ td {
 
   nav {
     padding-bottom: 0;
+    background-color: white;
   }
 }
 
 @media only screen and (min-width: 600px) and (max-width: 1203px) {
-  #title {
-    padding-top: 0;
-    margin-bottom: 0;
-    margin-top: -3.4em;
-    z-index: 9;
-    position: fixed;
-    width: 100%;
-    background-color: white;
+  #login-logout {
+    width: auto;
   }
 
-  header {
-    position: fixed;
-    background-color: white;
-    z-index: 4;
-    width: 100%;
+  #control-bar-message-wrapper {
+    top: 70px;
   }
 
   nav {
     background-color: white;
   }
-
-  #control-bar-message-wrapper {
-    position: fixed;
-    z-index: 4;
-    top: 9em;
-  }
-
-  #tasks-list {
-    margin-top: 18em;
-    width: 99%;
-    margin-right: auto;
-    margin-left: auto;
-  }
-
-  #login-logout {
-    width: auto;
-  }
-
-  #control-bar {
-    max-width: 95vw;
-  }
-}
-
-#task-detail-container {
-  margin-bottom: 20px;
-}
-
-.task-content {
-  cursor: pointer;
-}
-
-.task-content:hover {
-  color: gray;
-}
-
-.highlight {
-  box-shadow: 0 0 5px rgba(255, 0, 0, 1);
-  border: 4px solid rgb(255, 0, 0);
-}
-
-.req {
-  margin: 2px;
-  color: red;
 }

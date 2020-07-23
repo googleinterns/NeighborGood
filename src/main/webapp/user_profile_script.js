@@ -66,6 +66,38 @@ function validateInfoForm(id) {
     return true;
 }
 
+function validateMessage() {
+    var msgField = document.getElementById("msg-input").value.trim();
+    if (msgField === "") {
+        document.getElementById("msg-input").classList.add("highlight");
+        alert("You cannot send an empty message.");
+        return false;
+    } else {
+        document.getElementById("msg-input").classList.remove("highlight");
+        return true;
+    }
+}
+
+async function loadMessages(keyString) {
+    const queryURL = "/messages?key=" + keyString;
+    const request = new Request(queryURL, {method: "GET"});
+    const response = await fetch(request);
+    const msgResponse = await response.json();
+
+    const msgContainer = document.getElementById("message-container");
+    msgContainer.innerHTML = "";
+    for (var index = 0; index < msgResponse.length; index++) {
+        var msg = msgResponse[index];
+        var newMessage = document.createElement("div");
+        newMessage.className = msg.className;
+        newMessage.appendChild(document.createTextNode(msg.message)); 
+        msgContainer.appendChild(newMessage);
+    }
+
+    // Keep message container scrolled to bottom at the beginning
+    msgContainer.scrollTop = msgContainer.scrollHeight;
+}
+
 async function getTaskInfo(keyString) {
     const queryURL = "/tasks/info?key=" + keyString;
     const request = new Request(queryURL, {method: "GET"});
@@ -179,8 +211,10 @@ async function showTaskInfo(keyString) {
     var detailContainer = document.getElementById("task-detail-container");
     detailContainer.innerHTML = "";
     detailContainer.appendChild(document.createTextNode(info.detail));
+    document.getElementById("chat-id-input").value = keyString;
     var modal = document.getElementById("taskInfoModalWrapper");
     modal.style.display = "block";
+    loadMessages(keyString);
 }
 
 function showNeedHelp() {

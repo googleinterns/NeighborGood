@@ -44,9 +44,11 @@ public class EditTaskServlet extends HttpServlet {
     UserService userService = UserServiceFactory.getUserService();
     if (!userService.isUserLoggedIn()) {
       System.err.println("User must be logged in to edit a task");
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       response.sendError(
           HttpServletResponse.SC_UNAUTHORIZED,
           "You must be logged in to perform this action on a task");
+      return;
     }
 
     // Edits tasks that have been claimed by setting the "helper" property to the userId
@@ -94,6 +96,7 @@ public class EditTaskServlet extends HttpServlet {
       task = datastore.get(taskKey);
     } catch (EntityNotFoundException e) {
       System.err.println("Unable to find the entity based on the input key");
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       response.sendError(HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
       return;
     }
@@ -120,6 +123,7 @@ public class EditTaskServlet extends HttpServlet {
     // If input task detail is empty, reject the request to edit.
     if (taskDetail.equals("")) {
       System.err.println("The input task detail is empty");
+      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       return;
     }
 
@@ -135,6 +139,7 @@ public class EditTaskServlet extends HttpServlet {
     // If input task overview is empty, reject the request to edit.
     if (taskOverview.equals("")) {
       System.err.println("The input task overview is empty");
+      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       return;
     }
 
@@ -142,6 +147,7 @@ public class EditTaskServlet extends HttpServlet {
     String taskCategory = request.getParameter("category-input");
     if (taskCategory == null || taskCategory.isEmpty()) {
       System.err.println("The task must have a category");
+      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       return;
     }
 
@@ -149,6 +155,7 @@ public class EditTaskServlet extends HttpServlet {
       task = datastore.get(taskKey);
     } catch (EntityNotFoundException e) {
       System.err.println("Unable to find the entity based on the input key");
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       response.sendError(HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
       return;
     }
