@@ -130,4 +130,67 @@ public final class MessageServletTest {
       assertEquals(i, ds.prepare(new Query("Message")).countEntities(withLimit(10)));
     }
   }
+
+  @Test
+  public void testEmptyInputEdgeCase() throws IOException {
+    // Check whether the datastore is empty before the test
+    assertEquals(0, ds.prepare(new Query("Message")).countEntities(withLimit(10)));
+
+    // First test the situation when task-id is not provided
+    System.setErr(new PrintStream(errContent));
+
+    new MessageServlet().doPost(request, response);
+
+    // This will lead to the first error handling clause of the doPost function of MessageServlet
+    assertEquals("The task id is not included\n", errContent.toString());
+    assertEquals(0, ds.prepare(new Query("Message")).countEntities(withLimit(10)));
+
+    errContent.reset();
+    System.setErr(originalErr);
+
+    when(request.getParameter("task-id")).thenReturn("1234567890");
+
+    // Now test the situation the message is not provided
+    System.setErr(new PrintStream(errContent));
+
+    new MessageServlet().doPost(request, response);
+
+    // This will lead to the second error handling clause of doPost() in MessageServlet
+    assertEquals("The message is not provided\n", errContent.toString());
+    assertEquals(0, ds.prepare(new Query("Message")).countEntities(withLimit(10)));
+
+    errContent.reset();
+    System.setErr(originalErr);
+
+    // Now test the situation the message is empty
+    when(request.getParameter("msg")).thenReturn("   ");
+    System.setErr(new PrintStream(errContent));
+
+    new MessageServlet().doPost(request, response);
+
+    // This will lead to the second error handling clause of doPost() in MessageServlet
+    assertEquals("The input message is empty\n", errContent.toString());
+    assertEquals(0, ds.prepare(new Query("Message")).countEntities(withLimit(10)));
+
+    errContent.reset();
+    System.setErr(originalErr);
+
+    // Now test the normal case
+    when(request.getParameter("msg")).thenReturn("Testing message");
+
+    new MessageServlet().doPost(request, response);
+
+    // After sending the POST request, there should be one entity in the datastore
+    assertEquals(1, ds.prepare(new Query("Message")).countEntities(withLimit(10)));
+    PreparedQuery results = ds.prepare(new Query("Message"));
+    Entity entity = results.asSingleEntity();
+
+    // The entity can't be null
+    assertNotNull(entity);
+
+    // Test the stored personal information
+    assertEquals("Testing message", (String) entity.getProperty("message"));
+    assertEquals("1234567890", (String) entity.getProperty("taskId"));
+    assertEquals("1234567890", (String) entity.getProperty("sender"));
+  }
 }
