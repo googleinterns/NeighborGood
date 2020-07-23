@@ -102,7 +102,7 @@ async function loadMessages(keyString) {
         moreMessageBtn.setAttribute("class", "more-msg-button");
         moreMessageBtn.textContent = "Load 10 more messages";
         moreMessageBtn.addEventListener("click", function() { 
-            loadMoreMessages(keyString, 20, newMessage)
+            loadMoreMessages(keyString, newMessage)
         });
         msgContainer.appendChild(moreMessageBtn);
         msgContainer.appendChild(newMessage);
@@ -127,9 +127,9 @@ async function loadMessages(keyString) {
     msgContainer.scrollTop = msgContainer.scrollHeight;
 }
 
-// loadMoreMessages(key, count, messageDiv) will load count many messages of
+// loadMoreMessages(key, messageDiv) will load 10 more messages of
 // task with keyString equals to key. After loading, scroll to element messageDiv
-async function loadMoreMessages(key, count, messageDiv) {
+async function loadMoreMessages(key, messageDiv) {
     const queryURL = "/messages?key=" + key;
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
@@ -137,6 +137,7 @@ async function loadMoreMessages(key, count, messageDiv) {
 
     const msgContainer = document.getElementById("message-container");
     msgContainer.removeChild(msgContainer.childNodes[0]);
+    var count = msgContainer.childNodes.length + 10;
     if (msgResponse.length > count) {
         var newMessageDiv;
         for (var index = msgResponse.length - count + 9; index > msgResponse.length - count - 1; index--) {
@@ -150,7 +151,7 @@ async function loadMoreMessages(key, count, messageDiv) {
         moreMessageBtn.setAttribute("class", "more-msg-button");
         moreMessageBtn.textContent = "Load 10 more messages";
         moreMessageBtn.addEventListener("click", function() { 
-            loadMoreMessages(key, count + 10, newMessageDiv);
+            loadMoreMessages(key, newMessageDiv);
         });
         msgContainer.insertBefore(moreMessageBtn, msgContainer.childNodes[0]);
     } else {

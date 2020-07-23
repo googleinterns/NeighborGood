@@ -399,6 +399,7 @@ table button:hover i {
   cursor: pointer;
   overflow: hidden;
   outline: none;
+  float: right;
 }
 
 .more-msg-button:hover {
