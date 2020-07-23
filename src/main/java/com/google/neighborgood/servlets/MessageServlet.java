@@ -17,6 +17,7 @@ package com.google.neighborgood.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
@@ -104,6 +105,40 @@ public class MessageServlet extends HttpServlet {
     msgEntity.setProperty("sentTime", System.currentTimeMillis());
 
     datastore.put(msgEntity);
+    response.sendRedirect(request.getHeader("Referer"));
+  }
+
+  @Override
+  public void doDelete(HttpServletRequest request, HttpServletResponse response)
+      throws IOException {
+    // First check whether the user is logged in
+    UserService userService = UserServiceFactory.getUserService();
+
+    if (!userService.isUserLoggedIn()) {
+      response.sendRedirect(userService.createLoginURL("/account.jsp"));
+      return;
+    }
+
+    // Get the task ID
+    String taskId = request.getParameter("task-id");
+    if (taskId == null) {
+      System.err.println("The task id is not included");
+      return;
+    }
+
+    // Get all stored entities related with the task that corresponds to the given taskId
+    Filter filter = new FilterPredicate("taskId", FilterOperator.EQUAL, taskId);
+    Query query = new Query("Message").setFilter(filter);
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    PreparedQuery results = datastore.prepare(query);
+
+    // Loop through all entities and delete them using the key
+    for (Entity entity : results.asIterable()) {
+      Key key = entity.getKey();
+      datastore.delete(key);
+    }
+
     response.sendRedirect(request.getHeader("Referer"));
   }
 }

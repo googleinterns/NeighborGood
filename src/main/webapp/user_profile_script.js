@@ -172,6 +172,15 @@ async function loadMoreMessages(key, messageDiv) {
     messageDiv.scrollIntoView();
 }
 
+// deleteMessages(taskId) will delete all the messages stored in datastore related
+// with the task corresponds to the given taskId
+async function deleteMessages(taskId) {
+    const queryURL = "messages?task-id=" + taskId;
+    const request = new Request(queryURL, {method: "DELETE"});
+    const response = await fetch(request);
+    return;
+}
+
 async function getTaskInfo(keyString) {
     const queryURL = "/tasks/info?key=" + keyString;
     const request = new Request(queryURL, {method: "GET"});
@@ -189,6 +198,7 @@ async function deleteTask(keyString) {
             const queryURL = "/tasks?key=" + keyString;
             const request = new Request(queryURL, {method: "DELETE"});
             const response = await fetch(request);
+            deleteMessages(keyString);
             showNeedHelp();
         }
     }
@@ -247,6 +257,7 @@ async function abandonTask(keyString) {
             const queryURL = "/tasks/info?key=" + keyString + "&status=" + "OPEN";
             const request = new Request(queryURL, {method: "POST"});
             const response = await fetch(request);
+            deleteMessages(keyString);
             showOfferHelp();
         }
     }
@@ -261,6 +272,7 @@ async function verifyTask(keyString) {
             const queryURL = "/tasks/info?key=" + keyString + "&status=" + "COMPLETE";
             const request = new Request(queryURL, {method: "POST"});
             const response = await fetch(request);
+            deleteMessages(keyString);
             showNeedHelp();
         }
     }
