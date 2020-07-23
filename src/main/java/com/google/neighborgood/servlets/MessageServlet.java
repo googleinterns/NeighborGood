@@ -17,7 +17,9 @@ package com.google.neighborgood.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
@@ -105,6 +107,42 @@ public class MessageServlet extends HttpServlet {
     msgEntity.setProperty("sentTime", System.currentTimeMillis());
 
     datastore.put(msgEntity);
+
+    // After storing the message, create a notification entity to notify the receiver
+    Key taskKey = KeyFactory.stringToKey(taskId);
+
+    Entity taskEntity;
+    try {
+      taskEntity = datastore.get(taskKey);
+    } catch (EntityNotFoundException e) {
+      System.err.println("Unable to find the entity based on the input key");
+      response.sendError(HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
+      return;
+    }
+
+    String owner = (String) taskEntity.getProperty("Owner");
+    String helper = (String) taskEntity.getProperty("Helper");
+    String currentUser = userService.getCurrentUser().getUserId();
+
+    Entity notificationEntity;
+    if (currentUser.equals(helper)) {
+      notificationEntity = new Entity("Notification");
+      notificationEntity.setProperty("receiver", owner);
+      notificationEntity.setProperty("taskId", taskId);
+      datastore.put(notificationEntity);
+    } else if (currentUser.equals(owner)) {
+      // If the task is still OPEN, we would not send a notification
+      if (!helper.equals("N/A")) {
+        notificationEntity = new Entity("Notification");
+        notificationEntity.setProperty("receiver", helper);
+        notificationEntity.setProperty("taskId", taskId);
+        datastore.put(notificationEntity);
+      }
+    } else {
+      System.err.println("The message is not sent by the owner or helper of the task");
+      return;
+    }
+
     response.sendRedirect(request.getHeader("Referer"));
   }
 

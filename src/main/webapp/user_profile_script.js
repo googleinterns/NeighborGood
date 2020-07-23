@@ -369,6 +369,52 @@ window.onclick = function(event) {
     }
 }
 
+async function showNotifications() {
+    const request = new Request("/notifications", {method: "GET"});
+    const response = await fetch(request);
+    const notifiResponse = await response.json();
+    const notiList = document.getElementById("notification-list");
+    notiList.innerHTML = "";
+    if (notifiResponse.length === 0) return;
+    var totalCnt = 0;
+    for (var index = 0; index < notifiResponse.length; index++) {
+        var li = document.createElement("li");
+        var notification = notifiResponse[index];
+        var overview = notification.overview;
+        var count = notification.count;
+        var id = notification.taskId;
+        totalCnt += count;
+        var taskLink = document.createElement("a");
+        taskLink.setAttribute("class", "notification-element");
+        taskLink.appendChild(
+            document.createTextNode("You have " + count.toString() + " new notificatioins for Task: "
+            + overview));
+        taskLink.addEventListener("click", function() {
+            closeNotificationModal();
+            showTaskInfo(id);
+        });
+        li.appendChild(taskLink);
+        notiList.appendChild(li);
+    }
+    var notiMsg = document.createElement("span");
+    notiMsg.appendChild(document.createTextNode("You have " + totalCnt.toString() + " new notifications"));
+    notiMsg.addEventListener("click", function() {
+        showNotificationList();
+    });
+    notiMsg.setAttribute("class", "blink-text");
+    document.getElementById("notice-container").appendChild(notiMsg);
+}
+
+function showNotificationList() {
+    var modal = document.getElementById("notificationModalWrapper");
+    modal.style.display = "block";
+}
+
+function closeNotificationModal() {
+    var modal = document.getElementById("notificationModalWrapper");
+    modal.style.display = "none";
+}
+
 async function displayNeedHelpTasks() {
     const queryURL = "/mytasks?keyword=Owner&complete=False";
     const request = new Request(queryURL, {method: "GET"});
@@ -515,11 +561,13 @@ async function displayOfferHelpCompleteTasks() {
 if (document.readyState === 'loading') {
     // adds on load event listeners if document hasn't yet loaded
     document.addEventListener('DOMContentLoaded', initMap);
-    document.addEventListener('DOMContentLoaded', showNeedHelp)
+    document.addEventListener('DOMContentLoaded', showNeedHelp);
+    document.addEventListener('DOMContentLoaded', showNotifications);
 } else {
     // if DOMContentLoaded has already fired, it simply calls the functions
     initMap();
     showNeedHelp();
+    showNotifications();
 }
 
 /**
