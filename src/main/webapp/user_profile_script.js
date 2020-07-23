@@ -83,6 +83,8 @@ async function refresh() {
     loadMessages(document.getElementById("chat-id-input").value);
 }
 
+// To address the scaling issue and avoid loading too many messages at a time,
+// the chat box would first load at most 10 most recent messages.
 async function loadMessages(keyString) {
     const queryURL = "/messages?key=" + keyString;
     const request = new Request(queryURL, {method: "GET"});
@@ -91,16 +93,76 @@ async function loadMessages(keyString) {
 
     const msgContainer = document.getElementById("message-container");
     msgContainer.innerHTML = "";
-    for (var index = 0; index < msgResponse.length; index++) {
-        var msg = msgResponse[index];
+    if (msgResponse.length > 10) {
+        var msg = msgResponse[msgResponse.length - 10];
         var newMessage = document.createElement("div");
         newMessage.className = msg.className;
         newMessage.appendChild(document.createTextNode(msg.message)); 
+        var moreMessageBtn = document.createElement("button");
+        moreMessageBtn.setAttribute("class", "more-msg-button");
+        moreMessageBtn.textContent = "Load 10 more messages";
+        moreMessageBtn.addEventListener("click", function() { 
+            loadMoreMessages(keyString, 20, newMessage)
+        });
+        msgContainer.appendChild(moreMessageBtn);
         msgContainer.appendChild(newMessage);
+        for (var index = msgResponse.length - 9; index < msgResponse.length; index++) {
+            var message = msgResponse[index];
+            var newMessageDiv = document.createElement("div");
+            newMessageDiv.className = message.className;
+            newMessageDiv.appendChild(document.createTextNode(message.message)); 
+            msgContainer.appendChild(newMessageDiv);
+        }
+    } else {
+        for (var index = 0; index < msgResponse.length; index++) {
+            var msg = msgResponse[index];
+            var newMessage = document.createElement("div");
+            newMessage.className = msg.className;
+            newMessage.appendChild(document.createTextNode(msg.message)); 
+            msgContainer.appendChild(newMessage);
+        }
     }
 
     // Keep message container scrolled to bottom at the beginning
     msgContainer.scrollTop = msgContainer.scrollHeight;
+}
+
+// loadMoreMessages(key, count, messageDiv) will load count many messages of
+// task with keyString equals to key. After loading, scroll to element messageDiv
+async function loadMoreMessages(key, count, messageDiv) {
+    const queryURL = "/messages?key=" + key;
+    const request = new Request(queryURL, {method: "GET"});
+    const response = await fetch(request);
+    const msgResponse = await response.json();
+
+    const msgContainer = document.getElementById("message-container");
+    msgContainer.removeChild(msgContainer.childNodes[0]);
+    if (msgResponse.length > count) {
+        var newMessageDiv;
+        for (var index = msgResponse.length - count + 9; index > msgResponse.length - count - 1; index--) {
+            var message = msgResponse[index];
+            newMessageDiv = document.createElement("div");
+            newMessageDiv.className = message.className;
+            newMessageDiv.appendChild(document.createTextNode(message.message)); 
+            msgContainer.insertBefore(newMessageDiv, msgContainer.childNodes[0]);
+        }
+        var moreMessageBtn = document.createElement("button");
+        moreMessageBtn.setAttribute("class", "more-msg-button");
+        moreMessageBtn.textContent = "Load 10 more messages";
+        moreMessageBtn.addEventListener("click", function() { 
+            loadMoreMessages(key, count + 10, newMessageDiv);
+        });
+        msgContainer.insertBefore(moreMessageBtn, msgContainer.childNodes[0]);
+    } else {
+        for (var index = msgResponse.length - count + 9; index >= 0; index--) {
+            var message = msgResponse[index];
+            newMessageDiv = document.createElement("div");
+            newMessageDiv.className = message.className;
+            newMessageDiv.appendChild(document.createTextNode(message.message)); 
+            msgContainer.insertBefore(newMessageDiv, msgContainer.childNodes[0]);
+        } 
+    }
+    messageDiv.scrollIntoView();
 }
 
 async function getTaskInfo(keyString) {

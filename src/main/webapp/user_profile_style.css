@@ -391,3 +391,16 @@ table button:hover i {
 #refresh-button:hover {
   color: #0c0;
 }
+
+.more-msg-button {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+}
+
+.more-msg-button:hover {
+  color: gray;
+}
