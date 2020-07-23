@@ -43,6 +43,7 @@ public class MessageServlet extends HttpServlet {
     String taskId = request.getParameter("key");
     if (taskId == null) {
       System.err.println("No task id provided");
+      return;
     }
 
     // Make sure that the user has already logged into his account

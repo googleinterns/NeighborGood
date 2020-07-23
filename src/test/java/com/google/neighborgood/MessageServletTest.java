@@ -39,7 +39,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-/** Unit test on the UserInfoServlet file */
+/** Unit test on the MessageServlet file */
 @RunWith(JUnit4.class)
 public final class MessageServletTest {
 
@@ -109,7 +109,7 @@ public final class MessageServletTest {
     // The entity can't be null
     assertNotNull(entity);
 
-    // Test the stored personal information
+    // Test the stored message information
     assertEquals("Testing message", (String) entity.getProperty("message"));
     assertEquals("1234567890", (String) entity.getProperty("taskId"));
     assertEquals("1234567890", (String) entity.getProperty("sender"));
@@ -188,9 +188,86 @@ public final class MessageServletTest {
     // The entity can't be null
     assertNotNull(entity);
 
-    // Test the stored personal information
+    // Test the stored message information
     assertEquals("Testing message", (String) entity.getProperty("message"));
     assertEquals("1234567890", (String) entity.getProperty("taskId"));
     assertEquals("1234567890", (String) entity.getProperty("sender"));
+  }
+
+  @Test
+  public void doGetTest() throws IOException {
+    // Check whether the datastore is empty before the test
+    assertEquals(0, ds.prepare(new Query("Message")).countEntities(withLimit(10)));
+
+    Entity dummy = new Entity("Message");
+    dummy.setProperty("message", "Test 1");
+    dummy.setProperty("taskId", "1");
+    dummy.setProperty("sender", userService.getCurrentUser().getUserId());
+    dummy.setProperty("sentTime", 0);
+
+    Entity dummy2 = new Entity("Message");
+    dummy2.setProperty("message", "Test 2");
+    dummy2.setProperty("taskId", "1");
+    dummy2.setProperty("sender", userService.getCurrentUser().getUserId());
+    dummy2.setProperty("sentTime", 5);
+
+    ds.put(dummy);
+    ds.put(dummy2);
+
+    when(request.getParameter("key")).thenReturn("1");
+
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    new MessageServlet().doGet(request, response);
+
+    // After sending the GET request, the doGet function should output the json string
+    writer.flush();
+    System.out.println(stringWriter.toString());
+    assertTrue(
+        stringWriter
+            .toString()
+            .contains("{\"message\":\"Test 1\",\"className\":\"sentByMe\",\"sentTime\":0}"));
+    assertTrue(
+        stringWriter
+            .toString()
+            .contains("{\"message\":\"Test 2\",\"className\":\"sentByMe\",\"sentTime\":5}"));
+
+    // Finally, ensure that the servlet file has set the content type to json
+    verify(response).setContentType("application/json;");
+  }
+
+  @Test
+  public void doGetWithoutTaskIdTest() throws IOException {
+    // Check whether the datastore is empty before the test
+    assertEquals(0, ds.prepare(new Query("Message")).countEntities(withLimit(10)));
+
+    Entity dummy = new Entity("Message");
+    dummy.setProperty("message", "Test 1");
+    dummy.setProperty("taskId", "1");
+    dummy.setProperty("sender", userService.getCurrentUser().getUserId());
+    dummy.setProperty("sentTime", 0);
+
+    Entity dummy2 = new Entity("Message");
+    dummy2.setProperty("message", "Test 2");
+    dummy2.setProperty("taskId", "1");
+    dummy2.setProperty("sender", userService.getCurrentUser().getUserId());
+    dummy2.setProperty("sentTime", 5);
+
+    ds.put(dummy);
+    ds.put(dummy2);
+
+    // Now test the edge case that task id is not provided
+    System.setErr(new PrintStream(errContent));
+
+    new MessageServlet().doGet(request, response);
+
+    // This will lead to the first error handling clause of doGet() in MessageServlet
+    assertEquals("No task id provided\n", errContent.toString());
+    assertEquals(2, ds.prepare(new Query("Message")).countEntities(withLimit(10)));
+
+    errContent.reset();
+    System.setErr(originalErr);
   }
 }
