@@ -394,6 +394,8 @@ async function showNotifications() {
         var overview = notification.overview;
         var count = notification.count;
         var id = notification.taskId;
+        // Create a copy for taskId to prevent alias
+        const idCopy = id.slice();
         totalCnt += count;
         var taskLink = document.createElement("a");
         taskLink.setAttribute("class", "notification-element");
@@ -402,7 +404,7 @@ async function showNotifications() {
             + overview));
         taskLink.addEventListener("click", function() {
             closeNotificationModal();
-            showTaskInfo(id);
+            showTaskInfo(idCopy);
         });
         li.appendChild(taskLink);
         notiList.appendChild(li);

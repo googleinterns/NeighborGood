@@ -435,3 +435,17 @@ table button:hover i {
   50% { opacity: 0.0; }
   100% { opacity: 1.0; }
 }
+
+#notification-list li {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#notification-list a {
+  cursor: pointer;
+}
+
+#notification-list a:hover {
+  color: blue;
+  text-decoration: underline;
+}
