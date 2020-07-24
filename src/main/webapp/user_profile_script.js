@@ -175,7 +175,7 @@ async function loadMoreMessages(key, messageDiv) {
 // deleteMessages(taskId) will delete all the messages stored in datastore related
 // with the task corresponds to the given taskId
 async function deleteMessages(taskId) {
-    const queryURL = "messages?task-id=" + taskId;
+    const queryURL = "/messages?task-id=" + taskId;
     const request = new Request(queryURL, {method: "DELETE"});
     const response = await fetch(request);
     return;
@@ -301,6 +301,15 @@ async function showTaskInfo(keyString) {
     var modal = document.getElementById("taskInfoModalWrapper");
     modal.style.display = "block";
     loadMessages(keyString);
+    removeNotifications(keyString);
+}
+
+async function removeNotifications(taskId) {
+    const queryURL = "/notifications?task-id=" + taskId;
+    const request = new Request(queryURL, {method: "POST"});
+    const response = await fetch(request);
+    showNotifications();
+    return;
 }
 
 function showNeedHelp() {
@@ -375,6 +384,8 @@ async function showNotifications() {
     const notifiResponse = await response.json();
     const notiList = document.getElementById("notification-list");
     notiList.innerHTML = "";
+    const noticeContainer = document.getElementById("notice-container");
+    noticeContainer.innerHTML = "";
     if (notifiResponse.length === 0) return;
     var totalCnt = 0;
     for (var index = 0; index < notifiResponse.length; index++) {
@@ -402,7 +413,7 @@ async function showNotifications() {
         showNotificationList();
     });
     notiMsg.setAttribute("class", "blink-text");
-    document.getElementById("notice-container").appendChild(notiMsg);
+    noticeContainer.appendChild(notiMsg);
 }
 
 function showNotificationList() {

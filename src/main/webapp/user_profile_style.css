@@ -60,6 +60,10 @@ body {
   margin-right: 2%;
 }
 
+#notice-container {
+  margin-left: 2%;
+}
+
 #title {
   font-size: 3em;
   font-family: Roboto, sans-serif;
@@ -404,4 +408,30 @@ table button:hover i {
 
 .more-msg-button:hover {
   color: gray;
+}
+
+.blink-text {
+  animation: 1s blinker linear infinite;
+  -webkit-animation: 1s blinker linear infinite;
+  -moz-animation: 1s blinker linear infinite;
+  color: red;
+  cursor: pointer;
+}
+
+@-moz-keyframes blinker {
+  0% { opacity: 1.0; }
+  50% { opacity: 0.0; }
+  100% { opacity: 1.0; }
+}
+
+@-webkit-keyframes blinker {
+  0% { opacity: 1.0; }
+  50% { opacity: 0.0; }
+  100% { opacity: 1.0; }
+}
+
+@keyframes blinker {
+  0% { opacity: 1.0; }
+  50% { opacity: 0.0; }
+  100% { opacity: 1.0; }
 }

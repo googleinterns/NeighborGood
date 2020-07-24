@@ -17,8 +17,11 @@ package com.google.neighborgood.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
@@ -72,5 +75,43 @@ public class NotificationServlet extends HttpServlet {
     String json = gson.toJson(finalResult);
     response.setContentType("application/json;");
     response.getWriter().println(json);
+  }
+
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    // First check whether the user is logged in
+    UserService userService = UserServiceFactory.getUserService();
+
+    if (!userService.isUserLoggedIn()) {
+      response.sendRedirect(userService.createLoginURL("/account.jsp"));
+      return;
+    }
+
+    // Get the task ID
+    String taskId = request.getParameter("task-id");
+    if (taskId == null) {
+      System.err.println("The task id is not included");
+      return;
+    }
+
+    // Get all stored entities related with the task that corresponds to the given taskId
+    // and the receiver equals to the current user
+    Filter idFilter = new FilterPredicate("taskId", FilterOperator.EQUAL, taskId);
+    Filter receiverFilter =
+        new FilterPredicate(
+            "receiver", FilterOperator.EQUAL, userService.getCurrentUser().getUserId());
+    CompositeFilter filter = CompositeFilterOperator.and(idFilter, receiverFilter);
+    Query query = new Query("Notification").setFilter(filter);
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    PreparedQuery results = datastore.prepare(query);
+
+    // Loop through all entities and delete them using the key
+    for (Entity entity : results.asIterable()) {
+      Key key = entity.getKey();
+      datastore.delete(key);
+    }
+
+    response.sendRedirect(request.getHeader("Referer"));
   }
 }
