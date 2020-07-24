@@ -19,7 +19,7 @@
 body {
   font-family: 'Roboto', sans-serif;
   margin: auto;
-  padding-bottom: 3em;
+  padding-bottom: 1em;
   color: #222;
 }
 
@@ -79,7 +79,7 @@ i:hover {
   font-size: 4em;
   text-align: center;
   margin-top: 1.2em;
-  margin-bottom: 0;
+  margin-bottom: 0.3em;
 }
 
 .login-messages {
@@ -105,14 +105,14 @@ section {
 
 #control-bar-message-wrapper {
   background-image: linear-gradient(to bottom, white 90%, transparent);
-  padding-top: 1em;
   position: sticky;
+  padding-top: 1em;
   position: -webkit-sticky;
   top: 0;
   width: 101%;
   z-index: 2;
   margin: -3px;
-  padding-bottom: 1em;
+  padding-bottom: 0;
 }
 
 #categories {
@@ -161,45 +161,6 @@ section {
   font-size: 3.5em;
 }
 
-#pagination-wrapper {
-  display: flex;
-  justify-content: space-between;
-  width: fit-content;
-  margin: auto;
-}
-
-#page-numbers-wrapper {
-  display: flex;
-  justify-content: space-between;
-  line-height: 1.7em;
-}
-
-.pagination-icon {
-  cursor: not-allowed;
-  font-size: 2em;
-  font-weight: bold;
-  line-height: 0.8em;
-  padding: 0 0.2em;
-}
-
-.pagination-icon:hover {
-  color: gray;
-}
-
-.page-number {
-  font-weight: normal;
-  margin: 0 0.5em;
-}
-
-#current-page {
-  font-weight: bold;
-  cursor: default;
-}
-
-#current-page:hover {
-  color: #222;
-}
-
 /* Tasks Styling */
 .results-message {
   display: none;
@@ -207,9 +168,14 @@ section {
   padding-bottom: 0.5em;
 }
 
+#loading {
+  display: block;
+}
+
 #tasks-list {
   display: none;
   transition: 0.5s;
+  padding-top: 0.5em;
 }
 
 .task {
@@ -298,7 +264,6 @@ section {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 3; /* Sit on top */
-  padding-top: 200px; /* Location of the box */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -314,6 +279,7 @@ section {
   padding: 20px;
   border: 1px solid #888;
   width: 50%;
+  margin-top: 20vh;
 }
 
 .modal textarea {
@@ -355,7 +321,6 @@ section {
 }
 
 #topScoresModal {
-  width: 70%;
   text-align: center;
   overflow: auto;
 }
@@ -427,11 +392,12 @@ td {
   }
 
   #control-bar-message-wrapper {
-    top: 70px;
+    top: 80px;
     background-color: white;
     background-image: none;
     width: 102%;
     margin-left: -5px;
+    padding-top: 0;
   }
 
   .categories {
@@ -486,7 +452,8 @@ td {
   }
 
   #control-bar-message-wrapper {
-    top: 70px;
+    top: 80px;
+    padding-top: 0;
   }
 
   nav {

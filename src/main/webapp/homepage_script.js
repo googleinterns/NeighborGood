@@ -16,21 +16,53 @@ const MAPSKEY = config.MAPS_KEY
 let neighborhood = [null , null];
 let userLocation = null;
 let currentCategory = "all";
-let currentPage = 1;
-let taskPagesCache = null;
-let currentPageNumberNode = null;
+let taskGroup = null;
+let startCursor = null;
+let endCursor = null;
 
-window.addEventListener("resize", displayPaginationUI);
-window.addEventListener("resize", window.onscroll);
+/* Changes navbar background upon resize */
+window.addEventListener("resize", function() {
+    let navbar = document.getElementsByTagName("nav")[0];
+    if (window.innerWidth < 1204) navbar.style.backgroundColor = "white";
+    else navbar.style.backgroundColor = "transparent";
+});
 
+/* Changes navbar background upon scroll */
 window.onscroll = function() {
     if (window.innerWidth >= 1204) {
-        const navbar = document.getElementsByTagName("nav")[0];
+        let navbar = document.getElementsByTagName("nav")[0];
         OFFSET = 180; // approx distance from top of page to top of control (categories) bar
         if (window.pageYOffset >= OFFSET || document.body.scrollTop >= OFFSET || document.documentElement.scrollTop >= OFFSET) {
             navbar.style.backgroundColor = "white";
         } else navbar.style.backgroundColor = "transparent";
     }
+}
+
+/* Adds scroll event listener to load more tasks if the user has reached the bottom of the page */
+document.addEventListener("scroll", function() {
+    if (getDocumentHeight() == getVerticalScroll() + window.innerHeight) {
+        loadMoreTasks();
+    }
+})
+
+/* Returns document height using different methods of doing so that differ by browser */
+function getDocumentHeight() {
+    return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight,
+        document.body.offsetHeight, document.documentElement.offsetHeight,
+        document.body.clientHeight, document.documentElement.clientHeight);
+}
+
+/* Returns the vertical scroll the user has gone using different methods of doing so that differ by browser */
+function getVerticalScroll() {
+    let verticalScroll = 0;
+    if( typeof( window.pageYOffset ) == 'number' ) {
+        verticalScroll = window.pageYOffset;
+    } else if( document.body && document.body.scrollTop) {
+        verticalScroll = document.body.scrollTop;
+    } else if( document.documentElement && document.documentElement.scrollTop) {
+        verticalScroll = document.documentElement.scrollTop;
+    }
+    return verticalScroll;
 }
 
 /* Calls addUIClickHandlers and getTasksForUserLocation once page has loaded */
@@ -65,28 +97,28 @@ function addUIClickHandlers() {
 
     // adds closeTaskInfoModal click event
     document.getElementById("task-info-close-button").addEventListener("click", closeTaskInfoModal);
-
-    // adds nextPage and prevPage click events
-    document.getElementById("prev-page").addEventListener("click", prevPage);
-    document.getElementById("next-page").addEventListener("click", nextPage);
 }
 
-/* Function loads previous page of tasks */
-function prevPage() {
-    if (currentPage > 1) {
-        currentPage--;
-        displayTasks(); 
-        displayPaginationUI();
+/* Function loads ten more tasks if there are any more, otherwise it displays a message saying there are no more tasks */
+function loadMoreTasks() {
+    if (userNeighborhoodIsKnown()) {
+        if (!taskGroup.endOfQuery) {
+            fetchTasks(currentCategory, endCursor)
+                .then(response => {
+                        taskGroup = response;
+                        startCursor = taskGroup.startCursor;
+                        endCursor = taskGroup.endCursor;
+                        displayTasks(true);
+                    });
+        } else if (!document.getElementById("no-more-tasks")) {
+            let noMoreTasksDiv = document.createElement("div");
+            noMoreTasksDiv.setAttribute("id", "no-more-tasks");
+            noMoreTasksDiv.classList.add("results-message");
+            noMoreTasksDiv.innerText = "There are no more tasks in your neighborhood";
+            noMoreTasksDiv.style.display = "block";
+            document.getElementById("tasks-list").appendChild(noMoreTasksDiv);
+        }                
     } 
-}
-
-/* Function loads next page of tasks */
-function nextPage() {
-    if (currentPage < taskPagesCache.pageCount) {
-        currentPage++;
-        displayTasks();
-        displayPaginationUI();
-    }
 }
 
 /* Function filters tasks by categories and styles selected categories */
@@ -95,10 +127,12 @@ function filterTasksBy(category) {
 
     // only fetches tasks if user's location has been retrieved
     if (userNeighborhoodIsKnown()) {
-        fetchTasks(category)
+        fetchTasks(currentCategory)
             .then(response => {
-                    displayTasks(response);
-                    displayPaginationUI();
+                    taskGroup = response;
+                    startCursor = taskGroup.startCursor;
+                    endCursor = taskGroup.endCursor;
+                    displayTasks();
                 });
     }
 	// Unhighlights and resets styling for all category buttons
@@ -148,9 +182,11 @@ function confirmHelp(element) {
         }
         // fetches tasks again if user's current location was successfully retrieved and stored
         else if (userNeighborhoodIsKnown()) {
-            fetchTasks(currentCategory).then(response => {
-                    displayTasks(response);
-                    displayPaginationUI();
+            fetchTasks(currentCategory, startCursor).then(response => {
+                    taskGroup = response;
+                    startCursor = taskGroup.startCursor;
+                    endCursor = taskGroup.endCursor;
+                    displayTasks();
                 });
         }
     });
@@ -292,13 +328,16 @@ function getTasksForUserLocation() {
     // fetchTasks and displayTasks
 	window.initialize = function () {
          getUserLocation().then(location => toNeighborhood(location))
-        	.then(() => fetchTasks())
+        	.then(() => fetchTasks(currentCategory))
             .then(response => {
-                    displayTasks(response);
-                    displayPaginationUI();
+                    taskGroup = response;
+                    startCursor = taskGroup.startCursor;
+                    endCursor = taskGroup.endCursor;
+                    displayTasks();
                 })
             .catch(() => {
                 console.error("User location and/or neighborhood could not be retrieved");
+                document.getElementById("loading").style.display = "none";
                 document.getElementById("location-missing-message").style.display = "block";
             });
 	}
@@ -368,111 +407,32 @@ function toNeighborhood(latlng) {
 }
 
 /* Fetches tasks from servlet by location and category */
-function fetchTasks(category) {
+function fetchTasks(category, cursor) {
     let url = "/tasks?zipcode=" + neighborhood[0]+ "&country=" + neighborhood[1];
     if (category !== undefined && category != "all") {
         url += "&category=" + category;
+    }
+    if (cursor !== undefined) {
+        url += "&cursor=" + cursor;
     }
     return fetch(url).then(response => response.json());
 }
 
 /* Displays the tasks received from the server response */
-function displayTasks(response) {
-    // If a response is passed, the the taskPagesCache is updated
-    if (response !== undefined) {
-        taskPagesCache = response;
-        // If displayTasks is called and the result has less pages than the page user was last at, the currentPage will get reset to 1
-        if (currentPage > taskPagesCache.pageCount) {
-            currentPage = 1;
-        }
-    }
-    if (taskPagesCache !== null && taskPagesCache.taskCount > 0) {
+function displayTasks(append) {
+    if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
         document.getElementById("no-tasks-message").style.display = "none";
+        document.getElementById("loading").style.display = "none";
         document.getElementById("tasks-message").style.display = "block";
-        document.getElementById("tasks-list").innerHTML = taskPagesCache.taskPages[currentPage - 1];
+        if (append) document.getElementById("tasks-list").innerHTML += taskGroup.tasks;
+        else document.getElementById("tasks-list").innerHTML = taskGroup.tasks;
         document.getElementById("tasks-list").style.display = "block";
         addTasksClickHandlers();
     } else {
+        document.getElementById("loading").style.display = "none";
         document.getElementById("no-tasks-message").style.display = "block";
         document.getElementById("tasks-message").style.display = "none";
         document.getElementById("tasks-list").style.display = "none";
-    }
-}
-
-/** Function loads and displays all the pagination UI components (page numbers and buttons) */
-function displayPaginationUI() {
-    updatePageButtonStyling();
-    let pageNumbersWrapper = document.getElementById("page-numbers-wrapper");
-    pageNumbersWrapper.innerHTML = "";
-
-    // Page numbers displayed for smaller screens with several pages should
-    // show only the first, current, and last page
-    if (taskPagesCache.pageCount >= 5 && (window.innerWidth < 375)) {
-        let pageNumberSpacing = document.createElement("div");
-        pageNumberSpacing.classList.add("page-number-spacing");
-        pageNumberSpacing.innerText = "...";
-
-        // Only displays first page if the current page isn't already the first page
-        if (currentPage !== 1) {
-            let firstPageNumber = createPageNumberElement(1);
-            pageNumbersWrapper.appendChild(firstPageNumber);
-            pageNumbersWrapper.appendChild(pageNumberSpacing);
-        }
-
-        let currentPageNumber = createPageNumberElement(currentPage);
-        pageNumbersWrapper.appendChild(currentPageNumber);
-
-        // Only displays last page if the current page isn't already the last page
-        if (currentPage != taskPagesCache.pageCount) {
-            pageNumbersWrapper.appendChild(pageNumberSpacing.cloneNode(true));
-            let lastPageNumber = createPageNumberElement(taskPagesCache.pageCount);
-            pageNumbersWrapper.appendChild(lastPageNumber);
-        }
-
-    // Displays all page numbers if less than 5 pages or if the screen is big enough
-    } else {
-        for (let i = 1; i <= taskPagesCache.pageCount; i++) {
-            let pageNumber = createPageNumberElement(i);
-            pageNumbersWrapper.appendChild(pageNumber);
-        }
-    }
-    currentPageNumberNode = document.getElementById("current-page");
-}
-
-/** Helper function that creates a page number element when provided with the page number */
-function createPageNumberElement(number) {
-    let pageNumber = document.createElement("a");
-    pageNumber.classList.add("page-number");
-    pageNumber.innerText = number;
-    if (currentPage === number) pageNumber.setAttribute("id", "current-page");
-    pageNumber.addEventListener("click", function() {
-            currentPageNumberNode.removeAttribute("id");
-            currentPageNumberNode = pageNumber;
-            currentPage = number;
-            pageNumber.setAttribute("id", "current-page");
-            displayPaginationUI();
-            displayTasks();
-        });
-    return pageNumber;
-}
-
-/** Function Updates the attributes and styles of the next and prev page buttons upon page changes */
-function updatePageButtonStyling() {
-    let nextPageButton = document.getElementById("next-page");
-    let prevPageButton = document.getElementById("prev-page");
-    if (currentPage === taskPagesCache.pageCount) {
-        nextPageButton.style.cursor = "not-allowed";
-        nextPageButton.setAttribute("title", "You are already on the last page");
-    } else {
-        nextPageButton.style.cursor = "pointer";
-        nextPageButton.removeAttribute("title");
-    }
-    if (currentPage === 1) {
-        prevPageButton.style.cursor = "not-allowed";
-        prevPageButton.setAttribute("title", "You are already on the first page");
-    } else {
-        prevPageButton.style.cursor = "pointer";
-        prevPageButton.removeAttribute("title");
     }
 }
 

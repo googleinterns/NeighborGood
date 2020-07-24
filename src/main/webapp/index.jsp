@@ -107,22 +107,18 @@
               </div>
 
               <!--Results Messages-->
+              <div id="loading" class="results-message">
+                  <img id="loading-gif" src="images/loading.gif" alt="Loading..."/>
+              </div>
               <div id="location-missing-message" class="results-message">
                   We could not retrieve your location to display your neighborhood tasks.
               </div>
               <div id="tasks-message" class="results-message">
-                  These are the 20 (or less) most recent tasks in your neighborhood:
-                  <div id="pagination-wrapper">
-                        <div id="prev-page" class="pagination-icon" title="You are already on the first page">&#8249;</div>
-                        <div id="page-numbers-wrapper"></div>
-                        <div id="next-page" class="pagination-icon" title="You are already on the last page">&#8250;</div>
-                  </div>
+                  These are the most recent tasks in your neighborhood:
               </div>
               <div id="no-tasks-message" class="results-message">
                   Sorry, there are currently no tasks within your neighborhood for you to help with.
               </div>
-
-
           </div>
           <!--Listed Tasks Container-->
           <div id="tasks-list"></div>
