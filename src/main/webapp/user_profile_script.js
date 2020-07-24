@@ -42,25 +42,19 @@ function validateTaskForm(id) {
 function validateInfoForm(id) {
     var result = true;
     var form = document.getElementById(id);
-    var inputName = ["nickname", "address", "zipcode", "country", "phone", "lat", "lng"];
+    var inputName = ["nickname", "address", "zipcode", "country", "phone"];
     for (var i = 0; i < inputName.length; i++) {
         var name = inputName[i];
         var inputField = form[name.concat("-input")].value.trim();
         if (inputField === "") {
             result = false;
             form[name.concat("-input")].classList.add("highlight");
-            if (inputName[i] === "lat" || inputName[i] === "lng") {
-                document.getElementById("map").classList.add("highlight");
-            }
         } else {
             form[name.concat("-input")].classList.remove("highlight");
-            if (inputName[i] === "lat" || inputName[i] === "lng") {
-                document.getElementById("map").classList.remove("highlight");
-            }
         }
     }
     if (!result) {
-        alert("All fields are required. Please fill out all fields with non-empty input and mark your personal address on the map.");
+        alert("All fields are required. Please fill out all fields with non-empty input.");
         return false;
     }
     return true;
@@ -689,9 +683,6 @@ function displayMarker(position) {
     markers = [];
     markers.push(marker);
 
-    document.getElementById("lat-input").value = position.lat();
-    document.getElementById("lng-input").value = position.lng();
-
     return marker;
 }
 
@@ -705,8 +696,6 @@ function deleteMarker(latitude, longitude) {
             return false;
         }
     });
-    document.getElementById("lat-input").value = '';
-    document.getElementById("lng-input").value = '';
 }
 
 function geocodeLatLng(geocoder, map, infowindow, position, marker) {
