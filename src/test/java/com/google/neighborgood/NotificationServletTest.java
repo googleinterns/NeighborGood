@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.CompositeFilter;
 import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
@@ -64,6 +65,10 @@ public final class NotificationServletTest {
   private DatastoreService ds;
   private HttpServletRequest request;
   private HttpServletResponse response;
+  private Entity userEntity;
+  private Entity taskEntity;
+  private String keyString;
+  private String anotherKey;
 
   @Before
   public void setUp() {
@@ -73,27 +78,69 @@ public final class NotificationServletTest {
     request = mock(HttpServletRequest.class);
     response = mock(HttpServletResponse.class);
 
-    // Add 3 dummy notification entities with the current user as receiver and taskId equals to 1
+    userEntity = new Entity("UserInfo", "1234567890");
+    userEntity.setProperty("nickname", "Leonard");
+    userEntity.setProperty("address", "xxx");
+    userEntity.setProperty("phone", "xxx");
+    userEntity.setProperty("email", "leonardzhang@google.com");
+    userEntity.setProperty("userId", "1234567890");
+    userEntity.setProperty("country", "US");
+    userEntity.setProperty("zipcode", "15213");
+    userEntity.setProperty("points", 0);
+    ds.put(userEntity);
+
+    taskEntity = new Entity("Task", userEntity.getKey());
+    taskEntity.setProperty("detail", "Test task");
+    taskEntity.setProperty("timestamp", 123);
+    taskEntity.setProperty("reward", 50);
+    taskEntity.setProperty("status", "IN PROGRESS");
+    taskEntity.setProperty("Owner", "1234567890");
+    taskEntity.setProperty("Helper", "1234567890");
+    taskEntity.setProperty("Address", "xxx");
+    taskEntity.setProperty("zipcode", "15213");
+    taskEntity.setProperty("country", "US");
+    taskEntity.setProperty("category", "Garden");
+    ds.put(taskEntity);
+
+    keyString = KeyFactory.keyToString(taskEntity.getKey());
+
+    taskEntity = new Entity("Task", userEntity.getKey());
+    taskEntity.setProperty("detail", "Test task 2");
+    taskEntity.setProperty("timestamp", 123);
+    taskEntity.setProperty("reward", 50);
+    taskEntity.setProperty("status", "IN PROGRESS");
+    taskEntity.setProperty("Owner", "1234567890");
+    taskEntity.setProperty("Helper", "1234567890");
+    taskEntity.setProperty("Address", "xxx");
+    taskEntity.setProperty("zipcode", "15213");
+    taskEntity.setProperty("country", "US");
+    taskEntity.setProperty("category", "Garden");
+    ds.put(taskEntity);
+
+    anotherKey = KeyFactory.keyToString(taskEntity.getKey());
+
+    // Add 3 dummy notification entities with the current user as receiver and taskId equals to
+    // keyString
     for (int i = 0; i < 3; i++) {
       Entity entity = new Entity("Notification");
       entity.setProperty("receiver", "1234567890");
-      entity.setProperty("taskId", "1");
+      entity.setProperty("taskId", keyString);
       ds.put(entity);
     }
 
-    // Add 4 dummy notification entities with taskId equals to 1 but not the current user as
+    // Add 4 dummy notification entities with taskId equals to keyString but not the current user as
     // receiver
     for (int i = 0; i < 4; i++) {
       Entity entity = new Entity("Notification");
       entity.setProperty("receiver", "123456789");
-      entity.setProperty("taskId", "1");
+      entity.setProperty("taskId", keyString);
       ds.put(entity);
     }
 
     // Add 1 dummy notification entity with the current user as receiver and taskId equals to 2
     Entity entity = new Entity("Notification");
     entity.setProperty("receiver", "1234567890");
-    entity.setProperty("taskId", "2");
+    entity.setProperty("taskId", anotherKey);
     ds.put(entity);
   }
 
@@ -119,7 +166,7 @@ public final class NotificationServletTest {
 
     // Now let's try to delete all the notification entity with task id 1 and the current user as
     // receiver
-    when(request.getParameter("task-id")).thenReturn("1");
+    when(request.getParameter("task-id")).thenReturn(keyString);
 
     new NotificationServlet().doPost(request, response);
 
@@ -127,7 +174,7 @@ public final class NotificationServletTest {
     assertEquals(5, ds.prepare(new Query("Notification")).countEntities(withLimit(10)));
 
     // Ensure that no notification with task id 1 and receiver 1234567890 is left
-    Filter idFilter = new FilterPredicate("taskId", FilterOperator.EQUAL, "1");
+    Filter idFilter = new FilterPredicate("taskId", FilterOperator.EQUAL, keyString);
     Filter receiverFilter = new FilterPredicate("receiver", FilterOperator.EQUAL, "1234567890");
     CompositeFilter filter = CompositeFilterOperator.and(idFilter, receiverFilter);
     assertEquals(
@@ -135,7 +182,7 @@ public final class NotificationServletTest {
 
     // Now let's try to delete all the notification entity with task id 2 and the current user as
     // receiver
-    when(request.getParameter("task-id")).thenReturn("2");
+    when(request.getParameter("task-id")).thenReturn(anotherKey);
 
     new NotificationServlet().doPost(request, response);
 
@@ -143,10 +190,35 @@ public final class NotificationServletTest {
     assertEquals(4, ds.prepare(new Query("Notification")).countEntities(withLimit(10)));
 
     // Ensure that no notification with task id 2 and receiver 1234567890 is left
-    idFilter = new FilterPredicate("taskId", FilterOperator.EQUAL, "2");
+    idFilter = new FilterPredicate("taskId", FilterOperator.EQUAL, anotherKey);
     receiverFilter = new FilterPredicate("receiver", FilterOperator.EQUAL, "1234567890");
     filter = CompositeFilterOperator.and(idFilter, receiverFilter);
     assertEquals(
         0, ds.prepare(new Query("Notification").setFilter(filter)).countEntities(withLimit(10)));
+  }
+
+  @Test
+  public void doGetTest() throws IOException {
+    // Ensure that there are 8 notificationi entity at the beginning
+    assertEquals(8, ds.prepare(new Query("Notification")).countEntities(withLimit(10)));
+
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    // Sending a GET request should return all the notification entities with the current user
+    // as receiver
+    new NotificationServlet().doGet(request, response);
+
+    // After sending the GET request, the doGet function should output the json string
+    // that contains a notification object for task 1 and a notification object for task 2
+    writer.flush();
+    System.out.println("Here");
+    System.out.println(stringWriter.toString());
+    assertTrue(stringWriter.toString().contains("\"taskId\":\"" + keyString + "\",\"count\":3"));
+    assertTrue(stringWriter.toString().contains("\"taskId\":\"" + anotherKey + "\",\"count\":1"));
+
+    // Finally, ensure that the servlet file has set the content type to json
+    verify(response).setContentType("application/json;");
   }
 }
