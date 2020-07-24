@@ -185,9 +185,9 @@ public final class AdminPageTest {
 
   @Test
   public void testSubmitPostReward() throws IOException, EntityNotFoundException {
-    // test when tasks detail input is empty
+    // test when reward input is empty
     when(request.getParameter("task-id")).thenReturn(keyString);
-    when(request.getParameter("reward-input")).thenReturn("words");
+    when(request.getParameter("reward-input")).thenReturn("");
     when(request.getParameter("task-detail-input")).thenReturn("Random text over here");
     when(request.getParameter("category-input")).thenReturn("shopping");
 
@@ -195,6 +195,13 @@ public final class AdminPageTest {
     PrintWriter writer = new PrintWriter(stringWriter);
     when(response.getWriter()).thenReturn(writer);
 
+    new AdminPage().doPost(request, response);
+    writer.flush();
+    assertEquals(stringWriter.toString(), "Please enter a valid integer in the range of 0-200\n");
+
+    // test when reward input is not a numerical value
+    when(request.getParameter("reward-input")).thenReturn("Random text over here");
+    stringWriter.getBuffer().setLength(0);
     new AdminPage().doPost(request, response);
     writer.flush();
     assertEquals(stringWriter.toString(), "Please enter a valid integer in the range of 0-200\n");
