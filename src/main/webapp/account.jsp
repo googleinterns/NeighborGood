@@ -36,7 +36,7 @@
                 </div>
                 <br/>
                 <textarea name="address-input" id="edit-address-input" placeholder="Input your address here:"></textarea>
-                <p id="rest-map">Click to mark your personal address on the map!<span class="req">*</span></p>
+                <p id="rest-map">Click to mark your personal address on the map!</p>
                 <input id="place-input" class="controls" type="text" placeholder="Search Box">
                 <div id="map"></div>
                 <br/><br/>
@@ -60,8 +60,6 @@
                 </div>
                 <br/>
                 <input type="text" name="phone-input" id="phone-input" placeholder="Input your phone number here:">
-                <input type="hidden" name="lat-input" id="lat-input">
-                <input type="hidden" name="lng-input" id="lng-input">
                 <!-- If account.jsp was loaded after being forwarded from /tasks, we pass on the task parameters as well -->
                 <%
                 if (request.getAttribute("javax.servlet.forward.request_uri") != null && request.getAttribute("javax.servlet.forward.request_uri").equals("/tasks")) {

@@ -112,19 +112,6 @@
               </div>
               <div id="tasks-message" class="results-message">
                   These are the 20 (or less) most recent tasks in your neighborhood:
-                  <!-- Distance Options -->
-                  <div id="distance-radius-div">
-                        <label for="distance-radius">Show results within a radius of:</label>
-                        <select name="distance-radius" id="distance-radius">
-                            <option value="1">1 mile</option>
-                            <option value="3">3 miles</option>
-                            <option value="5" selected>5 miles</option>
-                            <option value="10">10 miles</option>
-                            <option value="15">15 miles</option>
-                            <option value="30">30 miles</option>
-                            <option value="50">50 miles</option>
-                        </select>
-                  </div>
                   <div id="pagination-wrapper">
                         <div id="prev-page" class="pagination-icon" title="You are already on the first page">&#8249;</div>
                         <div id="page-numbers-wrapper"></div>
@@ -202,12 +189,12 @@
                 </table>
               </div> 
               <!--Neighborhood Top Scorers-->
-              <div id="nearby-topscore" class="topScoresDiv">
-                <h2>Near You</h2>
+              <div id="neighborhood-topscore" class="topScoresDiv">
+                <h2>Neighborhood</h2>
                 <table class="topScoresTable">
                 <%
                 for (int rank = 1; rank <= 10; rank++) {
-                  String rowId = "nearby" + rank;
+                  String rowId = "neighborhood" + rank;
                 %> 
                   <tr id="<%=rowId%>">
                     <td class="topscore-rank topscores"><%=rank%>.</td>

@@ -13,9 +13,9 @@
 // limitations under the License.
 
 const MAPSKEY = config.MAPS_KEY
+let neighborhood = [null , null];
 let userLocation = null;
 let currentCategory = "all";
-let currentMiles = 5;
 let currentPage = 1;
 let taskPagesCache = null;
 let currentPageNumberNode = null;
@@ -62,15 +62,6 @@ function addUIClickHandlers() {
     // adds showTopScoresModal click event 
     document.getElementById("topscore-button").addEventListener("click", showTopScoresModal);
     document.getElementById("close-topscore-button").addEventListener("click", closeTopScoresModal);
-    
-    // adds distance radius change event
-    document.getElementById("distance-radius").addEventListener("change", function(e) {
-        fetchTasks(currentCategory, e.target.value)
-            .then(response => {
-                    displayTasks(response);
-                    displayPaginationUI();
-                });
-    });
 
     // adds closeTaskInfoModal click event
     document.getElementById("task-info-close-button").addEventListener("click", closeTaskInfoModal);
@@ -103,8 +94,8 @@ function filterTasksBy(category) {
     currentCategory = category;
 
     // only fetches tasks if user's location has been retrieved
-    if (userLocationIsKnown()) {
-        fetchTasks(category, currentMiles)
+    if (userNeighborhoodIsKnown()) {
+        fetchTasks(category)
             .then(response => {
                     displayTasks(response);
                     displayPaginationUI();
@@ -156,8 +147,8 @@ function confirmHelp(element) {
             window.location.href = '/';
         }
         // fetches tasks again if user's current location was successfully retrieved and stored
-        else if (userLocationIsKnown()) {
-            fetchTasks(currentCategory, currentMiles).then(response => {
+        else if (userNeighborhoodIsKnown()) {
+            fetchTasks(currentCategory).then(response => {
                     displayTasks(response);
                     displayPaginationUI();
                 });
@@ -206,8 +197,8 @@ function validateTaskForm(id) {
    and then shows the top scores modal */
 function showTopScoresModal() {
     loadTopScorers("world");
-    if (userLocationIsKnown()){
-      loadTopScorers("nearby");
+    if (userNeighborhoodIsKnown()){
+      loadTopScorers("neighborhood");
     }
     document.getElementById("topScoresModalWrapper").style.display = "block";
 }
@@ -220,8 +211,8 @@ function closeTopScoresModal() {
 /* Function loads the data for the top scorers table */
 function loadTopScorers(location) {
     let url = "/account?action=topscorers";
-    if (location === "nearby") {
-      url += "&lat=" + userLocation.lat + "&lng=" + userLocation.lng;
+    if (location === "neighborhood") {
+      url += "&zipcode=" + neighborhood[0] + "&country=" + neighborhood[1];
     }
     fetch(url)
       .then(response => response.json())
@@ -300,13 +291,14 @@ function getTasksForUserLocation() {
     // waits until it gets an answer updates the global userLoaction variable and then calls
     // fetchTasks and displayTasks
 	window.initialize = function () {
-        getUserLocation().then(() => fetchTasks(currentCategory, currentMiles))
+         getUserLocation().then(location => toNeighborhood(location))
+        	.then(() => fetchTasks())
             .then(response => {
                     displayTasks(response);
                     displayPaginationUI();
                 })
             .catch(() => {
-                console.error("User location could not be retrieved");
+                console.error("User location and/or neighborhood could not be retrieved");
                 document.getElementById("location-missing-message").style.display = "block";
             });
 	}
@@ -346,9 +338,38 @@ function locationByIPSuccesful() {
     });
 }
 
+/* Function that returns a promise to return a neighborhood
+array that includes the postal code and country */
+function toNeighborhood(latlng) {
+	return new Promise((resolve, reject) => {
+        const geocoder = new google.maps.Geocoder;
+        geocoder.geocode({"location": latlng}, function(results, status) {
+            if (status == "OK") {
+                if (results[0]) {
+                    const result = results[0]
+                    let zipCode = "";
+                    let country ="";
+                    for (let i = result.address_components.length - 1; i >= 0; i--) {
+                        let component = result.address_components[i];
+                        if ((zipCode == "") && (component.types.indexOf("postal_code") >= 0 )) {
+                            zipCode = component.long_name;
+                        }
+                        if ((country == "") && (component.types.indexOf("country") >= 0 )) {
+                            country = component.long_name;
+                        }
+                        if (zipCode != "" && country != "") break;
+                    }
+                    neighborhood = [zipCode, country];
+                    resolve([zipCode, country]);
+                } else reject("Couldn't get neighborhood");
+            } else reject("Couldn't get neighborhood");
+        });
+    });
+}
+
 /* Fetches tasks from servlet by location and category */
-function fetchTasks(category, miles) {
-    let url = "/tasks?lat=" + userLocation.lat + "&lng=" + userLocation.lng + "&miles=" + miles;
+function fetchTasks(category) {
+    let url = "/tasks?zipcode=" + neighborhood[0]+ "&country=" + neighborhood[1];
     if (category !== undefined && category != "all") {
         url += "&category=" + category;
     }
@@ -504,7 +525,7 @@ function addTasksClickHandlers() {
     }
 }
 
-/* Helper function that determines if the current user's location is known */
-function userLocationIsKnown() {
-  return (userLocation !== null);
+/* Helper function that determines if the current user's neighborhood is known */
+function userNeighborhoodIsKnown() {
+  return (neighborhood[0] !== null && neighborhood[1] !== null);
 }
