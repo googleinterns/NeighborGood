@@ -107,7 +107,6 @@ section {
   background-image: linear-gradient(to bottom, white 90%, transparent);
   position: sticky;
   padding-top: 1em;
-  position: -webkit-sticky;
   top: 0;
   width: 101%;
   z-index: 2;
