@@ -443,6 +443,10 @@ td {
     padding-bottom: 0;
     background-color: white;
   }
+
+  .help-out {
+    display: none;
+  }
 }
 
 @media only screen and (min-width: 600px) and (max-width: 1203px) {
