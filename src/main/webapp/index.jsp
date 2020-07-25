@@ -105,6 +105,10 @@
                   }
                   %>
               </div>
+              <div id="search-box">
+                <label for="place-input">Search tasks in a different location:</label>
+                <input id="place-input" name="place-input" type="text" placeholder=" Type an address here" class="pac-target-input" autocomplete="off">
+              </div>
 
               <!--Results Messages-->
               <div id="loading" class="results-message">

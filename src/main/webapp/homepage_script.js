@@ -318,15 +318,30 @@ begins the processes of retrieving the user's location*/
 function getTasksForUserLocation() {
     const script = document.createElement("script");
     script.type = "text/javascript";
-    script.src =  "https://maps.googleapis.com/maps/api/js?key=" + MAPSKEY + "&callback=initialize&language=en";
+    script.src =  "https://maps.googleapis.com/maps/api/js?key=" + MAPSKEY + "&callback=initialize&libraries=places&language=en";
     script.defer = true;
     script.async = true;
     document.head.appendChild(script);
-	
+
     // Once the Maps API script has dynamically loaded it gets the user location,
     // waits until it gets an answer updates the global userLoaction variable and then calls
     // fetchTasks and displayTasks
 	window.initialize = function () {
+        let placeAutocomplete = new google.maps.places.Autocomplete(document.getElementById("place-input"));
+        placeAutocomplete.setFields(['geometry']);
+        google.maps.event.addListener(placeAutocomplete, 'place_changed', function() {
+                let place = placeAutocomplete.getPlace();
+                userLocation = place.geometry.location.toJSON();
+                toNeighborhood(userLocation)
+                    .then(() => fetchTasks())
+                    .then(response => {
+                            displayTasks(response);
+                        })
+                    .catch(() => {
+                        console.error("User location and/or neighborhood could not be retrieved");
+                        document.getElementById("location-missing-message").style.display = "block";
+                    });
+              });
          getUserLocation().then(location => toNeighborhood(location))
         	.then(() => fetchTasks(currentCategory))
             .then(response => {
