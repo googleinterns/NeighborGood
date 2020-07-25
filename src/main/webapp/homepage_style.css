@@ -213,8 +213,8 @@ section {
   color: gray;
 }
 
-.disable-help:hover {
-  cursor: not-allowed;
+.disable-help {
+  display: none;
 }
 
 .task-footer {
@@ -442,10 +442,6 @@ td {
   nav {
     padding-bottom: 0;
     background-color: white;
-  }
-
-  .help-out {
-    display: none;
   }
 }
 
