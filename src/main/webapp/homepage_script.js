@@ -345,34 +345,36 @@ function getTasksForUserLocation() {
 
 /* Function that returns a promise to get and return the user's location */
 function getUserLocation() {
+    let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
+    const request = new Request(url, {method: "POST"});
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 userLocation = {lat: position.coords.latitude, lng: position.coords.longitude};
                 resolve(userLocation);
             }, function() {
-                if (locationByIPSuccesful()) resolve(userLocation);
-                else reject("User location failed");
+                fetch(request).then(response => {
+                    if (response.status == 400 || response.status == 403 || response.status == 404) {
+                        reject("User location failed");
+                    } else {
+                        response.json().then(jsonresponse => {
+                            userLocation = jsonresponse["location"];
+                            resolve(userLocation);
+                        });
+                    }
+                });
             });
         } else {
-            if (locationByIPSuccesful()) resolve(userLocation);
-            else reject("User location failed");
-        }
-    });
-}
-
-/* Function used as a fallback to retrieve the user's location by IP address */
-function locationByIPSuccesful() {
-    let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
-    const request = new Request(url, {method: "POST"});
-    fetch(request).then(response => {
-        if (response.status == 400 || response.status == 403 || response.status == 404) {
-            return false;
-        } else {
-            response.json().then(jsonresponse => {
-                userLocation = jsonresponse["location"];
-                return true;
-            });
+            fetch(request).then(response => {
+                    if (response.status == 400 || response.status == 403 || response.status == 404) {
+                        reject("User location failed");
+                    } else {
+                        response.json().then(jsonresponse => {
+                            userLocation = jsonresponse["location"];
+                            resolve(userLocation);
+                        });
+                    }
+                });
         }
     });
 }
