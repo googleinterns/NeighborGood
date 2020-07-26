@@ -15,6 +15,7 @@
 const MAPSKEY = config.MAPS_KEY
 let neighborhood = [null , null];
 let userLocation = null;
+let userActualLocation = null;
 let currentCategory = "all";
 let taskGroup = null;
 let startCursor = null;
@@ -331,16 +332,23 @@ function getTasksForUserLocation() {
         placeAutocomplete.setFields(['geometry']);
         google.maps.event.addListener(placeAutocomplete, 'place_changed', function() {
                 let place = placeAutocomplete.getPlace();
-                userLocation = place.geometry.location.toJSON();
+                if (place.geometry != undefined) {
+                    userLocation = place.geometry.location.toJSON();
+                } else {
+                    userLocation = userActualLocation;
+                }
                 toNeighborhood(userLocation)
-                    .then(() => fetchTasks())
-                    .then(response => {
-                            displayTasks(response);
-                        })
-                    .catch(() => {
-                        console.error("User location and/or neighborhood could not be retrieved");
-                        document.getElementById("location-missing-message").style.display = "block";
-                    });
+                        .then(() => fetchTasks())
+                        .then(response => {
+                                taskGroup = response;
+                                startCursor = taskGroup.startCursor;
+                                endCursor = taskGroup.endCursor;
+                                displayTasks(response);
+                            })
+                        .catch(() => {
+                            console.error("User location and/or neighborhood could not be retrieved");
+                            document.getElementById("location-missing-message").style.display = "block";
+                        });
               });
          getUserLocation().then(location => toNeighborhood(location))
         	.then(() => fetchTasks(currentCategory))
@@ -366,6 +374,7 @@ function getUserLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 userLocation = {lat: position.coords.latitude, lng: position.coords.longitude};
+                userActualLocation = userLocation;
                 resolve(userLocation);
             }, function() {
                 fetch(request).then(response => {
@@ -374,6 +383,7 @@ function getUserLocation() {
                     } else {
                         response.json().then(jsonresponse => {
                             userLocation = jsonresponse["location"];
+                            userActualLocation = userLocation;
                             resolve(userLocation);
                         });
                     }
@@ -386,6 +396,7 @@ function getUserLocation() {
                     } else {
                         response.json().then(jsonresponse => {
                             userLocation = jsonresponse["location"];
+                            userActualLocation = userLocation;
                             resolve(userLocation);
                         });
                     }
@@ -440,7 +451,7 @@ function displayTasks(append) {
     if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
         document.getElementById("no-tasks-message").style.display = "none";
         document.getElementById("tasks-message").style.display = "block";
-        if (append) document.getElementById("tasks-list").innerHTML += taskGroup.tasks;
+        if (append == true) document.getElementById("tasks-list").innerHTML += taskGroup.tasks;
         else document.getElementById("tasks-list").innerHTML = taskGroup.tasks;
         document.getElementById("tasks-list").style.display = "block";
         addTasksClickHandlers();
