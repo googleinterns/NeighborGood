@@ -19,6 +19,10 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 public final class Task {
   private final String detail;
@@ -33,33 +37,8 @@ public final class Task {
   private final String zipcode;
   private final String country;
   private final String category;
-
-  public Task(
-      String keyString,
-      String detail,
-      String overview,
-      long creationTime,
-      String status,
-      long reward,
-      String owner,
-      String helper,
-      String address,
-      String zipcode,
-      String country,
-      String category) {
-    this.keyString = keyString;
-    this.detail = detail;
-    this.overview = overview;
-    this.creationTime = creationTime;
-    this.status = status;
-    this.reward = reward;
-    this.owner = owner;
-    this.helper = helper;
-    this.address = address;
-    this.zipcode = zipcode;
-    this.country = country;
-    this.category = category;
-  }
+  private boolean isOwnerCurrentUser;
+  private String dateTime;
 
   public Task(Entity entity) {
     this.keyString = KeyFactory.keyToString(entity.getKey());
@@ -101,5 +80,58 @@ public final class Task {
     } else {
       this.helper = "N/A";
     }
+
+    setOwnerCurrentUser(ownerId);
+    setDateTime();
+  }
+
+  public Task(Entity entity, String ownerId, String ownerNickname) {
+    this.keyString = KeyFactory.keyToString(entity.getKey());
+    this.detail = (String) entity.getProperty("detail");
+    this.overview = (String) entity.getProperty("overview");
+    this.creationTime = (long) entity.getProperty("timestamp");
+    this.reward = (long) entity.getProperty("reward");
+    this.status = (String) entity.getProperty("status");
+    this.address = (String) entity.getProperty("Address");
+    this.zipcode = (String) entity.getProperty("zipcode");
+    this.country = (String) entity.getProperty("country");
+    this.category = (String) entity.getProperty("category");
+    this.owner = ownerNickname;
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    String helperId = (String) entity.getProperty("Helper");
+
+    // If the task status is still "OPEN", the input helper should be "N/A".
+    // Otherwise, we will show the nickname of the helper.
+    if (!helperId.equals("N/A")) {
+      Entity helperEntity = null;
+      try {
+        helperEntity = datastore.get(KeyFactory.createKey("UserInfo", helperId));
+      } catch (EntityNotFoundException e) {
+        System.err.println("Unable to find the helper of the task in the database");
+        this.helper = helperId;
+        return;
+      }
+      this.helper = (String) helperEntity.getProperty("nickname");
+    } else {
+      this.helper = "N/A";
+    }
+
+    setOwnerCurrentUser(ownerId);
+    setDateTime();
+  }
+
+  private void setDateTime() {
+    Timestamp timestamp = new Timestamp(this.creationTime);
+    SimpleDateFormat timestampFormat = new SimpleDateFormat("HH:mm MM-dd-yyyy");
+    this.dateTime = timestampFormat.format(timestamp);
+  }
+
+  private void setOwnerCurrentUser(String ownerId) {
+    UserService userService = UserServiceFactory.getUserService();
+    boolean userLoggedIn = userService.isUserLoggedIn();
+    String userId = userLoggedIn ? userService.getCurrentUser().getUserId() : "null";
+    if (userId.equals(ownerId)) this.isOwnerCurrentUser = true;
+    else this.isOwnerCurrentUser = false;
   }
 }

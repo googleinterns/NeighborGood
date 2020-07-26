@@ -335,6 +335,9 @@ function getTasksForUserLocation() {
                 toNeighborhood(userLocation)
                     .then(() => fetchTasks())
                     .then(response => {
+                            taskGroup = response;
+                            startCursor = taskGroup.startCursor;
+                            endCursor = taskGroup.endCursor;
                             displayTasks(response);
                         })
                     .catch(() => {
@@ -440,9 +443,11 @@ function displayTasks(append) {
     if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
         document.getElementById("no-tasks-message").style.display = "none";
         document.getElementById("tasks-message").style.display = "block";
-        if (append) document.getElementById("tasks-list").innerHTML += taskGroup.tasks;
-        else document.getElementById("tasks-list").innerHTML = taskGroup.tasks;
         document.getElementById("tasks-list").style.display = "block";
+
+        let taskList = document.getElementById("tasks-list");
+        if (append != true) taskList.innerHTML = "";
+        taskGroup.tasks.map(createTaskNode).forEach(node => taskList.appendChild(node));
         addTasksClickHandlers();
     } else {
         document.getElementById("no-tasks-message").style.display = "block";
@@ -451,6 +456,68 @@ function displayTasks(append) {
     }
     document.getElementById("loading").style.display = "none";
     document.getElementById("search-box").style.visibility = "visible";
+}
+
+function createTaskNode(task) {
+    let taskDiv = document.createElement("div");
+    taskDiv.className = "task";
+    taskDiv.setAttribute("data-key", task.keyString);
+
+    if (taskGroup.userLoggedIn == true && task.isOwnerCurrentUser == false) {
+        let helpOverlay = document.createElement("div");
+        helpOverlay.className = "help-overlay";
+        let exitHelp = document.createElement("div");
+        exitHelp.className = "exit-help";
+        let exitLink = document.createElement("a");
+        exitLink.innerText = "×";
+        let confirmHelp = document.createElement("a");
+        confirmHelp.className = "confirm-help";
+        confirmHelp.innerText = "CONFIRM";
+
+        exitHelp.appendChild(exitLink);
+        helpOverlay.appendChild(exitHelp);
+        helpOverlay.appendChild(confirmHelp);
+        taskDiv.appendChild(helpOverlay);
+    }
+
+    let taskContainer = document.createElement("div");
+    taskContainer.className = "task-container";
+    let taskHeader = document.createElement("div");
+    taskHeader.className = "task-header";
+    let userNickname = document.createElement("div");
+    userNickname.className = "user-nickname";
+    userNickname.innerText = task.owner;
+    taskHeader.appendChild(userNickname);
+
+    if (taskGroup.userLoggedIn == true && task.isOwnerCurrentUser == false) {
+        let helpOut = document.createElement("div");
+        helpOut.className = "help-out";
+        helpOut.innerText = "HELP OUT";
+        taskHeader.appendChild(helpOut);
+    }
+
+    let taskContent = document.createElement("div");
+    taskContent.className = "task-content";
+    taskContent.innerText = task.overview;
+
+    let taskFooter = document.createElement("div");
+    taskFooter.className = "task-footer";
+    let taskCategory = document.createElement("div");
+    taskCategory.className = "task-category";
+    taskCategory.innerText = "#" + task.category;
+    let taskDateTime = document.createElement("div");
+    taskDateTime.className = "task-date-time";
+    taskDateTime.innerText = task.dateTime;
+    taskFooter.appendChild(taskCategory);
+    taskFooter.appendChild(taskDateTime);
+
+    taskContainer.appendChild(taskHeader);
+    taskContainer.appendChild(taskContent);
+    taskContainer.appendChild(taskFooter);
+
+    taskDiv.appendChild(taskContainer);
+
+    return taskDiv;
 }
 
 /* Function adds all the necessary tasks 'click' event listeners*/
