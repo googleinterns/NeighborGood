@@ -439,18 +439,18 @@ function fetchTasks(category, cursor) {
 function displayTasks(append) {
     if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
         document.getElementById("no-tasks-message").style.display = "none";
-        document.getElementById("loading").style.display = "none";
         document.getElementById("tasks-message").style.display = "block";
         if (append) document.getElementById("tasks-list").innerHTML += taskGroup.tasks;
         else document.getElementById("tasks-list").innerHTML = taskGroup.tasks;
         document.getElementById("tasks-list").style.display = "block";
         addTasksClickHandlers();
     } else {
-        document.getElementById("loading").style.display = "none";
         document.getElementById("no-tasks-message").style.display = "block";
         document.getElementById("tasks-message").style.display = "none";
         document.getElementById("tasks-list").style.display = "none";
     }
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("search-box").style.visibility = "visible";
 }
 
 /* Function adds all the necessary tasks 'click' event listeners*/
