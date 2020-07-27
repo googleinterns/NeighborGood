@@ -15,10 +15,12 @@
 const MAPSKEY = config.MAPS_KEY;
 const GOOGLE_KIRKLAND_LAT = 47.669846;
 const GOOGLE_KIRKLAND_LNG = -122.1996099;
+let map;
 let neighborhood = [null , null];
 let userLocation = null;
 let userActualLocation = null;
 let currentCategory = "all";
+let currentView = "list";
 let taskGroup = null;
 
 /* Changes navbar background upon resize */
@@ -119,9 +121,13 @@ function switchView(element) {
     if (buttonElement.value == "map") {
         document.getElementById("tasks-list").style.display = "none";
         document.getElementById("tasks-map").style.display = "block";
+        currentView = "map";
+        map.setCenter(userLocation);
+
     } else {
         document.getElementById("tasks-map").style.display = "none";
         document.getElementById("tasks-list").style.display = "block";
+        currentView = "list";
     }
 }
 
@@ -364,7 +370,7 @@ function getTasksForUserLocation() {
         // initialize map
         map = new google.maps.Map(document.getElementById("tasks-map"), {
             center: {lat: GOOGLE_KIRKLAND_LAT, lng: GOOGLE_KIRKLAND_LNG},
-            zoom: 15,
+            zoom: 13,
             styles: [
                 {
                     "elementType": "geometry",
@@ -599,17 +605,27 @@ function fetchTasks(category, cursorAction) {
 
 /* Displays the tasks received from the server response */
 function displayTasks(append) {
+    let taskMap = document.getElementById("tasks-map");
+    let taskList = document.getElementById("tasks-list");
+
     if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
         document.getElementById("no-tasks-message").style.display = "none";
-        document.getElementById("tasks-list").style.display = "block";
 
-        let taskList = document.getElementById("tasks-list");
         if (append != true) taskList.innerHTML = "";
         taskGroup.tasks.map(createTaskNode).forEach(node => taskList.appendChild(node));
         addTasksClickHandlers();
+
+        if (currentView === "list") {
+            taskList.style.display = "block";
+            taskMap.style.display = "none";
+        } else if (currentView === "map") {
+            taskMap.style.display = "block";
+            taskList.style.display = "none";
+        }
     } else {
         document.getElementById("no-tasks-message").style.display = "block";
-        document.getElementById("tasks-list").style.display = "none";
+        taskList.style.display = "none";
+        taskMap.style.display = "none";
     }
     document.getElementById("loading").style.display = "none";
 }
