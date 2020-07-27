@@ -234,19 +234,25 @@ function closeCreateTaskModal() {
 function validateTaskForm(id) {
     var result = true;
     var form = document.getElementById(id);
-    var inputName = ["task-overview", "task-detail", "reward", "category"];
+    var inputName = ["task-overview", "task-detail", "reward", "category", "lat", "lng"];
     for (var i = 0; i < inputName.length; i++) {
         var name = inputName[i];
         var inputField = form[name.concat("-input")].value.trim();
         if (inputField === "") {
             result = false;
             form[name.concat("-input")].classList.add("highlight");
+            if (inputName[i] === "lat" || inputName[i] === "lng") {
+                document.getElementById("map").classList.add("highlight");
+            }
         } else {
             form[name.concat("-input")].classList.remove("highlight");
+            if (inputName[i] === "lat" || inputName[i] === "lng") {
+                document.getElementById("map").classList.remove("highlight");
+            }
         }
     }
     if (!result) {
-        alert("All fields are required. Please fill out all fields with non-empty input.");
+        alert("All fields are required. Please fill out all fields with non-empty input and mark your personal address on the map.");
         return false;
     }
     return true;

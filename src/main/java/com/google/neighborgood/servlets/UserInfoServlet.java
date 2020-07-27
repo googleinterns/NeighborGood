@@ -95,6 +95,8 @@ public class UserInfoServlet extends HttpServlet {
     String phone = "";
     String zipcode = "";
     String country = "";
+    Float lat = null;
+    Float lng = null;
     String nicknameInput = request.getParameter("nickname-input");
     String addressInput = request.getParameter("address-input");
     String phoneInput = request.getParameter("phone-input");
@@ -108,6 +110,14 @@ public class UserInfoServlet extends HttpServlet {
     if (phoneInput != null) phone = phoneInput.trim();
     if (zipcodeInput != null) zipcode = zipcodeInput.trim();
     if (countryInput != null) country = countryInput.trim();
+
+    try {
+      lat = Float.parseFloat(request.getParameter("lat-input"));
+      lng = Float.parseFloat(request.getParameter("lng-input"));
+    } catch (NumberFormatException e) {
+      System.err.println("Invalid location coordinates");
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid location coordinates");
+    }
 
     if (nickname.equals("")
         || address.equals("")
@@ -135,6 +145,8 @@ public class UserInfoServlet extends HttpServlet {
       entity.setProperty("email", email);
       entity.setProperty("country", country);
       entity.setProperty("zipcode", zipcode);
+      entity.setProperty("lat", lat);
+      entity.setProperty("lng", lng);
       entity.setProperty("points", 0);
     } else {
       entity.setProperty("nickname", nickname);
@@ -142,6 +154,8 @@ public class UserInfoServlet extends HttpServlet {
       entity.setProperty("phone", phone);
       entity.setProperty("country", country);
       entity.setProperty("zipcode", zipcode);
+      entity.setProperty("lat", lat);
+      entity.setProperty("lng", lng);
     }
     datastore.put(entity);
     response.sendRedirect("/user_profile.jsp");
