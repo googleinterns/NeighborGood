@@ -115,7 +115,7 @@
                   <img id="loading-gif" src="images/loading.gif" alt="Loading..."/>
               </div>
               <div id="location-missing-message" class="results-message">
-                  We could not retrieve your location to display your neighborhood tasks.
+                  We could not retrieve your location to display your neighborhood tasks. Please use the search box to manually enter a location.
               </div>
               <div id="tasks-message" class="results-message">
                   These are the most recent tasks in your neighborhood:
