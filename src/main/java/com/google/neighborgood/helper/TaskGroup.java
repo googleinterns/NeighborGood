@@ -66,6 +66,9 @@ public class TaskGroup {
       try {
         Entity userEntity = this.datastore.get(taskOwnerKey);
         User taskUser = new User(userEntity);
+        taskOwnerNickname = taskUser.getUserNickname();
+        taskLat = taskUser.getUserLat();
+        taskLng = taskUser.getUserLng();
         this.usersInfo.put(taskOwnerId, taskUser);
       } catch (EntityNotFoundException e) {
         System.err.println(

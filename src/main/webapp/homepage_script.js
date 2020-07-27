@@ -21,6 +21,9 @@ let userLocation = null;
 let userActualLocation = null;
 let currentCategory = "all";
 let currentView = "list";
+let markersMap = new Map();
+let infoWindows = [];
+let infoWindowsOpened = 0;
 let taskGroup = null;
 
 /* Changes navbar background upon resize */
@@ -123,6 +126,7 @@ function switchView(element) {
         document.getElementById("tasks-map").style.display = "block";
         currentView = "map";
         map.setCenter(userLocation);
+        taskGroup.tasks.forEach(task => displayTaskMarker(task));
 
     } else {
         document.getElementById("tasks-map").style.display = "none";
@@ -197,9 +201,8 @@ function helpOut(element) {
 /* Function sends a fetch request to the edit task servlet when the user
 offers to help out, edits the task's status and helper properties, and
 then reloads the task list */
-function confirmHelp(element) {
-    const task = element.closest(".task");
-    const url = "/tasks/edit?task-id=" + task.dataset.key + "&action=helpout";
+function confirmHelp(taskKey) {
+    const url = "/tasks/edit?task-id=" + taskKey + "&action=helpout";
     const request = new Request(url, {method: "POST"});
     fetch(request).then((response) => {
         // checks if another user has already claimed the task
@@ -210,7 +213,7 @@ function confirmHelp(element) {
         }
         // hides task from list if it was succesfully claimed
         else {
-            element.closest(".task").style.display = "none";
+            document.querySelectorAll("[data-key='" + taskKey +"']")[0].style.display = "none";
         }
     });
 }
@@ -357,22 +360,7 @@ function getTasksForUserLocation() {
     // fetchTasks and displayTasks
     // It also initializes the autocomplete search box and the map.
 	window.initialize = function () {
-        // gets user location, then calls helper function that calls toNeighborhood, fetchTasks, and displayTasks
-        getUserLocation().then(callEndOfInitFunctions);
-
-        // initialize autocomplete input text search box
-        let placeAutocomplete = new google.maps.places.Autocomplete(document.getElementById("place-input"));
-        placeAutocomplete.setFields(['geometry']);
-        google.maps.event.addListener(placeAutocomplete, 'place_changed', function() {
-                let place = placeAutocomplete.getPlace();
-                if (place.geometry != undefined) {
-                    userLocation = place.geometry.location.toJSON();
-                } else {
-                    userLocation = userActualLocation;
-                }
-                callEndOfInitFunctions();
-              });
-
+    
         // initialize map
         map = new google.maps.Map(document.getElementById("tasks-map"), {
             center: {lat: GOOGLE_KIRKLAND_LAT, lng: GOOGLE_KIRKLAND_LNG},
@@ -513,6 +501,23 @@ function getTasksForUserLocation() {
             ],
         });
         map.setTilt(45);
+
+        // gets user location, then calls helper function that calls toNeighborhood, fetchTasks, and displayTasks
+        getUserLocation().then(callEndOfInitFunctions);
+
+        // initialize autocomplete input text search box
+        let placeAutocomplete = new google.maps.places.Autocomplete(document.getElementById("place-input"));
+        placeAutocomplete.setFields(['geometry']);
+        google.maps.event.addListener(placeAutocomplete, 'place_changed', function() {
+                let place = placeAutocomplete.getPlace();
+                if (place.geometry != undefined) {
+                    userLocation = place.geometry.location.toJSON();
+                } else {
+                    userLocation = userActualLocation;
+                }
+                callEndOfInitFunctions();
+              });
+
 	}
 }
 
@@ -614,11 +619,13 @@ function displayTasks(append) {
     let taskMap = document.getElementById("tasks-map");
     let taskList = document.getElementById("tasks-list");
 
+    console.log(taskGroup);
+
     if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
         document.getElementById("no-tasks-message").style.display = "none";
 
-        if (append != true) taskList.innerHTML = "";
-        taskGroup.tasks.map(createTaskNode).forEach(node => taskList.appendChild(node));
+        if (!append) taskList.innerHTML = "";
+        taskGroup.tasks.map(createTaskListNode).forEach(node => taskList.appendChild(node));
         addTasksClickHandlers();
 
         if (currentView === "list") {
@@ -636,7 +643,7 @@ function displayTasks(append) {
     document.getElementById("loading").style.display = "none";
 }
 
-function createTaskNode(task) {
+function createTaskListNode(task) {
     let taskDiv = document.createElement("div");
     taskDiv.className = "task";
     taskDiv.setAttribute("data-key", task.keyString);
@@ -698,6 +705,69 @@ function createTaskNode(task) {
     return taskDiv;
 }
 
+function displayTaskMarker(task) {
+    const marker = new google.maps.Marker({
+        position: {lat: task.lat, lng: task.lng},
+        map: map,
+        isCurrentUser: task.isOwnerCurrentUser,
+        detail: task.detail,
+        overview: task.overview,
+        category: task.category,
+        owner: task.owner,
+        dateTime: task.dateTime,
+        key: task.keyString});
+    markersMap.set(marker.get("key"), marker);
+
+    const infoWindow = new google.maps.InfoWindow;
+    infoWindow.addListener("closeclick", () => {
+        infoWindowsOpened--;
+    });
+
+    const geocoder = new google.maps.Geocoder;
+    marker.addListener("click", () => {
+        openInfoWindow(map, marker, infoWindow);
+    });
+}
+
+/** Builds and Opens Info Window */
+function openInfoWindow(map, marker, infoWindow) {
+    const windowNode = document.createElement("div");
+
+    let owner = document.createElement("div");
+    owner.innerText = marker.owner;
+    owner.className = "user-nickname";
+    windowNode.appendChild(owner);
+
+    let overview = document.createElement("div");
+    overview.innerText = marker.overview;
+    overview.className = "task-content-marker";
+    windowNode.appendChild(overview);
+
+    let category = document.createElement("div");
+    category.innerText = "#" + marker.category;
+    category.className = "task-category";
+    windowNode.appendChild(category);
+
+    let dateTime = document.createElement("div");
+    dateTime.innerText = marker.dateTime;
+    dateTime.className = "task-date-time";
+    windowNode.appendChild(dateTime);
+
+    // adds help out option
+    if (marker.get("isCurrentUser") == false) {
+        const helpOutButton = document.createElement("button");
+        helpOutButton.innerText = "Help Out";
+        helpOutButton.className = "help-out-marker";
+        helpOutButton.onclick = () => {confirmHelp(marker.get("key"));}
+        windowNode.appendChild(helpOutButton);
+    }
+    
+    infoWindow.setContent(windowNode);
+    infoWindow.open(map, marker);
+    infoWindows.push(infoWindow);
+    infoWindowsOpened++;
+}
+
 /* Function adds all the necessary tasks 'click' event listeners*/
 function addTasksClickHandlers() {
 
@@ -705,7 +775,8 @@ function addTasksClickHandlers() {
     const confirmHelpButtons = document.getElementsByClassName("confirm-help");
     for (let i = 0; i < confirmHelpButtons.length; i++){
         confirmHelpButtons[i].addEventListener("click", function(e) {
-            confirmHelp(e.target);
+            let taskKey = e.target.closest(".task").dataset.key;
+            confirmHelp(taskKey);
             e.stopPropagation();
         });
         

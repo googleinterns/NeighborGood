@@ -229,8 +229,13 @@ section {
   padding: 1em;
 }
 
+.task-content-marker {
+  padding: 1em 0;
+}
+
 .user-nickname {
   width: 70%;
+  font-weight: bold;
 }
 
 .help-out {
@@ -247,12 +252,15 @@ section {
 }
 
 .task-footer {
-  font-style: italic;
   display: flex;
   justify-content: space-between;
   padding-left: 1em;
   padding-bottom: 1em;
   padding-right: 1em;
+}
+
+.task-category {
+  font-style: italic;
 }
 
 .task-date-time {
@@ -277,6 +285,10 @@ section {
 .help-overlay a:hover {
   color: gray;
   cursor: pointer;
+}
+
+.help-out-marker {
+  margin-top: 0.5em;
 }
 
 .exit-help {
