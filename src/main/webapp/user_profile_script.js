@@ -14,6 +14,7 @@
 
 var markers = [];
 var map;
+var cursorString;
 const GOOGLE_KIRKLAND_LAT = 47.669846;
 const GOOGLE_KIRKLAND_LNG = -122.1996099;
 const MAPSKEY = config.MAPS_KEY;
@@ -95,12 +96,14 @@ async function loadMessages(keyString) {
     const queryURL = "/messages?key=" + keyString;
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
-    const msgResponse = await response.json();
+    const result = await response.json();
+    const msgResponse = result.messages;
+    cursorString = result.cursorString;
 
     const msgContainer = document.getElementById("message-container");
     msgContainer.innerHTML = "";
-    if (msgResponse.length > 10) {
-        var msg = msgResponse[msgResponse.length - 10];
+    if (msgResponse.length === 10) {
+        var msg = msgResponse[9];
         var newMessage = document.createElement("div");
         newMessage.className = msg.className;
         newMessage.appendChild(document.createTextNode(msg.message)); 
@@ -112,7 +115,7 @@ async function loadMessages(keyString) {
         });
         msgContainer.appendChild(moreMessageBtn);
         msgContainer.appendChild(newMessage);
-        for (var index = msgResponse.length - 9; index < msgResponse.length; index++) {
+        for (var index = 8; index >= 0; index--) {
             var message = msgResponse[index];
             var newMessageDiv = document.createElement("div");
             newMessageDiv.className = message.className;
@@ -120,7 +123,7 @@ async function loadMessages(keyString) {
             msgContainer.appendChild(newMessageDiv);
         }
     } else {
-        for (var index = 0; index < msgResponse.length; index++) {
+        for (var index = msgResponse.length - 1; index >= 0; index--) {
             var msg = msgResponse[index];
             var newMessage = document.createElement("div");
             newMessage.className = msg.className;
@@ -136,17 +139,18 @@ async function loadMessages(keyString) {
 // loadMoreMessages(key, messageDiv) will load 10 more messages of
 // task with keyString equals to key. After loading, scroll to element messageDiv
 async function loadMoreMessages(key, messageDiv) {
-    const queryURL = "/messages?key=" + key;
+    const queryURL = "/messages?key=" + key + "&cursor=" + cursorString;
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
-    const msgResponse = await response.json();
+    const result = await response.json();
+    const msgResponse = result.messages;
+    cursorString = result.cursorString;
 
     const msgContainer = document.getElementById("message-container");
     msgContainer.removeChild(msgContainer.childNodes[0]);
-    var count = msgContainer.childNodes.length + 10;
-    if (msgResponse.length > count) {
+    if (msgResponse.length === 10) {
         var newMessageDiv;
-        for (var index = msgResponse.length - count + 9; index > msgResponse.length - count - 1; index--) {
+        for (var index = 0; index < 10; index++) {
             var message = msgResponse[index];
             newMessageDiv = document.createElement("div");
             newMessageDiv.className = message.className;
@@ -161,7 +165,7 @@ async function loadMoreMessages(key, messageDiv) {
         });
         msgContainer.insertBefore(moreMessageBtn, msgContainer.childNodes[0]);
     } else {
-        for (var index = msgResponse.length - count + 9; index >= 0; index--) {
+        for (var index = 0; index < msgResponse.length; index++) {
             var message = msgResponse[index];
             newMessageDiv = document.createElement("div");
             newMessageDiv.className = message.className;
