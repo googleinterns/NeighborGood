@@ -327,9 +327,14 @@ function getTasksForUserLocation() {
     document.head.appendChild(script);
 
     // Once the Maps API script has dynamically loaded it gets the user location,
-    // waits until it gets an answer updates the global userLoaction variable and then calls
+    // waits until it gets an answer updates the global userLocation variable and then calls
     // fetchTasks and displayTasks
+    // It also initializes the autocomplete search box and the map.
 	window.initialize = function () {
+        // gets user location, then calls helper function that calls toNeighborhood, fetchTasks, and displayTasks
+        getUserLocation().then(callEndOfInitFunctions);
+
+        // initialize autocomplete input text search box
         let placeAutocomplete = new google.maps.places.Autocomplete(document.getElementById("place-input"));
         placeAutocomplete.setFields(['geometry']);
         google.maps.event.addListener(placeAutocomplete, 'place_changed', function() {
@@ -341,6 +346,8 @@ function getTasksForUserLocation() {
                 }
                 callEndOfInitFunctions();
               });
+
+        // initialize map
         map = new google.maps.Map(document.getElementById("tasks-map"), {
             center: {lat: GOOGLE_KIRKLAND_LAT, lng: GOOGLE_KIRKLAND_LNG},
             zoom: 15,
@@ -480,8 +487,6 @@ function getTasksForUserLocation() {
             ],
         });
         map.setTilt(45);
-        getUserLocation().then(callEndOfInitFunctions);
-        
 	}
 }
 
@@ -585,7 +590,6 @@ function fetchTasks(category, cursor) {
 function displayTasks(append) {
     if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
         document.getElementById("no-tasks-message").style.display = "none";
-        document.getElementById("tasks-message").style.display = "block";
         document.getElementById("tasks-list").style.display = "block";
 
         let taskList = document.getElementById("tasks-list");
@@ -594,11 +598,9 @@ function displayTasks(append) {
         addTasksClickHandlers();
     } else {
         document.getElementById("no-tasks-message").style.display = "block";
-        document.getElementById("tasks-message").style.display = "none";
         document.getElementById("tasks-list").style.display = "none";
     }
     document.getElementById("loading").style.display = "none";
-    document.getElementById("search-box").style.visibility = "visible";
 }
 
 function createTaskNode(task) {

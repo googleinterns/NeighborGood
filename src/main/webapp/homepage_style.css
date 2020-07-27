@@ -103,9 +103,34 @@ section {
   padding-bottom: 0.5em;
 }
 
-#search-box {
+#search-and-view-wrapper {
+  display: flex;
+  justify-content: space-between;
   padding: 0.5em 0.5em 1em 0.5em;
-  visibility: hidden;
+}
+
+#search-box {
+  padding-top: 0.4em;
+}
+
+#list-map-view {
+  display: flex;
+}
+
+.view-option {
+  border: solid 1px #bbb;
+  background-color: #eee;
+  font-size: 1.2em;
+  padding: 0.2em 0.5em 0.2em 0.5em;
+  margin-right: -0.5px;
+}
+
+#selected-view {
+  background-color: #bbb;
+}
+
+#selected-view:hover > i {
+  color: #222;
 }
 
 #control-bar-message-wrapper {
@@ -173,7 +198,6 @@ section {
 
 #loading {
   display: block;
-  margin-top: -2em;
 }
 
 #tasks-list {
@@ -421,21 +445,25 @@ td {
   #add-task {
     text-align: right;
     padding-right: 0.5em;
-    margin-top: -1em;
+    margin-top: -1.3em;
+    padding-bottom: 0.2em;
   }
 
   #addtaskbutton {
     font-size: 2.5em;
   }
 
-  #search-box {
-    padding-top: 0;
-    margin-top: -0.5em;
-  }
-
   #place-input { 
     display: block;
-   } 
+   }
+
+  #search-box {
+    padding-top: 0;
+  }
+
+  #list-map-view {
+    margin: 0.5em 0;
+  }
 
   .results-message {
     width: 95%;

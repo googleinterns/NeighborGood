@@ -105,10 +105,16 @@
                   }
                   %>
               </div>
-              <!--Search By Different Location Input-->
-              <div id="search-box">
-                <label for="place-input">Search tasks in a different location:</label>
-                <input id="place-input" name="place-input" type="text" placeholder=" Type an address here" class="pac-target-input" autocomplete="off">
+              <div id="search-and-view-wrapper">
+                <!--Search By Different Location Input-->
+                <div id="search-box">
+                    <label for="place-input">Search from a different location:</label>
+                    <input id="place-input" name="place-input" type="text" placeholder=" Type an address here" class="pac-target-input" autocomplete="off">
+                </div>
+                <div id="list-map-view">
+                    <div id="selected-view" class="view-option" aria-label="List View"><i class="fas fa-list" aria-hidden="true"></i></div>
+                    <div class="view-option" aria-label="Map View"><i class="fas fa-map" aria-hidden="true"></i></div>
+                </div>
               </div>
 
               <!--Results Messages-->
@@ -117,9 +123,6 @@
               </div>
               <div id="location-missing-message" class="results-message">
                   We could not retrieve your location to display your neighborhood tasks.
-              </div>
-              <div id="tasks-message" class="results-message">
-                  These are the most recent tasks in your neighborhood:
               </div>
               <div id="no-tasks-message" class="results-message">
                   Sorry, there are currently no tasks within your neighborhood for you to help with.
