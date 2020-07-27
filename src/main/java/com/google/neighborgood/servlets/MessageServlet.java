@@ -152,15 +152,15 @@ public class MessageServlet extends HttpServlet {
       return;
     }
 
-    // Get all stored entities related with the task that corresponds to the given taskId
+    // Get all stored entity ke related with the task that corresponds to the given taskId
     Filter filter = new FilterPredicate("taskId", FilterOperator.EQUAL, taskId);
-    Query query = new Query("Message").setFilter(filter);
+    Query query = new Query("Message").setFilter(filter).setKeysOnly();
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    PreparedQuery results = datastore.prepare(query);
+    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
 
     // Loop through all entities and delete them using the key
-    for (Entity entity : results.asIterable()) {
+    for (Entity entity : results) {
       Key key = entity.getKey();
       datastore.delete(key);
     }
