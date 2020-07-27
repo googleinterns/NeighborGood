@@ -414,7 +414,7 @@ async function showNotifications() {
     notiMsg.addEventListener("click", function() {
         showNotificationList();
     });
-    notiMsg.setAttribute("class", "blink-text");
+    notiMsg.setAttribute("class", "notification-text");
     noticeContainer.appendChild(notiMsg);
 }
 
