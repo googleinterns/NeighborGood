@@ -20,8 +20,6 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.CompositeFilter;
-import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
@@ -78,7 +76,8 @@ public class NotificationServlet extends HttpServlet {
   }
 
   @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doDelete(HttpServletRequest request, HttpServletResponse response)
+      throws IOException {
     // First check whether the user is logged in
     UserService userService = UserServiceFactory.getUserService();
 
@@ -94,13 +93,9 @@ public class NotificationServlet extends HttpServlet {
       return;
     }
 
-    // Get all stored entities related with the task that corresponds to the given taskId
-    // and the receiver equals to the current user
-    Filter idFilter = new FilterPredicate("taskId", FilterOperator.EQUAL, taskId);
-    Filter receiverFilter =
-        new FilterPredicate(
-            "receiver", FilterOperator.EQUAL, userService.getCurrentUser().getUserId());
-    CompositeFilter filter = CompositeFilterOperator.and(idFilter, receiverFilter);
+    // Get all stored entities related with the task that corresponds to the given taskId.
+    // Then deletes these entities
+    Filter filter = new FilterPredicate("taskId", FilterOperator.EQUAL, taskId);
     Query query = new Query("Notification").setFilter(filter);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();

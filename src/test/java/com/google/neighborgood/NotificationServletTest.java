@@ -137,7 +137,8 @@ public final class NotificationServletTest {
       ds.put(entity);
     }
 
-    // Add 1 dummy notification entity with the current user as receiver and taskId equals to 2
+    // Add 1 dummy notification entity with the current user as receiver and taskId equals to
+    // anotherKey
     Entity entity = new Entity("Notification");
     entity.setProperty("receiver", "1234567890");
     entity.setProperty("taskId", anotherKey);
@@ -160,36 +161,36 @@ public final class NotificationServletTest {
   }
 
   @Test
-  public void doPostTest() throws IOException {
-    // Ensure that there are 8 notificationi entity at the beginning
+  public void doDeleteTest() throws IOException {
+    // Ensure that there are 8 notification entity at the beginning
     assertEquals(8, ds.prepare(new Query("Notification")).countEntities(withLimit(10)));
 
-    // Now let's try to delete all the notification entity with task id 1 and the current user as
-    // receiver
+    // Now let's try to delete all the notification entity with task id keyString and
+    // receiver not equals to N/A
     when(request.getParameter("task-id")).thenReturn(keyString);
 
-    new NotificationServlet().doPost(request, response);
+    new NotificationServlet().doDelete(request, response);
 
-    // After handling the POST request, 3 entities should be removed
-    assertEquals(5, ds.prepare(new Query("Notification")).countEntities(withLimit(10)));
+    // After handling the POST request, 7 entities should be removed
+    assertEquals(1, ds.prepare(new Query("Notification")).countEntities(withLimit(10)));
 
-    // Ensure that no notification with task id 1 and receiver 1234567890 is left
+    // Ensure that no notification with task id keyString and receiver 1234567890 is left
     Filter idFilter = new FilterPredicate("taskId", FilterOperator.EQUAL, keyString);
     Filter receiverFilter = new FilterPredicate("receiver", FilterOperator.EQUAL, "1234567890");
     CompositeFilter filter = CompositeFilterOperator.and(idFilter, receiverFilter);
     assertEquals(
         0, ds.prepare(new Query("Notification").setFilter(filter)).countEntities(withLimit(10)));
 
-    // Now let's try to delete all the notification entity with task id 2 and the current user as
-    // receiver
+    // Now let's try to delete all the notification entity with task id anotherKey and the receiver
+    // not equals to N/A
     when(request.getParameter("task-id")).thenReturn(anotherKey);
 
-    new NotificationServlet().doPost(request, response);
+    new NotificationServlet().doDelete(request, response);
 
     // After handling the POST request, 1 entity should be removed
-    assertEquals(4, ds.prepare(new Query("Notification")).countEntities(withLimit(10)));
+    assertEquals(0, ds.prepare(new Query("Notification")).countEntities(withLimit(10)));
 
-    // Ensure that no notification with task id 2 and receiver 1234567890 is left
+    // Ensure that no notification with task id anotherKey and receiver 1234567890 is left
     idFilter = new FilterPredicate("taskId", FilterOperator.EQUAL, anotherKey);
     receiverFilter = new FilterPredicate("receiver", FilterOperator.EQUAL, "1234567890");
     filter = CompositeFilterOperator.and(idFilter, receiverFilter);

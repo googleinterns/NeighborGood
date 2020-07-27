@@ -20,6 +20,13 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -80,6 +87,7 @@ public class EditTaskServlet extends HttpServlet {
         System.err.println("Unable to find the entity based on the input key");
         response.sendError(
             HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
+        return;
 
       } finally {
         if (transaction.isActive()) {
@@ -87,7 +95,26 @@ public class EditTaskServlet extends HttpServlet {
           System.err.println("Task must be open to be claimed by a helper");
           response.sendError(
               HttpServletResponse.SC_CONFLICT, "Task has already been claimed by another helper");
+          return;
         }
+      }
+      // When a user takes a new task, send the user notifications for the messages that the owner
+      // writes before he takes the task
+      Filter idFilter = new FilterPredicate("taskId", FilterOperator.EQUAL, keyString);
+      Filter receiverFilter = new FilterPredicate("receiver", FilterOperator.EQUAL, "N/A");
+      CompositeFilter filter = CompositeFilterOperator.and(idFilter, receiverFilter);
+      Query query = new Query("Notification").setFilter(filter);
+
+      PreparedQuery results = datastore.prepare(query);
+
+      if (!userService.isUserLoggedIn()) {
+        response.sendRedirect(userService.createLoginURL("/account.jsp"));
+        return;
+      }
+
+      for (Entity notificationEntity : results.asIterable()) {
+        notificationEntity.setProperty("receiver", userService.getCurrentUser().getUserId());
+        datastore.put(notificationEntity);
       }
       return;
     }

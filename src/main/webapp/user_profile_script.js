@@ -178,6 +178,8 @@ async function deleteMessages(taskId) {
     const queryURL = "/messages?task-id=" + taskId;
     const request = new Request(queryURL, {method: "DELETE"});
     const response = await fetch(request);
+    // After deleting the messages, remove the notifications
+    removeNotifications(taskId);
     return;
 }
 
@@ -306,7 +308,7 @@ async function showTaskInfo(keyString) {
 
 async function removeNotifications(taskId) {
     const queryURL = "/notifications?task-id=" + taskId;
-    const request = new Request(queryURL, {method: "POST"});
+    const request = new Request(queryURL, {method: "DELETE"});
     const response = await fetch(request);
     showNotifications();
     return;

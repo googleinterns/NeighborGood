@@ -124,24 +124,17 @@ public class MessageServlet extends HttpServlet {
     String helper = (String) taskEntity.getProperty("Helper");
     String currentUser = userService.getCurrentUser().getUserId();
 
-    Entity notificationEntity;
+    Entity notificationEntity = new Entity("Notification");
+    notificationEntity.setProperty("taskId", taskId);
     if (currentUser.equals(helper)) {
-      notificationEntity = new Entity("Notification");
       notificationEntity.setProperty("receiver", owner);
-      notificationEntity.setProperty("taskId", taskId);
-      datastore.put(notificationEntity);
     } else if (currentUser.equals(owner)) {
-      // If the task is still OPEN, we would not send a notification
-      if (!helper.equals("N/A")) {
-        notificationEntity = new Entity("Notification");
-        notificationEntity.setProperty("receiver", helper);
-        notificationEntity.setProperty("taskId", taskId);
-        datastore.put(notificationEntity);
-      }
+      notificationEntity.setProperty("receiver", helper);
     } else {
       System.err.println("The message is not sent by the owner or helper of the task");
       return;
     }
+    datastore.put(notificationEntity);
 
     response.sendRedirect(request.getHeader("Referer"));
   }
