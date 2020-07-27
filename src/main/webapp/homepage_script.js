@@ -313,12 +313,13 @@ function getTasksForUserLocation() {
     script.async = true;
     document.head.appendChild(script);
 
-    // Once the Maps API script has dynamically loaded it gets the user location,
-    // waits until it gets an answer updates the global userLoaction variable and then calls
-    // fetchTasks and displayTasks
 	window.initialize = function () {
+        // Once the Maps API script has dynamically loaded it initializes the place autocomplete searchbox
         let placeAutocomplete = new google.maps.places.Autocomplete(document.getElementById("place-input"));
+        // 'geometry' field specifies that returned data will include the place's viewport and lat/lng
         placeAutocomplete.setFields(['geometry']);
+
+        // listener will use the inputted place to retrieve and display tasks
         google.maps.event.addListener(placeAutocomplete, 'place_changed', function() {
                 let place = placeAutocomplete.getPlace();
                 if (place.geometry != undefined) {
@@ -337,6 +338,8 @@ function getTasksForUserLocation() {
                             document.getElementById("location-missing-message").style.display = "block";
                         });
               });
+        // Once the Maps API script has dynamically loaded it initializes it gets the user location,
+        // retrieves the neighborhood from the location coordinates, fetches the tasks, and displays them
          getUserLocation().then(location => toNeighborhood(location))
         	.then(() => fetchTasks(currentCategory, "clear"))
             .then(response => {
