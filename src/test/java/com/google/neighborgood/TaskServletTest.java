@@ -23,7 +23,6 @@ import static org.mockito.Mockito.*;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.GeoPt;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.users.UserService;
@@ -80,7 +79,6 @@ public final class TaskServletTest {
     userEntity.setProperty("userId", "1234567890");
     userEntity.setProperty("country", "US");
     userEntity.setProperty("zipcode", "15213");
-    userEntity.setProperty("location", new GeoPt((float) 40.440836, (float) -79.958306));
     userEntity.setProperty("points", 0);
     ds.put(userEntity);
   }
@@ -127,8 +125,6 @@ public final class TaskServletTest {
     assertEquals("1234567890", (String) entity.getProperty("Owner"));
     assertEquals("Help me please", (String) entity.getProperty("detail"));
     assertEquals("Task Overview", (String) entity.getProperty("overview"));
-    assertEquals(
-        new GeoPt((float) 40.440836, (float) -79.958306), (GeoPt) entity.getProperty("location"));
     assertEquals(50, (long) entity.getProperty("reward"));
   }
 
@@ -165,9 +161,6 @@ public final class TaskServletTest {
         assertEquals("1234567890", (String) entity.getProperty("Owner"));
         assertEquals("Testing task 1", (String) entity.getProperty("detail"));
         assertEquals("Task Overview", (String) entity.getProperty("overview"));
-        assertEquals(
-            new GeoPt((float) 40.440836, (float) -79.958306),
-            (GeoPt) entity.getProperty("location"));
         assertEquals(50, (long) entity.getProperty("reward"));
       }
     }
