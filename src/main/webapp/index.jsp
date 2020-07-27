@@ -112,8 +112,12 @@
                     <input id="place-input" name="place-input" type="text" placeholder=" Type an address here" class="pac-target-input" autocomplete="off">
                 </div>
                 <div id="list-map-view">
-                    <div id="selected-view" class="view-option" aria-label="List View"><i class="fas fa-list" aria-hidden="true"></i></div>
-                    <div class="view-option" aria-label="Map View"><i class="fas fa-map" aria-hidden="true"></i></div>
+                    <button id="selected-view" value="list" class="view-option" aria-label="List View">
+                        <i class="fas fa-list" aria-hidden="true"></i>
+                    </button>
+                    <button class="view-option" value="map" aria-label="Map View">
+                        <i class="fas fa-map" aria-hidden="true"></i>
+                    </button>
                 </div>
               </div>
 

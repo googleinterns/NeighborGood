@@ -100,6 +100,31 @@ function addUIClickHandlers() {
 
     // adds closeTaskInfoModal click event
     document.getElementById("task-info-close-button").addEventListener("click", closeTaskInfoModal);
+
+    document.getElementsByClassName("view-option")[0].addEventListener("click", function(e) {
+        switchView(e.target);
+    });
+    document.getElementsByClassName("view-option")[1].addEventListener("click", function(e) {
+        switchView(e.target);
+    });
+}
+
+function switchView(element) {
+    let buttonElement;
+    if (element.classList.contains("fas")) {
+        buttonElement = element.parentNode;
+    } else {
+        buttonElement = element;
+    }
+    document.getElementById("selected-view").removeAttribute("id");
+    buttonElement.setAttribute("id", "selected-view");
+    if (buttonElement.value == "map") {
+        document.getElementById("tasks-list").style.display = "none";
+        document.getElementById("tasks-map").style.display = "block";
+    } else {
+        document.getElementById("tasks-map").style.display = "none";
+        document.getElementById("tasks-list").style.display = "block";
+    }
 }
 
 /* Function loads ten more tasks if there are any more, otherwise it displays a message saying there are no more tasks */
