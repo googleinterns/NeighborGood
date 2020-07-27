@@ -81,7 +81,7 @@ public final class Task {
       this.helper = "N/A";
     }
 
-    setOwnerCurrentUser(ownerId);
+    setIsOwnerCurrentUser(ownerId);
     setDateTime();
   }
 
@@ -117,7 +117,7 @@ public final class Task {
       this.helper = "N/A";
     }
 
-    setOwnerCurrentUser(ownerId);
+    setIsOwnerCurrentUser(ownerId);
     setDateTime();
   }
 
@@ -127,7 +127,7 @@ public final class Task {
     this.dateTime = timestampFormat.format(timestamp);
   }
 
-  private void setOwnerCurrentUser(String ownerId) {
+  private void setIsOwnerCurrentUser(String ownerId) {
     UserService userService = UserServiceFactory.getUserService();
     boolean userLoggedIn = userService.isUserLoggedIn();
     String userId = userLoggedIn ? userService.getCurrentUser().getUserId() : "null";

@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const MAPSKEY = config.MAPS_KEY
+const MAPSKEY = config.MAPS_KEY;
+const GOOGLE_KIRKLAND_LAT = 47.669846;
+const GOOGLE_KIRKLAND_LNG = -122.1996099;
 let neighborhood = [null , null];
 let userLocation = null;
 let userActualLocation = null;
@@ -337,33 +339,166 @@ function getTasksForUserLocation() {
                 } else {
                     userLocation = userActualLocation;
                 }
-                toNeighborhood(userLocation)
-                        .then(() => fetchTasks())
-                        .then(response => {
-                                taskGroup = response;
-                                startCursor = taskGroup.startCursor;
-                                endCursor = taskGroup.endCursor;
-                                displayTasks(response);
-                            })
-                        .catch(() => {
-                            console.error("User location and/or neighborhood could not be retrieved");
-                            document.getElementById("location-missing-message").style.display = "block";
-                        });
+                callEndOfInitFunctions();
               });
-         getUserLocation().then(location => toNeighborhood(location))
-        	.then(() => fetchTasks(currentCategory))
-            .then(response => {
-                    taskGroup = response;
-                    startCursor = taskGroup.startCursor;
-                    endCursor = taskGroup.endCursor;
-                    displayTasks();
-                })
-            .catch(() => {
-                console.error("User location and/or neighborhood could not be retrieved");
-                document.getElementById("loading").style.display = "none";
-                document.getElementById("location-missing-message").style.display = "block";
-            });
+        map = new google.maps.Map(document.getElementById("tasks-map"), {
+            center: {lat: GOOGLE_KIRKLAND_LAT, lng: GOOGLE_KIRKLAND_LNG},
+            zoom: 15,
+            styles: [
+                {
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#ebe3cd"}]
+                },
+                {
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#523735"}]
+                },
+                {
+                    "elementType": "labels.text.stroke",
+                    "stylers": [{"color": "#f5f1e6"}]
+                },
+                {
+                    "featureType": "administrative",
+                    "elementType": "geometry.stroke",
+                    "stylers": [{"color": "#c9b2a6"}]
+                },
+                {
+                    "featureType": "administrative.land_parcel",
+                    "elementType": "geometry.stroke",
+                    "stylers": [{"color": "#dcd2be"}]
+                },
+                {
+                    "featureType": "administrative.land_parcel",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#ae9e90"}]
+                },
+                {
+                    "featureType": "landscape.man_made",
+                    "elementType": "geometry.stroke",
+                    "stylers": [{"color": "#36aff9"}]
+                },
+                {
+                    "featureType": "landscape.natural",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#dfd2ae"}]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#dfd2ae"}]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#93817c"}]
+                },
+                {
+                    "featureType": "poi.park",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#a5b076"}]
+                },
+                {
+                    "featureType": "poi.park",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#28c4fa"}, {"lightness": -5}, {"weight": 2}]
+                },
+                {
+                    "featureType": "poi.park",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [{"color": "#f9fcc7"}]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#f5f1e6"}]
+                },
+                {
+                    "featureType": "road.arterial",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#fdfcf8"}]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#f8c967"}]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry.stroke",
+                    "stylers": [{"color": "#f2756a"}]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#f98357"}]
+                },
+                {
+                    "featureType": "road.highway.controlled_access",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#e98d58"}]
+                },
+                {
+                    "featureType": "road.highway.controlled_access",
+                    "elementType": "geometry.stroke",
+                    "stylers": [{"color": "#db8555"}]
+                },
+                {
+                    "featureType": "road.local",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#806b63"}]
+                },
+                {
+                    "featureType": "transit.line",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#dfd2ae"}]
+                },
+                {
+                    "featureType": "transit.line",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#8f7d77"}]
+                },
+                {
+                    "featureType": "transit.line",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [{"color": "#ebe3cd"}]
+                },
+                {
+                    "featureType": "transit.station",
+                    "elementType": "geometry",
+                    "stylers": [{"color": "#dfd2ae"}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#65d3f9"}, {"saturation": -10},  {"lightness": 10}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#92998d"}]
+                }
+            ],
+        });
+        map.setTilt(45);
+        getUserLocation().then(callEndOfInitFunctions);
+        
 	}
+}
+
+function callEndOfInitFunctions() {
+    toNeighborhood(userLocation)
+        .then(() => fetchTasks(currentCategory))
+        .then(response => {
+                taskGroup = response;
+                startCursor = taskGroup.startCursor;
+                endCursor = taskGroup.endCursor;
+                displayTasks();
+            })
+        .catch(() => {
+            console.error("User location and/or neighborhood could not be retrieved");
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("location-missing-message").style.display = "block";
+        });
 }
 
 /* Function that returns a promise to get and return the user's location */

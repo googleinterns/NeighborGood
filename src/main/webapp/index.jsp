@@ -105,6 +105,7 @@
                   }
                   %>
               </div>
+              <!--Search By Different Location Input-->
               <div id="search-box">
                 <label for="place-input">Search tasks in a different location:</label>
                 <input id="place-input" name="place-input" type="text" placeholder=" Type an address here" class="pac-target-input" autocomplete="off">
@@ -126,6 +127,8 @@
           </div>
           <!--Listed Tasks Container-->
           <div id="tasks-list"></div>
+          <!--Map Tasks Container-->
+          <div id="tasks-map"></div>
       </section>
       <!--Create Tasks Modal-->
       <div class="modalWrapper" id="createTaskModalWrapper">
