@@ -14,10 +14,12 @@
 
 package com.google.neighborgood.servlets;
 
+import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
@@ -26,10 +28,12 @@ import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import com.google.neighborgood.Message;
+import com.google.neighborgood.MessageResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +45,8 @@ import javax.servlet.http.HttpServletResponse;
 /** Servlet that loads and records new message entities. */
 @WebServlet("/messages")
 public class MessageServlet extends HttpServlet {
+  private static final int PAGE_SIZE = 10;
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String taskId = request.getParameter("key");
@@ -55,20 +61,40 @@ public class MessageServlet extends HttpServlet {
       return;
     }
 
+    FetchOptions fetchOptions = FetchOptions.Builder.withLimit(PAGE_SIZE);
+
+    // If the client requires for a cursor, get the cursor string given
+    String startCursor = request.getParameter("cursor");
+    if (startCursor != null) {
+      fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor));
+    }
+
     Filter filter = new FilterPredicate("taskId", FilterOperator.EQUAL, taskId);
     Query query =
-        new Query("Message").setFilter(filter).addSort("sentTime", SortDirection.ASCENDING);
+        new Query("Message").setFilter(filter).addSort("sentTime", SortDirection.DESCENDING);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    PreparedQuery results = datastore.prepare(query);
+    PreparedQuery pq = datastore.prepare(query);
+
+    QueryResultList<Entity> results;
+    try {
+      results = pq.asQueryResultList(fetchOptions);
+    } catch (IllegalArgumentException e) {
+      System.err.println("Invalid cursor is provided");
+      // Redirect to the current url without the cursor parameter
+      response.sendRedirect("/messages");
+      return;
+    }
 
     List<Message> messages = new ArrayList<>();
-    for (Entity entity : results.asIterable()) {
+    for (Entity entity : results) {
       messages.add(new Message(entity));
     }
 
+    String cursorString = results.getCursor().toWebSafeString();
+
     Gson gson = new Gson();
-    String json = gson.toJson(messages);
+    String json = gson.toJson(new MessageResponse(cursorString, messages));
     response.setContentType("application/json;");
     response.getWriter().println(json);
   }
@@ -157,15 +183,15 @@ public class MessageServlet extends HttpServlet {
       return;
     }
 
-    // Get all stored entities related with the task that corresponds to the given taskId
+    // Get all stored entity ke related with the task that corresponds to the given taskId
     Filter filter = new FilterPredicate("taskId", FilterOperator.EQUAL, taskId);
-    Query query = new Query("Message").setFilter(filter);
+    Query query = new Query("Message").setFilter(filter).setKeysOnly();
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    PreparedQuery results = datastore.prepare(query);
+    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
 
     // Loop through all entities and delete them using the key
-    for (Entity entity : results.asIterable()) {
+    for (Entity entity : results) {
       Key key = entity.getKey();
       datastore.delete(key);
     }

@@ -79,8 +79,6 @@ public class TaskInfoServlet extends HttpServlet {
       return;
     }
 
-    String currentStatus = (String) entity.getProperty("status");
-
     if (newStatus.equals("OPEN")) {
       entity.setProperty("Helper", "N/A");
     } else if (newStatus.equals("COMPLETE")) {
