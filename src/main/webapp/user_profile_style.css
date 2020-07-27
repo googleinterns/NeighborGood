@@ -207,7 +207,12 @@ table button:hover i {
   overflow-y: auto;
 }
 
-.modal textarea {
+.modal textarea:focus {
+  width: 100%;
+  border: 4px solid black;
+}
+
+.modal textarea:not(#msg-input) {
   width: 50%;
   box-sizing: border-box;
   border: 4px solid gray;
@@ -215,11 +220,6 @@ table button:hover i {
   font-size: 16px;
   padding: 10px 20px 10px 20px;
   transition: width 0.5s ease-in-out;
-}
-
-.modal textarea:focus {
-  width: 100%;
-  border: 4px solid black;
 }
 
 .modal label {
@@ -329,4 +329,65 @@ table button:hover i {
   border-radius: 5px;
   padding: 10px;
   margin: 10px 10px;
+}
+
+#send-button {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+  float: right;
+  margin-bottom: 50px;
+}
+
+#send-button:hover {
+  color: #0c0;
+}
+
+#msg-input {
+  width: 95%;
+  height: 80px;
+  box-sizing: border-box;
+  border: 4px solid gray;
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 10px 0 10px 20px;
+  float: left;
+}
+
+@media (max-width: 1550px) {
+  #msg-input {
+    width: 90%;
+  }
+}
+
+@media (max-width: 800px) {
+  #msg-input {
+    width: 83%;
+  }
+}
+
+#msg-input:focus {
+  border-color: black;
+}
+
+#chat-title {
+  float: left;
+}
+
+#refresh-button {
+  margin-top: 30px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+  float: right;
+}
+
+#refresh-button:hover {
+  color: #0c0;
 }
