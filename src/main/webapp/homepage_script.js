@@ -17,8 +17,6 @@ let neighborhood = [null , null];
 let userLocation = null;
 let currentCategory = "all";
 let taskGroup = null;
-let startCursor = null;
-let endCursor = null;
 
 /* Changes navbar background upon resize */
 window.addEventListener("resize", function() {
@@ -103,11 +101,9 @@ function addUIClickHandlers() {
 function loadMoreTasks() {
     if (userNeighborhoodIsKnown()) {
         if (!taskGroup.endOfQuery) {
-            fetchTasks(currentCategory, endCursor)
+            fetchTasks(currentCategory, "end")
                 .then(response => {
                         taskGroup = response;
-                        startCursor = taskGroup.startCursor;
-                        endCursor = taskGroup.endCursor;
                         displayTasks(true);
                     });
         } else if (!document.getElementById("no-more-tasks")) {
@@ -127,11 +123,9 @@ function filterTasksBy(category) {
 
     // only fetches tasks if user's location has been retrieved
     if (userNeighborhoodIsKnown()) {
-        fetchTasks(currentCategory)
+        fetchTasks(currentCategory, "clear")
             .then(response => {
                     taskGroup = response;
-                    startCursor = taskGroup.startCursor;
-                    endCursor = taskGroup.endCursor;
                     displayTasks();
                 });
     }
@@ -182,10 +176,8 @@ function confirmHelp(element) {
         }
         // fetches tasks again if user's current location was successfully retrieved and stored
         else if (userNeighborhoodIsKnown()) {
-            fetchTasks(currentCategory, startCursor).then(response => {
+            fetchTasks(currentCategory, "start").then(response => {
                     taskGroup = response;
-                    startCursor = taskGroup.startCursor;
-                    endCursor = taskGroup.endCursor;
                     displayTasks();
                 });
         }
@@ -328,11 +320,9 @@ function getTasksForUserLocation() {
     // fetchTasks and displayTasks
 	window.initialize = function () {
          getUserLocation().then(location => toNeighborhood(location))
-        	.then(() => fetchTasks(currentCategory))
+        	.then(() => fetchTasks(currentCategory, "clear"))
             .then(response => {
                     taskGroup = response;
-                    startCursor = taskGroup.startCursor;
-                    endCursor = taskGroup.endCursor;
                     displayTasks();
                 })
             .catch(() => {
@@ -410,12 +400,9 @@ function toNeighborhood(latlng) {
 
 /* Fetches tasks from servlet by location and category */
 function fetchTasks(category, cursor) {
-    let url = "/tasks?zipcode=" + neighborhood[0]+ "&country=" + neighborhood[1];
+    let url = "/tasks?zipcode=" + neighborhood[0]+ "&country=" + neighborhood[1] +"&cursor=" + cursor;
     if (category !== undefined && category != "all") {
         url += "&category=" + category;
-    }
-    if (cursor !== undefined) {
-        url += "&cursor=" + cursor;
     }
     return fetch(url).then(response => response.json());
 }

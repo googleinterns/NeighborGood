@@ -38,6 +38,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /** Servlet that creates new task entity and fetch saved tasks. */
 @WebServlet("/tasks")
@@ -85,12 +86,23 @@ public class TaskServlet extends HttpServlet {
     // Helper class instance that will store 10 tasks and keep track of some query metadata
     TaskGroup taskGroup = new TaskGroup();
 
-    // Checks if the request was passed a cursor to resume the query from that point and store it in
-    // taskGroup
-    String startCursor = request.getParameter("cursor");
+    HttpSession session = request.getSession();
+    String cursorAction = request.getParameter("cursor");
+    if (cursorAction == null || cursorAction.equals("clear")) {
+      session.removeAttribute("startCursor");
+      session.removeAttribute("endCursor");
+    }
+
+    String startCursor = null;
+    if (cursorAction.equals("start")) {
+      startCursor = (String) session.getAttribute("startCursor");
+    } else if (cursorAction.equals("end")) {
+      startCursor = (String) session.getAttribute("endCursor");
+    }
+
     if (startCursor != null) {
       fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor));
-      taskGroup.addStartCursor(startCursor);
+      session.setAttribute("startCursor", startCursor);
     }
 
     QueryResultList<Entity> results;
@@ -106,7 +118,7 @@ public class TaskServlet extends HttpServlet {
     }
 
     // Stores end cursor and checks if the end of the query has been reached
-    taskGroup.addEndCursor(results.getCursor().toWebSafeString());
+    session.setAttribute("endCursor", results.getCursor().toWebSafeString());
     taskGroup.checkIfEnd();
 
     Gson gson = new Gson();
