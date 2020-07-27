@@ -16,6 +16,7 @@ const MAPSKEY = config.MAPS_KEY;
 const GOOGLE_KIRKLAND_LAT = 47.669846;
 const GOOGLE_KIRKLAND_LNG = -122.1996099;
 let map;
+let oms;
 let neighborhood = [null , null];
 let userLocation = null;
 let userActualLocation = null;
@@ -502,6 +503,12 @@ function getTasksForUserLocation() {
         });
         map.setTilt(45);
 
+        oms = new OverlappingMarkerSpiderfier(map, {
+            markersWontMove: true,
+            markersWontHide: true,
+            basicFormatEvents: true
+        });
+
         // gets user location, then calls helper function that calls toNeighborhood, fetchTasks, and displayTasks
         getUserLocation().then(callEndOfInitFunctions);
 
@@ -706,8 +713,10 @@ function createTaskListNode(task) {
 }
 
 function displayTaskMarker(task) {
+    let lat = task.lat;// + (Math.random() - 0.5) / 3000;
+    let lng = task.lng;// + (Math.random() - 0.5) / 3000;
     const marker = new google.maps.Marker({
-        position: {lat: task.lat, lng: task.lng},
+        position: {lat: lat, lng: lng},
         map: map,
         isCurrentUser: task.isOwnerCurrentUser,
         detail: task.detail,
@@ -724,9 +733,10 @@ function displayTaskMarker(task) {
     });
 
     const geocoder = new google.maps.Geocoder;
-    marker.addListener("click", () => {
+    marker.addListener("spider_click", () => {
         openInfoWindow(map, marker, infoWindow);
     });
+    oms.addMarker(marker);
 }
 
 /** Builds and Opens Info Window */

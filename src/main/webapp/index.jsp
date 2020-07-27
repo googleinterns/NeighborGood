@@ -22,6 +22,7 @@
     <title>NeighborGood</title>
     <link rel="stylesheet" href="homepage_style.css">
     <script type='text/javascript' src='config.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier/1.0.3/oms.min.js"></script>
     <script src="homepage_script.js"></script>
     <script src="https://kit.fontawesome.com/71105f4105.js" crossorigin="anonymous"></script> 
   </head>
