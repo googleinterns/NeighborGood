@@ -330,11 +330,9 @@ function getTasksForUserLocation() {
                     userLocation = userActualLocation;
                 }
                 toNeighborhood(userLocation)
-                        .then(() => fetchTasks())
+                        .then(() => fetchTasks(currentCategory, "clear"))
                         .then(response => {
                                 taskGroup = response;
-                                startCursor = taskGroup.startCursor;
-                                endCursor = taskGroup.endCursor;
                                 displayTasks(response);
                             })
                         .catch(() => {
