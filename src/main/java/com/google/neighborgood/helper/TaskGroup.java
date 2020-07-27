@@ -26,9 +26,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Helper class that stores the HTML depiction of tasks in groups of 10 or less along with storing
- * the current position of the query's cursor and whether or not the end of the query has been
- * reached
+ * Helper class that stores the HTML depiction of tasks in groups of 10 or less along with whether
+ * or not the end of the query has been reached
  */
 public class TaskGroup {
   private static HashMap<String, String>
@@ -37,8 +36,6 @@ public class TaskGroup {
   private static DatastoreService datastore;
   private final boolean userLoggedIn;
   private int currentTaskCount;
-  private String endCursor;
-  private String startCursor;
   private boolean endOfQuery;
   private ArrayList<Task> tasks;
 
@@ -77,16 +74,7 @@ public class TaskGroup {
     this.currentTaskCount++;
   }
 
-  /** Adds end cursor position to TaskGroup instance */
-  public void addEndCursor(String cursor) {
-    this.endCursor = cursor;
-  }
-
-  /** Adds start cursor position to TaskGroup instance */
-  public void addStartCursor(String cursor) {
-    this.startCursor = cursor;
-  }
-
+  /** Checks if its the end of the query */
   public void checkIfEnd() {
     if (this.currentTaskCount < 10) {
       this.endOfQuery = true;
