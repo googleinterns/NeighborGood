@@ -21,6 +21,7 @@ import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.neighborgood.User;
 import com.google.neighborgood.task.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,8 +31,8 @@ import java.util.HashMap;
  * or not the end of the query has been reached
  */
 public class TaskGroup {
-  private static HashMap<String, String>
-      usersNicknames; // Stores task owner's user info to prevent querying multiple times in
+  private static HashMap<String, User>
+      usersInfo; // Stores task owner's user info to prevent querying multiple times in
   // datastore for the same user's info
   private static DatastoreService datastore;
   private final boolean userLoggedIn;
@@ -40,7 +41,7 @@ public class TaskGroup {
   private ArrayList<Task> tasks;
 
   public TaskGroup() {
-    this.usersNicknames = new HashMap<String, String>();
+    this.usersInfo = new HashMap<String, User>();
     UserService userService = UserServiceFactory.getUserService();
     this.userLoggedIn = userService.isUserLoggedIn();
     this.datastore = DatastoreServiceFactory.getDatastoreService();
@@ -54,21 +55,25 @@ public class TaskGroup {
 
     String taskOwnerId = (String) entity.getProperty("Owner");
     String taskOwnerNickname = null;
-    if (this.usersNicknames.containsKey(taskOwnerId)) {
-      taskOwnerNickname = this.usersNicknames.get(taskOwnerId);
+    Double taskLat = null;
+    Double taskLng = null;
+    if (this.usersInfo.containsKey(taskOwnerId)) {
+      taskOwnerNickname = this.usersInfo.get(taskOwnerId).getUserNickname();
+      taskLat = this.usersInfo.get(taskOwnerId).getUserLat();
+      taskLng = this.usersInfo.get(taskOwnerId).getUserLng();
     } else {
       Key taskOwnerKey = entity.getParent();
       try {
         Entity userEntity = this.datastore.get(taskOwnerKey);
-        taskOwnerNickname = (String) userEntity.getProperty("nickname");
-        this.usersNicknames.put(taskOwnerId, taskOwnerNickname);
+        User taskUser = new User(userEntity);
+        this.usersInfo.put(taskOwnerId, taskUser);
       } catch (EntityNotFoundException e) {
         System.err.println(
             "Unable to find the task's owner info to retrieve the owner's nickname. Setting a default nickname.");
         taskOwnerNickname = "Neighbor";
       }
     }
-    Task task = new Task(entity, taskOwnerId, taskOwnerNickname);
+    Task task = new Task(entity, taskOwnerId, taskOwnerNickname, taskLat, taskLng);
     tasks.add(task);
 
     this.currentTaskCount++;

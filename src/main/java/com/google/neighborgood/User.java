@@ -25,6 +25,8 @@ public final class User {
   private final String email;
   private final String userId;
   private final long points;
+  private final Double lat;
+  private final Double lng;
   private boolean isCurrentUser;
 
   public User(Entity entity) {
@@ -37,6 +39,8 @@ public final class User {
     this.email = (String) entity.getProperty("email");
     this.userId = entity.getKey().getName();
     this.points = (Long) entity.getProperty("points");
+    this.lat = (Double) entity.getProperty("lat");
+    this.lng = (Double) entity.getProperty("lng");
     this.isCurrentUser = false;
   }
 
@@ -46,5 +50,17 @@ public final class User {
 
   public String getUserId() {
     return this.userId;
+  }
+
+  public String getUserNickname() {
+    return this.nickname;
+  }
+
+  public Double getUserLat() {
+    return this.lat;
+  }
+
+  public Double getUserLng() {
+    return this.lng;
   }
 }

@@ -95,8 +95,8 @@ public class UserInfoServlet extends HttpServlet {
     String phone = "";
     String zipcode = "";
     String country = "";
-    Float lat = null;
-    Float lng = null;
+    Double lat = null;
+    Double lng = null;
     String nicknameInput = request.getParameter("nickname-input");
     String addressInput = request.getParameter("address-input");
     String phoneInput = request.getParameter("phone-input");
@@ -112,8 +112,8 @@ public class UserInfoServlet extends HttpServlet {
     if (countryInput != null) country = countryInput.trim();
 
     try {
-      lat = Float.parseFloat(request.getParameter("lat-input"));
-      lng = Float.parseFloat(request.getParameter("lng-input"));
+      lat = Double.parseDouble(request.getParameter("lat"));
+      lng = Double.parseDouble(request.getParameter("lng"));
     } catch (NumberFormatException e) {
       System.err.println("Invalid location coordinates");
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid location coordinates");

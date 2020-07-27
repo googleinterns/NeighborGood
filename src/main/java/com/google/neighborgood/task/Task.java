@@ -39,6 +39,8 @@ public final class Task {
   private final String category;
   private boolean isOwnerCurrentUser;
   private String dateTime;
+  private Double lat;
+  private Double lng;
 
   public Task(Entity entity) {
     this.keyString = KeyFactory.keyToString(entity.getKey());
@@ -65,6 +67,9 @@ public final class Task {
       return;
     }
     this.owner = (String) ownerEntity.getProperty("nickname");
+    this.lat = (Double) ownerEntity.getProperty("lat");
+    this.lng = (Double) ownerEntity.getProperty("lng");
+
     // If the task status is still "OPEN", the input helper should be "N/A".
     // Otherwise, we will show the nickname of the helper.
     if (!helperId.equals("N/A")) {
@@ -85,7 +90,8 @@ public final class Task {
     setDateTime();
   }
 
-  public Task(Entity entity, String ownerId, String ownerNickname) {
+  public Task(
+      Entity entity, String ownerId, String ownerNickname, Double ownerLat, Double ownerLng) {
     this.keyString = KeyFactory.keyToString(entity.getKey());
     this.detail = (String) entity.getProperty("detail");
     this.overview = (String) entity.getProperty("overview");
@@ -97,6 +103,8 @@ public final class Task {
     this.country = (String) entity.getProperty("country");
     this.category = (String) entity.getProperty("category");
     this.owner = ownerNickname;
+    this.lat = ownerLat;
+    this.lng = ownerLng;
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     String helperId = (String) entity.getProperty("Helper");
