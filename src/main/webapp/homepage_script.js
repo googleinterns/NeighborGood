@@ -398,9 +398,11 @@ function toNeighborhood(latlng) {
     });
 }
 
-/* Fetches tasks from servlet by location and category */
-function fetchTasks(category, cursor) {
-    let url = "/tasks?zipcode=" + neighborhood[0]+ "&country=" + neighborhood[1] +"&cursor=" + cursor;
+/* Fetches tasks from servlet by category and cursor action.
+   Cursor can pick up from the last start, the endpoint, or clear
+   the cursor and start from beginning of query */
+function fetchTasks(category, cursorAction) {
+    let url = "/tasks?zipcode=" + neighborhood[0]+ "&country=" + neighborhood[1] +"&cursor=" + cursorAction;
     if (category !== undefined && category != "all") {
         url += "&category=" + category;
     }

@@ -86,13 +86,17 @@ public class TaskServlet extends HttpServlet {
     // Helper class instance that will store 10 tasks and keep track of some query metadata
     TaskGroup taskGroup = new TaskGroup();
 
+    // Gets session and passed cursor action
     HttpSession session = request.getSession();
     String cursorAction = request.getParameter("cursor");
+
+    // Clears cursors if no cursor action is passed or a clear action is passed
     if (cursorAction == null || cursorAction.equals("clear")) {
       session.removeAttribute("startCursor");
       session.removeAttribute("endCursor");
     }
 
+    // initializes startCursor to the appropriate cursor location
     String startCursor = null;
     if (cursorAction.equals("start")) {
       startCursor = (String) session.getAttribute("startCursor");
@@ -100,6 +104,7 @@ public class TaskServlet extends HttpServlet {
       startCursor = (String) session.getAttribute("endCursor");
     }
 
+    // sets cursor in fetchOptions and stores the new startCursor in the session
     if (startCursor != null) {
       fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor));
       session.setAttribute("startCursor", startCursor);
