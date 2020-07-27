@@ -19,7 +19,6 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
-import com.google.appengine.api.datastore.GeoPt;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
@@ -29,12 +28,9 @@ import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import com.google.neighborgood.helper.RetrieveUserInfo;
 import com.google.neighborgood.helper.RewardingPoints;
-import com.google.neighborgood.helper.UnitConversion;
+import com.google.neighborgood.helper.TaskPages;
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -47,48 +43,30 @@ public class TaskServlet extends HttpServlet {
   @Override
   // doGet method retrieves tasks from datastore and responds with the HTML for each task fetched
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    final double DEFAULT_FIVE_MILES_RADIUS = 5;
     UserService userService = UserServiceFactory.getUserService();
     boolean userLoggedIn = userService.isUserLoggedIn();
     String userId = userLoggedIn ? userService.getCurrentUser().getUserId() : "null";
-    Float lat = null;
-    Float lng = null;
-    Double radiusInMeters = UnitConversion.milesToMeters(DEFAULT_FIVE_MILES_RADIUS);
+    String zipcode = "";
+    String country = "";
 
-    if (request.getParameterMap().containsKey("lat")
-        && request.getParameterMap().containsKey("lng")) {
-      try {
-        lat = Float.parseFloat(request.getParameter("lat"));
-        lng = Float.parseFloat(request.getParameter("lng"));
-      } catch (NumberFormatException e) {
-        System.err.println("Invalid location coordinates");
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid location coordinates");
-      }
+    if (request.getParameterMap().containsKey("zipcode")
+        && request.getParameterMap().containsKey("country")) {
+      zipcode = request.getParameter("zipcode");
+      country = request.getParameter("country");
     } else {
-      System.err.println("Location coordinates are missing");
-      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Location coordinates are missing");
-    }
-
-    if (request.getParameterMap().containsKey("miles")) {
-      try {
-        radiusInMeters =
-            UnitConversion.milesToMeters(Double.parseDouble(request.getParameter("miles")));
-      } catch (NumberFormatException e) {
-        System.err.println("Invalid miles input. Using 5 miles as default.");
-      }
+      System.err.println("Zipcode and Country details are missing");
+      response.sendError(
+          HttpServletResponse.SC_BAD_REQUEST, "Zipcode and Country details are missing");
     }
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-
-    GeoPt userLocation = new GeoPt(lat, lng);
 
     Query query = new Query("Task").addSort("timestamp", SortDirection.DESCENDING);
 
     // Creates list of filters
     List<Query.Filter> filters = new ArrayList<Query.Filter>();
-    filters.add(
-        new Query.StContainsFilter(
-            "location", new Query.GeoRegion.Circle(userLocation, radiusInMeters)));
+    filters.add(new Query.FilterPredicate("zipcode", Query.FilterOperator.EQUAL, zipcode));
+    filters.add(new Query.FilterPredicate("country", Query.FilterOperator.EQUAL, country));
     filters.add(new Query.FilterPredicate("status", Query.FilterOperator.EQUAL, "OPEN"));
 
     // Applies a category filter, if any
@@ -100,76 +78,21 @@ public class TaskServlet extends HttpServlet {
     // Applies filters to query
     query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, filters));
 
-    // limits results to the 20 most recent tasks
-    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(20));
+    // As we are now not using geospatial queries, we can now use cursors for this - I will change
+    // this in a different PR
+    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(100));
 
-    StringBuilder out = new StringBuilder();
-
-    // Stores task owner's user info to prevent querying multiple
-    // times in datastore for the same user's info
-    HashMap<String, String> usersNicknames = new HashMap<String, String>();
+    TaskPages taskPages = new TaskPages();
 
     // Builds and stores HTML for each task
     for (Entity entity : results) {
-      out.append("<div class='task' data-key='")
-          .append(KeyFactory.keyToString(entity.getKey()))
-          .append("'>");
-      if (userLoggedIn) {
-        out.append("<div class='help-overlay'>");
-        out.append("<div class='exit-help'><a>&times</a></div>");
-        out.append("<a class='confirm-help'>CONFIRM</a>");
-        out.append("</div>");
-      }
-      out.append("<div class='task-container'>");
-      out.append("<div class='task-header'>");
-      out.append("<div class='user-nickname'>");
-
-      // Checks if tasks's user nickname has already been retrieved,
-      // otherwise retrieves it and temporarily stores it
-      String taskOwner = (String) entity.getProperty("Owner");
-      if (usersNicknames.containsKey(taskOwner)) {
-        out.append(usersNicknames.get(taskOwner));
-      } else {
-        Key taskOwnerKey = entity.getParent();
-        try {
-          Entity userEntity = datastore.get(taskOwnerKey);
-          String userNickname = (String) userEntity.getProperty("nickname");
-          usersNicknames.put(taskOwner, userNickname);
-          out.append(userNickname);
-        } catch (EntityNotFoundException e) {
-          System.err.println(
-              "Unable to find the task's owner info to retrieve the owner's nickname. Setting a default nickname.");
-          out.append("Neighbor");
-        }
-      }
-      out.append("</div>");
-      if (userLoggedIn) {
-        // changes the Help Button div if the current user is the owner of the task
-        if (!userId.equals(taskOwner)) {
-          out.append("<div class='help-out'>HELP OUT</div>");
-        } else {
-          out.append(
-              "<div class='help-out disable-help' title='This is your own task'>HELP OUT</div>");
-        }
-      }
-      out.append("</div>");
-      out.append("<div class='task-content'>")
-          .append((String) entity.getProperty("overview"))
-          .append("</div>");
-      out.append("<div class='task-footer'><div class='task-category'>#")
-          .append((String) entity.getProperty("category"))
-          .append("</div>");
-
-      Timestamp timestamp = new Timestamp((Long) entity.getProperty("timestamp"));
-      SimpleDateFormat timestampFormat = new SimpleDateFormat("HH:mm MM-dd-yyyy");
-
-      out.append("<div class='task-date-time'>")
-          .append((String) timestampFormat.format(timestamp))
-          .append("</div></div></div></div>");
+      taskPages.addTask(entity);
     }
 
+    taskPages.endPages();
+
     Gson gson = new Gson();
-    String json = gson.toJson(out.toString());
+    String json = gson.toJson(taskPages);
     response.setContentType("application/json;");
     response.getWriter().println(json);
   }
@@ -260,7 +183,6 @@ public class TaskServlet extends HttpServlet {
     String formattedAddress = (String) userEntity.getProperty("address");
     String country = (String) userEntity.getProperty("country");
     String zipcode = (String) userEntity.getProperty("zipcode");
-    GeoPt location = (GeoPt) userEntity.getProperty("location");
 
     // Create an Entity that stores the input comment
     Entity taskEntity = new Entity("Task", userEntity.getKey());
@@ -274,7 +196,6 @@ public class TaskServlet extends HttpServlet {
     taskEntity.setProperty("Address", formattedAddress);
     taskEntity.setProperty("zipcode", zipcode);
     taskEntity.setProperty("country", country);
-    taskEntity.setProperty("location", location);
     taskEntity.setProperty("category", taskCategory);
 
     datastore.put(taskEntity);
