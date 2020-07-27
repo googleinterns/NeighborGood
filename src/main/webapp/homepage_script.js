@@ -175,12 +175,9 @@ function confirmHelp(element) {
                 ("We're sorry, but the task you're trying to help with has already been claimed by another user.");
             window.location.href = '/';
         }
-        // fetches tasks again if user's current location was successfully retrieved and stored
-        else if (userNeighborhoodIsKnown()) {
-            fetchTasks(currentCategory, "start").then(response => {
-                    taskGroup = response;
-                    displayTasks();
-                });
+        // hides task from list if it was succesfully claimed
+        else {
+            element.closest(".task").style.display = "none";
         }
     });
 }
