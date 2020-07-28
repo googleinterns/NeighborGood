@@ -299,10 +299,35 @@ section {
   padding-top: 1em;
 }
 
+#tasks-map-wrapper {
+  position: relative;
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.18);
+  display: none;
+}
+
 #tasks-map { 
   height: calc(100vh - 330px);
   max-height: 70vh;
-  display: none;
+}
+
+#confirm-wrapper {
+  display: table;
+  position: absolute;
+  width: 100%;
+  line-height: 1em;
+}
+
+#confirm-map {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+
+#exit-help-map {
+  font-size: 30px;
+  text-align: right;
+  padding-right: 1em;
+  height: calc(50% - 0.5em);
 }
 
 #search-area-control {

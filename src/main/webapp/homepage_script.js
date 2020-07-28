@@ -164,7 +164,7 @@ function switchView(element) {
 /* Helper function that switches to map view */
 function switchToMap() {
     document.getElementById("tasks-list").style.display = "none";
-    document.getElementById("tasks-map").style.display = "block";
+    document.getElementById("tasks-map-wrapper").style.display = "block";
     currentView = "map";
     map.setCenter(userLocation);
     taskGroup.tasks.forEach(task => displayTaskMarker(task));
@@ -172,7 +172,7 @@ function switchToMap() {
 
 /* Helper function that switches to list view */
 function switchToList() {
-    document.getElementById("tasks-map").style.display = "none";
+    document.getElementById("tasks-map-wrapper").style.display = "none";
     document.getElementById("tasks-list").style.display = "block";
     currentView = "list";
 }
@@ -700,7 +700,7 @@ function fetchTasks(category, cursorAction) {
 
 /* Displays the tasks received from the server response */
 function displayTasks(append) {
-    let taskMap = document.getElementById("tasks-map");
+    let taskMap = document.getElementById("tasks-map-wrapper");
     let taskList = document.getElementById("tasks-list");
 
     if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
@@ -846,9 +846,17 @@ function openInfoWindow(map, marker, infoWindow) {
         helpOutButton.innerText = "Help Out";
         helpOutButton.className = "help-out-marker";
         helpOutButton.addEventListener("click", function(e) {
-            if (confirm("Are you sure you want to help out with this task?")) {
+            let helpOverlay = document.getElementById("help-overlay-map");
+            helpOverlay.style.display = "block";
+            document.getElementById("confirm-map").addEventListener("click", function(e) {
                 confirmHelp(marker.get("key"));
-            }
+                helpOverlay.style.display = "none";
+                e.stopPropagation();
+            });
+            document.getElementById("exit-help-map").addEventListener("click", function(e) {
+                helpOverlay.style.display = "none";
+                e.stopPropagation();
+            });
             e.stopPropagation();
         });
         windowNode.appendChild(helpOutButton);
@@ -869,12 +877,13 @@ function addTasksClickHandlers() {
     // adds confirmHelp click event listener to confirm help buttons
     const confirmHelpButtons = document.getElementsByClassName("confirm-help");
     for (let i = 0; i < confirmHelpButtons.length; i++){
-        confirmHelpButtons[i].addEventListener("click", function(e) {
-            let taskKey = e.target.closest(".task").dataset.key;
-            confirmHelp(taskKey);
-            e.stopPropagation();
-        });
-        
+        if (confirmHelpButtons[i].id != "confirm-map") {
+            confirmHelpButtons[i].addEventListener("click", function(e) {
+                let taskKey = e.target.closest(".task").dataset.key;
+                confirmHelp(taskKey);
+                e.stopPropagation();
+            });
+        } 
     }
     // adds exitHelp click event listener to exit help buttons
     const exitHelpButtons = document.getElementsByClassName("exit-help");

@@ -136,7 +136,17 @@
           <!--Listed Tasks Container-->
           <div id="tasks-list"></div>
           <!--Map Tasks Container-->
-          <div id="tasks-map"></div>
+          <div id="tasks-map-wrapper">
+              <div class="help-overlay" id="help-overlay-map">
+                  <div id="exit-help-map"><a>&times</a></div>
+                  <div id="confirm-wrapper">
+                      <a class="confirm-help" id="confirm-map">
+                          CONFIRM
+                      </a>
+                  </div>
+              </div>
+            <div id="tasks-map"></div>
+          </div>
       </section>
       <!--Create Tasks Modal-->
       <div class="modalWrapper" id="createTaskModalWrapper">
