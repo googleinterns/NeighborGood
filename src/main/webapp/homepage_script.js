@@ -373,9 +373,8 @@ async function getTaskInfo(keyString) {
     return info;
 }
 
-async function showTaskInfo(element) {
-    const task = element.closest(".task");
-    const info = await getTaskInfo(task.dataset.key);
+async function showTaskInfo(taskKey) {
+    const info = await getTaskInfo(taskKey);
     var detailContainer = document.getElementById("task-detail-container");
     detailContainer.innerHTML = "";
     detailContainer.appendChild(document.createTextNode(info.detail));
@@ -791,7 +790,6 @@ function createTaskListNode(task) {
 }
 
 function displayTaskMarker(task) {
-    console.log(task);
     // only adds task that aren't already loaded in map
     if (!markersMap.has(task.keyString)) {
         const marker = new google.maps.Marker({
@@ -847,9 +845,16 @@ function openInfoWindow(map, marker, infoWindow) {
         const helpOutButton = document.createElement("button");
         helpOutButton.innerText = "Help Out";
         helpOutButton.className = "help-out-marker";
-        helpOutButton.onclick = () => {confirmHelp(marker.get("key"));}
+        helpOutButton.addEventListener("click", function(e) {
+            confirmHelp(marker.get("key"));
+            e.stopPropagation();
+        });
         windowNode.appendChild(helpOutButton);
     }
+
+    windowNode.addEventListener("click", function() {
+        showTaskInfo(marker.get("key"));
+    });
     
     infoWindow.setContent(windowNode);
     infoWindow.open(map, marker);
@@ -901,7 +906,7 @@ function addTasksClickHandlers() {
     const tasks = document.getElementsByClassName("task");
     for (let i = 0; i < tasks.length; i++) {
         tasks[i].addEventListener("click", function(e) {
-            showTaskInfo(e.target);
+            showTaskInfo(e.target.dataset.key);
         });
     }
 }
