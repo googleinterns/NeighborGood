@@ -24,13 +24,13 @@
     <script type='text/javascript' src='config.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier/1.0.3/oms.min.js"></script>
     <script src="homepage_script.js"></script>
-    <script src="https://kit.fontawesome.com/71105f4105.js" crossorigin="anonymous"></script> 
+    <script src="https://kit.fontawesome.com/71105f4105.js" crossorigin="anonymous"></script>
   </head>
   <%@ page import = "com.google.appengine.api.users.UserService" %>
   <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
   <%@ page import = "com.google.neighborgood.helper.RetrieveUserInfo" %>
   <%@ page import = "java.util.List" %>
-  <% UserService userService = UserServiceFactory.getUserService(); 
+  <% UserService userService = UserServiceFactory.getUserService();
   boolean userLoggedIn = userService.isUserLoggedIn();
   String categoriesClass = userLoggedIn ? "notFullWidth" : "fullWidth";
   %>
@@ -40,7 +40,7 @@
           <nav>
               <div id="dashboard-icon-container">
               <%
-              if (userLoggedIn){ 
+              if (userLoggedIn){
               %>
                   <a href="user_profile.jsp" class="dashboard-icon">
                       <i class="fas fa-user-circle fa-3x" title="Go to User Page"></i>
@@ -57,21 +57,21 @@
               %>
               </div>
 
-              <div id="login-logout">
+              <div id="UI-messages">
           	    <%
             	  if (userLoggedIn) {
                   List<String> userInfo = RetrieveUserInfo.getInfo(userService);
-                  String urlToRedirectToAfterUserLogsOut = "/";
+                  String urlToRedirectToAfterUserLogsOut = "/index.jsp";
                   String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
                   String nickname = (userInfo == null) ? userService.getCurrentUser().getEmail() : userInfo.get(0);
                 %>
-          	      <p class="login-messages"> <%=nickname%> | <a href="<%=logoutUrl%>">Logout</a></p>
+          	      <p class="login-messages" id="login-logout"> <%=nickname%> | <a href="<%=logoutUrl%>" id="loginLogoutMessage">Logout</a></p>
                 <%
                 } else {
                       String urlToRedirectToAfterUserLogsIn = "/account.jsp";
                       String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
                 %>
-                  <p class="login-messages"><a href="<%=loginUrl%>">Login to help out a neighbor!</a></p>
+                  <p class="login-messages"><a href="<%=loginUrl%>" id="loginLogoutMessage">Login to help out a neighbor!</a></p>
                   <%
                     }
                   %>
@@ -100,9 +100,9 @@
                   if (userLoggedIn) {
                   %>
                   <div id="add-task">
-                      <i class="fas fa-plus-circle" aria-hidden="true" id="addtaskbutton" title="Add Task"></i>
+                      <i class="fas fa-plus-circle" aria-hidden="true" id="create-task-button" title="Add Task"></i>
                   </div>
-                  <% 
+                  <%
                   }
                   %>
               </div>
@@ -110,8 +110,9 @@
                 <!--Search By Different Location Input-->
                 <div id="search-box">
                     <label for="place-input">Search from a different location:</label>
-                    <input id="place-input" name="place-input" type="text" placeholder=" Type an address here" class="pac-target-input" autocomplete="off">
+                    <input id="place-input" name="place-input" type="text" placeholder=" Type an address here" autocomplete="off">
                 </div>
+                <!-- View toggle buttons -->
                 <div id="list-map-view">
                     <button id="selected-view" value="list" class="view-option" aria-label="List View">
                         <i class="fas fa-list" aria-hidden="true"></i>
@@ -120,14 +121,13 @@
                         <i class="fas fa-map" aria-hidden="true"></i>
                     </button>
                 </div>
-              </div>
 
               <!--Results Messages-->
               <div id="loading" class="results-message">
                   <img id="loading-gif" src="images/loading.gif" alt="Loading..."/>
               </div>
               <div id="location-missing-message" class="results-message">
-                  We could not retrieve your location to display your neighborhood tasks.
+                  We could not retrieve your location to display your neighborhood tasks. Please use the search box to manually enter a location.
               </div>
               <div id="no-tasks-message" class="results-message">
                   Sorry, there are currently no tasks within the neighborhood for you to help with.
@@ -184,7 +184,7 @@
                   <option value="misc">Misc</option>
                 </select>
                 <br/><br/>
-                <input type="submit" />
+                <input type="submit" id="submit-create-task"/>
             </form>
         </div>
       </div>
@@ -203,7 +203,7 @@
                 <%
                 for (int rank = 1; rank <= 10; rank++) {
                   String rowId = "world" + rank;
-                %> 
+                %>
                   <tr id="<%=rowId%>">
                     <td class="topscore-rank topscores"><%=rank%>.</td>
                     <td class="topscore-nickname topscores">-</td>
@@ -213,7 +213,7 @@
                 }
                 %>
                 </table>
-              </div> 
+              </div>
               <!--Neighborhood Top Scorers-->
               <div id="neighborhood-topscore" class="topScoresDiv">
                 <h2>Neighborhood</h2>
@@ -221,7 +221,7 @@
                 <%
                 for (int rank = 1; rank <= 10; rank++) {
                   String rowId = "neighborhood" + rank;
-                %> 
+                %>
                   <tr id="<%=rowId%>">
                     <td class="topscore-rank topscores"><%=rank%>.</td>
                     <td class="topscore-nickname topscores">-</td>

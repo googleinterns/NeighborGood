@@ -35,6 +35,7 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalUserServiceTestConfig;
 import com.google.common.collect.ImmutableMap;
 import java.io.*;
+import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import org.junit.After;
 import org.junit.Before;
@@ -89,7 +90,7 @@ public final class UserInfoServletTest {
   }
 
   @Test
-  public void normalSingleInputTest() throws IOException {
+  public void normalSingleInputTest() throws IOException, ServletException {
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -149,7 +150,7 @@ public final class UserInfoServletTest {
   }
 
   @Test
-  public void normalMultipleInputTest() throws IOException {
+  public void normalMultipleInputTest() throws IOException, ServletException {
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -237,7 +238,7 @@ public final class UserInfoServletTest {
 
   /** Test the edge case where at least one of the three input fields are empty or spaces. */
   @Test
-  public void emptyInputTest() throws IOException {
+  public void emptyInputTest() throws IOException, ServletException {
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
 

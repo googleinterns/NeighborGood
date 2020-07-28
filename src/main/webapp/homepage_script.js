@@ -86,8 +86,8 @@ if (document.readyState === 'loading') {
 /* Function adds all the necessary UI 'click' event listeners*/
 function addUIClickHandlers() {
     // adds showCreateTaskModal and closeCreateTaskModal click events for the add task button
-    if (document.body.contains(document.getElementById("addtaskbutton"))) {
-        document.getElementById("addtaskbutton").addEventListener("click", showCreateTaskModal);
+    if ((document.getElementById("create-task-button") !== null)) {
+        document.getElementById("create-task-button").addEventListener("click", showCreateTaskModal);
     	document.getElementById("close-addtask-button").addEventListener("click", closeCreateTaskModal);
     }
 
@@ -98,7 +98,7 @@ function addUIClickHandlers() {
             filterTasksBy(e.target.id);
         });
     }
-    // adds showTopScoresModal click event 
+    // adds showTopScoresModal and closeTopScoresModal click event
     document.getElementById("topscore-button").addEventListener("click", showTopScoresModal);
     document.getElementById("close-topscore-button").addEventListener("click", closeTopScoresModal);
 
@@ -434,10 +434,6 @@ function getTasksForUserLocation() {
     script.async = true;
     document.head.appendChild(script);
 
-    // Once the Maps API script has dynamically loaded it gets the user location,
-    // waits until it gets an answer updates the global userLocation variable and then calls
-    // fetchTasks and displayTasks
-    // It also initializes the autocomplete search box and the map.
 	window.initialize = function () {
     
         // initialize map
@@ -616,8 +612,13 @@ function getTasksForUserLocation() {
         getUserLocation().then(callEndOfInitFunctions);
 
         // initialize autocomplete input text search box
+
+        // Once the Maps API script has dynamically loaded it initializes the place autocomplete searchbox
         let placeAutocomplete = new google.maps.places.Autocomplete(document.getElementById("place-input"));
+        // 'geometry' field specifies that returned data will include the place's viewport and lat/lng
         placeAutocomplete.setFields(['geometry']);
+
+        // listener will use the inputted place to retrieve and display tasks
         google.maps.event.addListener(placeAutocomplete, 'place_changed', function() {
                 let place = placeAutocomplete.getPlace();
                 if (place.geometry != undefined) {
