@@ -253,9 +253,17 @@ function confirmHelp(taskKey) {
                 ("We're sorry, but the task you're trying to help with has already been claimed by another user.");
             window.location.href = '/';
         }
-        // hides task from list if it was succesfully claimed
+        // hides task from list and map if it was succesfully claimed
         else {
             document.querySelectorAll("[data-key='" + taskKey +"']")[0].style.display = "none";
+            let marker = markersMap.get(taskKey);
+            marker.setMap(null);
+            oms.forgetMarker(marker);
+            markersMap.delete(taskKey);
+            if (markersMap.size == 0) {
+                document.getElementById("tasks-list").style.display = "none";
+                document.getElementById("no-tasks-message").style.display = "block";
+            }
         }
     });
 }
@@ -279,21 +287,15 @@ function closeCreateTaskModal() {
 function validateTaskForm(id) {
     var result = true;
     var form = document.getElementById(id);
-    var inputName = ["task-overview", "task-detail", "reward", "category", "lat", "lng"];
+    var inputName = ["task-overview", "task-detail", "reward", "category"];
     for (var i = 0; i < inputName.length; i++) {
         var name = inputName[i];
         var inputField = form[name.concat("-input")].value.trim();
         if (inputField === "") {
             result = false;
             form[name.concat("-input")].classList.add("highlight");
-            if (inputName[i] === "lat" || inputName[i] === "lng") {
-                document.getElementById("map").classList.add("highlight");
-            }
         } else {
             form[name.concat("-input")].classList.remove("highlight");
-            if (inputName[i] === "lat" || inputName[i] === "lng") {
-                document.getElementById("map").classList.remove("highlight");
-            }
         }
     }
     if (!result) {
@@ -545,11 +547,8 @@ function getTasksForUserLocation() {
         map.setTilt(45);
         map.addListener('dragend', function() {
             previousNeighborhood = [...neighborhood];
-            console.log("prev" + previousNeighborhood);
             toNeighborhood(map.getCenter().toJSON()).then(() => {
-                console.log("after" + neighborhood);
                 if (previousNeighborhood[0] != neighborhood[0] || previousNeighborhood[1] != neighborhood[1]) {
-                    console.log("inside if");
                     let searchNeighborhoodNode = document.createElement("div");
                     let searchNeighborhood = new SearchAreaControl(searchNeighborhoodNode);
                     searchNeighborhoodNode.index = 1;
@@ -785,6 +784,7 @@ function createTaskListNode(task) {
 }
 
 function displayTaskMarker(task) {
+    console.log(task);
     // only adds task that aren't already loaded in map
     if (!markersMap.has(task.keyString)) {
         const marker = new google.maps.Marker({
