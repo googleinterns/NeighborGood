@@ -846,7 +846,9 @@ function openInfoWindow(map, marker, infoWindow) {
         helpOutButton.innerText = "Help Out";
         helpOutButton.className = "help-out-marker";
         helpOutButton.addEventListener("click", function(e) {
-            confirmHelp(marker.get("key"));
+            if (confirm("Are you sure you want to help out with this task?")) {
+                confirmHelp(marker.get("key"));
+            }
             e.stopPropagation();
         });
         windowNode.appendChild(helpOutButton);
