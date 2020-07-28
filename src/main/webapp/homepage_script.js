@@ -105,13 +105,17 @@ function addUIClickHandlers() {
     // adds closeTaskInfoModal click event
     document.getElementById("task-info-close-button").addEventListener("click", closeTaskInfoModal);
 
+    // adds click event to switch to list view
     document.getElementsByClassName("view-option")[0].addEventListener("click", function(e) {
         switchView(e.target);
     });
+
+    // adds click event to switch to map view
     document.getElementsByClassName("view-option")[1].addEventListener("click", function(e) {
         switchView(e.target);
     });
 
+    // adds click event for the map view's load more tasks control button
     document.getElementById("load-more-tasks-control").addEventListener("click", loadMoreTasks);
 }
 
@@ -169,9 +173,15 @@ function switchToMap() {
     document.getElementById("tasks-list").style.display = "none";
     document.getElementById("tasks-map-wrapper").style.display = "block"
     currentView = "map";
+
+    // centers map on user location
     map.setCenter(userLocation);
+
+    // displays task markers for each task
     taskGroup.tasks.forEach(task => displayTaskMarker(task));
+
     let loadMoreTasksMapControl = document.getElementById("load-more-tasks-control");
+    // hides or shows load more tasks control button if there are more results or not
     if (taskGroup.endOfQuery) loadMoreTasksMapControl.style.display = "none";
     else loadMoreTasksMapControl.style.display = "block";
 }
@@ -213,6 +223,12 @@ function filterTasksBy(category) {
             .then(response => {
                     taskGroup = response;
                     displayTasks();
+                    markersMap.forEach((marker) => {
+                        oms.forgetMarker(marker);
+                        marker.setMap(null);
+                    });
+                    markersMap.clear();
+                    taskGroup.tasks.forEach(task => displayTaskMarker(task));
                 });
     }
 	// Unhighlights and resets styling for all category buttons
@@ -262,14 +278,23 @@ function confirmHelp(taskKey) {
         }
         // hides task from list and map if it was succesfully claimed
         else {
+
+            // hides task that was claimed from list
             document.querySelectorAll("[data-key='" + taskKey +"']")[0].style.display = "none";
             
+            // if in list view keeps tabs on which tasks have been claimed so they are later not displayed in map view
             if (currentView == "list") {
                 markersToHide.set(taskKey, markersMap.get(taskKey));
             }
+
+            // deletes task markers from map
+            // (when switching to map view, displayTaskMarker is called again, 
+            // which will retrieve all task markers again until reload -
+            // this is where markersToHide comes along)
             oms.forgetMarker(markersMap.get(taskKey));
             markersMap.get(taskKey).setMap(null);
             markersMap.delete(taskKey);
+
             if (markersMap.size == 0) {
                 document.getElementById("tasks-list").style.display = "none";
                 document.getElementById("no-tasks-message").style.display = "block";
@@ -556,6 +581,8 @@ function getTasksForUserLocation() {
         });
         map.setTilt(45);
 
+        // creates event listener for dragging and releasing map. If map is centered in a new neighborhood,
+        // then the Search this neighborhood control appears.
         map.addListener('dragend', function() {
             previousNeighborhood = [...neighborhood];
             toNeighborhood(map.getCenter().toJSON()).then(() => {
@@ -567,6 +594,7 @@ function getTasksForUserLocation() {
                 } 
             });
         });
+
         // closes info windows if user clicks anywhere else on the map
         map.addListener("click", (event) => {
             infoWindows.forEach(infoWindow => {
@@ -574,6 +602,8 @@ function getTasksForUserLocation() {
                 });
         });
 
+        // Helper class that spiderfies markers that are exactly in the same lat/lng coordinates
+        // this is helpful to visualized several tasks from the same user with the same location coordinates
         oms = new OverlappingMarkerSpiderfier(map, {
             markersWontMove: true,
             markersWontHide: false,
@@ -581,7 +611,8 @@ function getTasksForUserLocation() {
             keepSpiderfied: true
         });
 
-        // gets user location, then calls helper function that calls toNeighborhood, fetchTasks, and displayTasks
+        // gets user location, then calls helper function that calls helper function
+        // that calls toNeighborhood, fetchTasks, and displayTasks
         getUserLocation().then(callEndOfInitFunctions);
 
         // initialize autocomplete input text search box
@@ -594,12 +625,14 @@ function getTasksForUserLocation() {
                 } else {
                     userLocation = userActualLocation;
                 }
+                // calls helper function that calls toNeighborhood, fetchTasks, and displayTasks
                 callEndOfInitFunctions();
               });
 
 	}
 }
 
+// Helper function that calls the end of the initialize functions
 function callEndOfInitFunctions() {
     toNeighborhood(userLocation)
         .then(() => fetchTasks(currentCategory, "clear"))
@@ -623,31 +656,23 @@ function SearchNeighborhoodMapControl(controlNode) {
     controlUI.title = "Click to search current neighborhood";
     controlUI.textContent = "Search current neighborhood";
     controlNode.appendChild(controlUI);
+    // adds click event listener to search by the new neighborhood area
     controlUI.addEventListener("click", function() {
         fetchTasks(currentCategory, "clear")
             .then(response => {
                     taskGroup = response;
                     displayTasks();
+                    // clears markers from previous neighborhood
                     markersMap.forEach((marker) => {
                         oms.forgetMarker(marker);
                         marker.setMap(null);
                     });
                     markersMap.clear();
+                    // displays new markers
                     taskGroup.tasks.forEach(task => displayTaskMarker(task));
+                    // removes search neighborhood control button
                     controlNode.remove();
                 })
-    });
-}
-
-function LoadMoreTasksControl(controlNode) {
-    const controlUI = document.createElement("div");
-    controlUI.setAttribute("id", "load-more-tasks-control");
-    controlUI.className = "map-control";
-    controlUI.title = "Click to load more tasks";
-    controlUI.textContent = "Load more tasks";
-    controlNode.appendChild(controlUI);
-    controlUI.addEventListener("click", function() {
-        loadMoreTasks();
     });
 }
 
@@ -825,8 +850,9 @@ function createTaskListNode(task) {
     return taskDiv;
 }
 
+// Loads and displays markers for each task fetched that hasn't been added or claimed already
 function displayTaskMarker(task) {
-    // only adds task that aren't already loaded in map
+    // only adds task that aren't already loaded in map and that haven't been claimed in the list-view already
     if (!markersMap.has(task.keyString) && !markersToHide.has(task.keyString)) {
         const marker = new google.maps.Marker({
             position: {lat: task.lat, lng: task.lng},
@@ -841,10 +867,9 @@ function displayTaskMarker(task) {
         markersMap.set(marker.get("key"), marker);
 
         const infoWindow = new google.maps.InfoWindow;
-        infoWindow.addListener("closeclick", () => {
-        });
 
-        const geocoder = new google.maps.Geocoder;
+        // adds marker click listener to close all other opened infowindows
+        // and then open the current marker's infowindow
         marker.addListener("spider_click", () => {
             infoWindows.forEach(infoWindow => {
                     infoWindow.close();
@@ -884,14 +909,20 @@ function openInfoWindow(map, marker, infoWindow) {
         const helpOutButton = document.createElement("button");
         helpOutButton.innerText = "Help Out";
         helpOutButton.className = "help-out-marker";
+
+        // adds help out button click event
         helpOutButton.addEventListener("click", function(e) {
             let helpOverlay = document.getElementById("help-overlay-map");
             helpOverlay.style.display = "block";
+
+            // adds confirm help click event
             document.getElementById("confirm-map").addEventListener("click", function(e) {
                 confirmHelp(marker.get("key"));
                 helpOverlay.style.display = "none";
                 e.stopPropagation();
             });
+
+            // adss exit help click event
             document.getElementById("exit-help-map").addEventListener("click", function(e) {
                 helpOverlay.style.display = "none";
                 e.stopPropagation();
@@ -901,6 +932,7 @@ function openInfoWindow(map, marker, infoWindow) {
         windowNode.appendChild(helpOutButton);
     }
 
+    // adds click even to open up the task details modal
     windowNode.addEventListener("click", function() {
         showTaskInfo(marker.get("key"));
     });
