@@ -90,6 +90,7 @@ public final class Task {
     setDateTime();
   }
 
+  // Constructor with provided ownerId, ownerNickn, ownerLat, and ownerLng
   public Task(
       Entity entity, String ownerId, String ownerNickname, Double ownerLat, Double ownerLng) {
     this.keyString = KeyFactory.keyToString(entity.getKey());
