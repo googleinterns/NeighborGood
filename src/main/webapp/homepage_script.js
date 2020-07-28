@@ -593,9 +593,10 @@ function callEndOfInitFunctions() {
         .then(response => {
                 taskGroup = response;
                 displayTasks();
+                map.setCenter(userLocation);
+                taskGroup.tasks.forEach(task => displayTaskMarker(task));
             })
         .catch(() => {
-            console.error("User location and/or neighborhood could not be retrieved");
             document.getElementById("loading").style.display = "none";
             document.getElementById("location-missing-message").style.display = "block";
         });
