@@ -103,11 +103,11 @@ async function loadMessages(keyString) {
     const msgContainer = document.getElementById("message-container");
     msgContainer.innerHTML = "";
     if (msgResponse.length === 10) {
-        var msg = msgResponse[9];
-        var newMessage = document.createElement("div");
+        let msg = msgResponse[9];
+        let newMessage = document.createElement("div");
         newMessage.className = msg.className;
         newMessage.appendChild(document.createTextNode(msg.message)); 
-        var moreMessageBtn = document.createElement("button");
+        let moreMessageBtn = document.createElement("button");
         moreMessageBtn.setAttribute("class", "more-msg-button");
         moreMessageBtn.textContent = "Load 10 more messages";
         moreMessageBtn.addEventListener("click", function() { 

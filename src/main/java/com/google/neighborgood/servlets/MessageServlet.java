@@ -152,7 +152,7 @@ public class MessageServlet extends HttpServlet {
       return;
     }
 
-    // Get all stored entity ke related with the task that corresponds to the given taskId
+    // Get all stored entity keys related with the task that corresponds to the given taskId
     Filter filter = new FilterPredicate("taskId", FilterOperator.EQUAL, taskId);
     Query query = new Query("Message").setFilter(filter).setKeysOnly();
 
