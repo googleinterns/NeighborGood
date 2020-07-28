@@ -23,9 +23,9 @@ let userActualLocation = null;
 let currentCategory = "all";
 let currentView = "list";
 let markersMap = new Map();
+let markersToHide = new Map();
 let infoWindows = [];
 let taskGroup = null;
-let markersToHide = new Map();
 
 /* Changes navbar background upon resize */
 window.addEventListener("resize", function() {
@@ -846,6 +846,9 @@ function displayTaskMarker(task) {
 
         const geocoder = new google.maps.Geocoder;
         marker.addListener("spider_click", () => {
+            infoWindows.forEach(infoWindow => {
+                    infoWindow.close();
+                });
             openInfoWindow(map, marker, infoWindow);
         });
         oms.addMarker(marker);
