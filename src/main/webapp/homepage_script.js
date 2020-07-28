@@ -200,7 +200,6 @@ function loadMoreTasks() {
                 .then(response => {
                         taskGroup = response;
                         displayTasks(true);
-                        taskGroup.tasks.forEach(task => displayTaskMarker(task));
                     });
         } else if (!document.getElementById("no-more-tasks")) {
             let noMoreTasksDiv = document.createElement("div");
@@ -223,12 +222,6 @@ function filterTasksBy(category) {
             .then(response => {
                     taskGroup = response;
                     displayTasks();
-                    markersMap.forEach((marker) => {
-                        oms.forgetMarker(marker);
-                        marker.setMap(null);
-                    });
-                    markersMap.clear();
-                    taskGroup.tasks.forEach(task => displayTaskMarker(task));
                 });
     }
 	// Unhighlights and resets styling for all category buttons
@@ -266,7 +259,7 @@ function helpOut(element) {
 offers to help out, edits the task's status and helper properties, and
 then reloads the task list */
 function confirmHelp(taskKey) {
-    if (!markersMap.has(taskKey)) return;
+    if (!markersMap.has(taskKey) || markersToHide.has(taskKey)) return;
     const url = "/tasks/edit?task-id=" + taskKey + "&action=helpout";
     const request = new Request(url, {method: "POST"});
     fetch(request).then((response) => {
@@ -282,10 +275,8 @@ function confirmHelp(taskKey) {
             // hides task that was claimed from list
             document.querySelectorAll("[data-key='" + taskKey +"']")[0].style.display = "none";
             
-            // if in list view keeps tabs on which tasks have been claimed so they are later not displayed in map view
-            if (currentView == "list") {
-                markersToHide.set(taskKey, markersMap.get(taskKey));
-            }
+            // keeps tabs on which tasks have been claimed so they are later not displayed in map view
+            markersToHide.set(taskKey, markersMap.get(taskKey));
 
             // deletes task markers from map
             // (when switching to map view, displayTaskMarker is called again, 
@@ -639,9 +630,8 @@ function callEndOfInitFunctions() {
         .then(() => fetchTasks(currentCategory, "clear"))
         .then(response => {
                 taskGroup = response;
-                displayTasks();
                 map.setCenter(userLocation);
-                taskGroup.tasks.forEach(task => displayTaskMarker(task));
+                displayTasks();
             })
         .catch(() => {
             document.getElementById("loading").style.display = "none";
@@ -663,14 +653,6 @@ function SearchNeighborhoodMapControl(controlNode) {
             .then(response => {
                     taskGroup = response;
                     displayTasks();
-                    // clears markers from previous neighborhood
-                    markersMap.forEach((marker) => {
-                        oms.forgetMarker(marker);
-                        marker.setMap(null);
-                    });
-                    markersMap.clear();
-                    // displays new markers
-                    taskGroup.tasks.forEach(task => displayTaskMarker(task));
                     // removes search neighborhood control button
                     controlNode.remove();
                 })
@@ -761,13 +743,27 @@ function displayTasks(append) {
     let taskMap = document.getElementById("tasks-map-wrapper");
     let taskList = document.getElementById("tasks-list");
 
+    if (!append) {
+        // clears old markers
+        markersMap.forEach((marker) => {
+            oms.forgetMarker(marker);
+            marker.setMap(null);
+        });
+        markersMap.clear();     
+    }
+
     if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
+
+        if (!append) taskList.innerHTML = "";
+        
         document.getElementById("no-tasks-message").style.display = "none";
 
-        if (!append) {
-            taskList.innerHTML = "";
-        }
+        // displays new marker tasks
+        taskGroup.tasks.forEach(task => displayTaskMarker(task));
+
+        //displays new listed tasks
         taskGroup.tasks.map(createTaskListNode).forEach(node => taskList.appendChild(node));
+        
         addTasksClickHandlers();
 
         let loadMoreTasksMapControl = document.getElementById("load-more-tasks-control");

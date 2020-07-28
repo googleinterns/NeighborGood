@@ -121,6 +121,7 @@
                         <i class="fas fa-map" aria-hidden="true"></i>
                     </button>
                 </div>
+              </div>
 
               <!--Results Messages-->
               <div id="loading" class="results-message">
