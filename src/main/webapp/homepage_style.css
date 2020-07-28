@@ -46,10 +46,7 @@ nav {
 }
 
 #login-logout {
-  padding-right: 1em;
   padding-top: 0.8em;
-  text-align: right;
-  width: calc(calc(100vw - 60em) / 2);
 }
 
 a {
@@ -85,6 +82,9 @@ i:hover {
 .login-messages {
   margin-top: 0;
   margin-bottom: 0.5em;
+  text-align: right;
+  padding-right: 1em;
+  width: calc(calc(100vw - 60em) / 2);
 }
 
 /* Main Content Styling */
@@ -100,7 +100,12 @@ section {
   margin: auto;
   max-width: 55em;
   justify-content: space-between;
-  padding-bottom: 1.5em;
+  padding-bottom: 0.5em;
+}
+
+#search-box {
+  padding: 0.5em 0.5em 1em 0.5em;
+  visibility: hidden;
 }
 
 #control-bar-message-wrapper {
@@ -169,6 +174,7 @@ section {
 
 #loading {
   display: block;
+  margin-top: -2em;
 }
 
 #tasks-list {
@@ -376,11 +382,15 @@ td {
     width: auto;
   }
 
+  .login-messages {
+    width: auto;
+  }
+
   #control-bar {
     display: block;
     width: 95%;
     margin: auto;
-    padding-bottom: 0.7em;
+    padding-bottom: 0;
   }
 
   #categories {
@@ -412,6 +422,15 @@ td {
 
   #create-task-button {
     font-size: 2.5em;
+  }
+
+  #search-box {
+    padding-top: 0;
+    margin-top: -0.5em;
+  }
+
+  #place-input {
+    display: block;
   }
 
   .results-message {
@@ -453,6 +472,10 @@ td {
   #control-bar-message-wrapper {
     top: 80px;
     padding-top: 0;
+  }
+
+  .login-messages {
+    width: auto;
   }
 
   nav {

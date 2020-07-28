@@ -15,6 +15,7 @@
 const MAPSKEY = config.MAPS_KEY
 let neighborhood = [null , null];
 let userLocation = null;
+let userActualLocation = null;
 let currentCategory = "all";
 let taskGroup = null;
 
@@ -307,15 +308,38 @@ begins the processes of retrieving the user's location*/
 function getTasksForUserLocation() {
     const script = document.createElement("script");
     script.type = "text/javascript";
-    script.src =  "https://maps.googleapis.com/maps/api/js?key=" + MAPSKEY + "&callback=initialize&language=en";
+    script.src =  "https://maps.googleapis.com/maps/api/js?key=" + MAPSKEY + "&callback=initialize&libraries=places&language=en";
     script.defer = true;
     script.async = true;
     document.head.appendChild(script);
 
-    // Once the Maps API script has dynamically loaded it gets the user location,
-    // waits until it gets an answer updates the global userLoaction variable and then calls
-    // fetchTasks and displayTasks
 	window.initialize = function () {
+        // Once the Maps API script has dynamically loaded it initializes the place autocomplete searchbox
+        let placeAutocomplete = new google.maps.places.Autocomplete(document.getElementById("place-input"));
+        // 'geometry' field specifies that returned data will include the place's viewport and lat/lng
+        placeAutocomplete.setFields(['geometry']);
+
+        // listener will use the inputted place to retrieve and display tasks
+        google.maps.event.addListener(placeAutocomplete, 'place_changed', function() {
+                let place = placeAutocomplete.getPlace();
+                if (place.geometry != undefined) {
+                    userLocation = place.geometry.location.toJSON();
+                } else {
+                    userLocation = userActualLocation;
+                }
+                toNeighborhood(userLocation)
+                        .then(() => fetchTasks(currentCategory, "clear"))
+                        .then(response => {
+                                taskGroup = response;
+                                displayTasks(response);
+                            })
+                        .catch(() => {
+                            document.getElementById("loading").style.display = "none";
+                            document.getElementById("location-missing-message").style.display = "block";
+                        });
+              });
+        // Once the Maps API script has dynamically loaded it initializes it gets the user location,
+        // retrieves the neighborhood from the location coordinates, fetches the tasks, and displays them
          getUserLocation().then(location => toNeighborhood(location))
         	.then(() => fetchTasks(currentCategory, "clear"))
             .then(response => {
@@ -323,7 +347,6 @@ function getTasksForUserLocation() {
                     displayTasks();
                 })
             .catch(() => {
-                console.error("User location and/or neighborhood could not be retrieved");
                 document.getElementById("loading").style.display = "none";
                 document.getElementById("location-missing-message").style.display = "block";
             });
@@ -338,6 +361,7 @@ function getUserLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 userLocation = {lat: position.coords.latitude, lng: position.coords.longitude};
+                userActualLocation = userLocation;
                 resolve(userLocation);
             }, function() {
                 fetch(request).then(response => {
@@ -346,6 +370,7 @@ function getUserLocation() {
                     } else {
                         response.json().then(jsonresponse => {
                             userLocation = jsonresponse["location"];
+                            userActualLocation = userLocation;
                             resolve(userLocation);
                         });
                     }
@@ -358,6 +383,7 @@ function getUserLocation() {
                     } else {
                         response.json().then(jsonresponse => {
                             userLocation = jsonresponse["location"];
+                            userActualLocation = userLocation;
                             resolve(userLocation);
                         });
                     }
@@ -410,18 +436,18 @@ function fetchTasks(category, cursorAction) {
 function displayTasks(append) {
     if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
         document.getElementById("no-tasks-message").style.display = "none";
-        document.getElementById("loading").style.display = "none";
         document.getElementById("tasks-message").style.display = "block";
         if (append) document.getElementById("tasks-list").innerHTML += taskGroup.tasks;
         else document.getElementById("tasks-list").innerHTML = taskGroup.tasks;
         document.getElementById("tasks-list").style.display = "block";
         addTasksClickHandlers();
     } else {
-        document.getElementById("loading").style.display = "none";
         document.getElementById("no-tasks-message").style.display = "block";
         document.getElementById("tasks-message").style.display = "none";
         document.getElementById("tasks-list").style.display = "none";
     }
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("search-box").style.visibility = "visible";
 }
 
 /* Function adds all the necessary tasks 'click' event listeners*/

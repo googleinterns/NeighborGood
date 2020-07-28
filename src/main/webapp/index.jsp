@@ -105,13 +105,17 @@
                   }
                   %>
               </div>
+              <div id="search-box">
+                <label for="place-input">Search tasks in a different location:</label>
+                <input id="place-input" name="place-input" type="text" placeholder=" Type an address here" autocomplete="off">
+              </div>
 
               <!--Results Messages-->
               <div id="loading" class="results-message">
                   <img id="loading-gif" src="images/loading.gif" alt="Loading..."/>
               </div>
               <div id="location-missing-message" class="results-message">
-                  We could not retrieve your location to display your neighborhood tasks.
+                  We could not retrieve your location to display your neighborhood tasks. Please use the search box to manually enter a location.
               </div>
               <div id="tasks-message" class="results-message">
                   These are the most recent tasks in your neighborhood:
