@@ -549,9 +549,9 @@ function getTasksForUserLocation() {
             toNeighborhood(map.getCenter().toJSON()).then(() => {
                 if (previousNeighborhood[0] != neighborhood[0] || previousNeighborhood[1] != neighborhood[1]) {
                     let searchNeighborhoodNode = document.createElement("div");
-                    let searchNeighborhood = new SearchAreaControl(searchNeighborhoodNode);
                     searchNeighborhoodNode.index = 1;
                     map.controls[google.maps.ControlPosition.TOP_CENTER].push(searchNeighborhoodNode);
+                    new SearchNeighborhoodMapControl(searchNeighborhoodNode);
                 } 
             });
         });
@@ -601,12 +601,12 @@ function callEndOfInitFunctions() {
         });
 }
 
-/** Constructs Search Area Map Control */
-function SearchAreaControl(controlNode) {
+/** Constructs Search Neighborhood Map Control */
+function SearchNeighborhoodMapControl(controlNode) {
     const controlUI = document.createElement("div");
     controlUI.setAttribute("id", "search-area-control");
     controlUI.title = "Click to search current neighborhood";
-    controlUI.textContent = "Search current area";
+    controlUI.textContent = "Search current neighborhood";
     controlNode.appendChild(controlUI);
     controlUI.addEventListener("click", function() {
         fetchTasks(currentCategory, "clear")
@@ -703,12 +703,12 @@ function displayTasks(append) {
     let taskMap = document.getElementById("tasks-map");
     let taskList = document.getElementById("tasks-list");
 
-    console.log(taskGroup);
-
     if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
         document.getElementById("no-tasks-message").style.display = "none";
 
-        if (!append) taskList.innerHTML = "";
+        if (!append) {
+            taskList.innerHTML = "";
+        }
         taskGroup.tasks.map(createTaskListNode).forEach(node => taskList.appendChild(node));
         addTasksClickHandlers();
 
@@ -720,6 +720,7 @@ function displayTasks(append) {
             taskList.style.display = "none";
         }
     } else {
+        taskList.innerHTML = "";
         document.getElementById("no-tasks-message").style.display = "block";
         taskList.style.display = "none";
     }
