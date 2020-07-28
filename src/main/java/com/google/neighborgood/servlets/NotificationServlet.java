@@ -42,7 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 public class NotificationServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // Make sure that the user has already logged into his account
+    // Make sure that the user has already logged into their account
     UserService userService = UserServiceFactory.getUserService();
     if (!userService.isUserLoggedIn()) {
       response.sendRedirect(userService.createLoginURL("/account.jsp"));

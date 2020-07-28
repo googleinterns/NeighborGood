@@ -393,7 +393,7 @@ async function showNotifications() {
     const noticeContainer = document.getElementById("notice-container");
     noticeContainer.innerHTML = "";
     if (notifiResponse.length === 0) return;
-    var totalCnt = 0;
+    let totalCnt = 0;
     for (var index = 0; index < notifiResponse.length; index++) {
         var li = document.createElement("li");
         var notification = notifiResponse[index];

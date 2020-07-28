@@ -99,23 +99,8 @@ public class EditTaskServlet extends HttpServlet {
         }
       }
       // When a user takes a new task, send the user notifications for the messages that the owner
-      // writes before he takes the task
-      Filter idFilter = new FilterPredicate("taskId", FilterOperator.EQUAL, keyString);
-      Filter receiverFilter = new FilterPredicate("receiver", FilterOperator.EQUAL, "N/A");
-      CompositeFilter filter = CompositeFilterOperator.and(idFilter, receiverFilter);
-      Query query = new Query("Notification").setFilter(filter);
-
-      PreparedQuery results = datastore.prepare(query);
-
-      if (!userService.isUserLoggedIn()) {
-        response.sendRedirect(userService.createLoginURL("/account.jsp"));
-        return;
-      }
-
-      for (Entity notificationEntity : results.asIterable()) {
-        notificationEntity.setProperty("receiver", userService.getCurrentUser().getUserId());
-        datastore.put(notificationEntity);
-      }
+      // writes before they takes the task
+      getPastNotificationsForClaimedTasks(keyString, response);
       return;
     }
 
@@ -195,5 +180,28 @@ public class EditTaskServlet extends HttpServlet {
     datastore.put(task);
 
     response.sendRedirect(request.getHeader("Referer"));
+  }
+
+  private void getPastNotificationsForClaimedTasks(String keyString, HttpServletResponse response)
+      throws IOException {
+    UserService userService = UserServiceFactory.getUserService();
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    Filter idFilter = new FilterPredicate("taskId", FilterOperator.EQUAL, keyString);
+    Filter receiverFilter = new FilterPredicate("receiver", FilterOperator.EQUAL, "N/A");
+    CompositeFilter filter = CompositeFilterOperator.and(idFilter, receiverFilter);
+    Query query = new Query("Notification").setFilter(filter);
+
+    PreparedQuery results = datastore.prepare(query);
+
+    if (!userService.isUserLoggedIn()) {
+      response.sendRedirect(userService.createLoginURL("/account.jsp"));
+      return;
+    }
+
+    for (Entity notificationEntity : results.asIterable()) {
+      notificationEntity.setProperty("receiver", userService.getCurrentUser().getUserId());
+      datastore.put(notificationEntity);
+    }
   }
 }

@@ -55,7 +55,7 @@ public final class NotificationServletTest {
               new LocalDatastoreServiceTestConfig(), new LocalUserServiceTestConfig())
           .setEnvIsAdmin(true)
           .setEnvIsLoggedIn(true)
-          .setEnvEmail("leonardzhang@google.com")
+          .setEnvEmail("leonard@xxx.com")
           .setEnvAuthDomain("1234567890")
           .setEnvAttributes(
               ImmutableMap.of(
@@ -81,7 +81,7 @@ public final class NotificationServletTest {
     userEntity = new Entity("UserInfo", "1234567890");
     userEntity.setProperty("nickname", "Leonard");
     userEntity.setProperty("address", "xxx");
-    userEntity.setProperty("email", "leonardzhang@google.com");
+    userEntity.setProperty("email", "leonard@xxx.com");
     userEntity.setProperty("userId", "1234567890");
     userEntity.setProperty("country", "US");
     userEntity.setProperty("zipcode", "15213");
@@ -199,7 +199,7 @@ public final class NotificationServletTest {
 
   @Test
   public void doGetTest() throws IOException {
-    // Ensure that there are 8 notificationi entity at the beginning
+    // Ensure that there are 8 notification entity at the beginning
     assertEquals(8, ds.prepare(new Query("Notification")).countEntities(withLimit(10)));
 
     StringWriter stringWriter = new StringWriter();

@@ -135,14 +135,24 @@ public class MessageServlet extends HttpServlet {
     datastore.put(msgEntity);
 
     // After storing the message, create a notification entity to notify the receiver
+    notifyReceiver(taskId);
+
+    response.sendRedirect(request.getHeader("Referer"));
+  }
+
+  // Notify the receiver of a certain message according to the given task id information
+  private void notifyReceiver(String taskId) {
     Key taskKey = KeyFactory.stringToKey(taskId);
 
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    UserService userService = UserServiceFactory.getUserService();
     Entity taskEntity;
     try {
       taskEntity = datastore.get(taskKey);
     } catch (EntityNotFoundException e) {
-      System.err.println("Unable to find the entity based on the input key");
-      response.sendError(HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
+      System.err.println(
+          String.format(
+              "Unable to find the entity based on the input key %s for task %s", taskKey, taskId));
       return;
     }
 
@@ -161,8 +171,6 @@ public class MessageServlet extends HttpServlet {
       return;
     }
     datastore.put(notificationEntity);
-
-    response.sendRedirect(request.getHeader("Referer"));
   }
 
   @Override
