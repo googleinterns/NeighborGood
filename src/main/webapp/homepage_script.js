@@ -25,6 +25,7 @@ let currentView = "list";
 let markersMap = new Map();
 let infoWindows = [];
 let taskGroup = null;
+let markersToHide = new Map();
 
 /* Changes navbar background upon resize */
 window.addEventListener("resize", function() {
@@ -248,9 +249,9 @@ function helpOut(element) {
 /* Function sends a fetch request to the edit task servlet when the user
 offers to help out, edits the task's status and helper properties, and
 then reloads the task list */
-function confirmHelp(key) {
-    console.log(key);
-    const url = "/tasks/edit?task-id=" + key + "&action=helpout";
+function confirmHelp(taskKey) {
+    if (!markersMap.has(taskKey)) return;
+    const url = "/tasks/edit?task-id=" + taskKey + "&action=helpout";
     const request = new Request(url, {method: "POST"});
     fetch(request).then((response) => {
         // checks if another user has already claimed the task
@@ -262,18 +263,18 @@ function confirmHelp(key) {
         // hides task from list and map if it was succesfully claimed
         else {
             document.querySelectorAll("[data-key='" + taskKey +"']")[0].style.display = "none";
-            console.log(markersMap);
-            let marker = markersMap.get(taskKey);
-            console.log(taskKey);
-            console.log(marker);
-            marker.setMap(null);
-            oms.forgetMarker(marker);
+            
+            if (currentView == "list") {
+                markersToHide.set(taskKey, markersMap.get(taskKey));
+            }
+            oms.forgetMarker(markersMap.get(taskKey));
+            markersMap.get(taskKey).setMap(null);
             markersMap.delete(taskKey);
-            console.log(markersMap);
             if (markersMap.size == 0) {
                 document.getElementById("tasks-list").style.display = "none";
                 document.getElementById("no-tasks-message").style.display = "block";
             }
+            
         }
     });
 }
@@ -575,8 +576,9 @@ function getTasksForUserLocation() {
 
         oms = new OverlappingMarkerSpiderfier(map, {
             markersWontMove: true,
-            markersWontHide: true,
-            basicFormatEvents: true
+            markersWontHide: false,
+            basicFormatEvents: true,
+            keepSpiderfied: true
         });
 
         // gets user location, then calls helper function that calls toNeighborhood, fetchTasks, and displayTasks
@@ -819,10 +821,8 @@ function createTaskListNode(task) {
 }
 
 function displayTaskMarker(task) {
-    console.log("task keystring");
-    console.log(task.keyString);
     // only adds task that aren't already loaded in map
-    if (!markersMap.has(task.keyString)) {
+    if (!markersMap.has(task.keyString) && !markersToHide.has(task.keyString)) {
         const marker = new google.maps.Marker({
             position: {lat: task.lat, lng: task.lng},
             map: map,
@@ -834,8 +834,6 @@ function displayTaskMarker(task) {
             dateTime: task.dateTime,
             key: task.keyString});
         markersMap.set(marker.get("key"), marker);
-        console.log("marker get key inside displayTaskMarker");
-        console.log(marker.get("key"));
 
         const infoWindow = new google.maps.InfoWindow;
         infoWindow.addListener("closeclick", () => {
@@ -844,11 +842,6 @@ function displayTaskMarker(task) {
         const geocoder = new google.maps.Geocoder;
         marker.addListener("spider_click", () => {
             openInfoWindow(map, marker, infoWindow);
-            console.log("marker get key inside click");
-            console.log(marker.get("key"));
-
-            console.log("task key inside click");
-            console.log(task.keyString);
         });
         oms.addMarker(marker);
     }
@@ -887,7 +880,6 @@ function openInfoWindow(map, marker, infoWindow) {
             let helpOverlay = document.getElementById("help-overlay-map");
             helpOverlay.style.display = "block";
             document.getElementById("confirm-map").addEventListener("click", function(e) {
-                console.log(marker.get("key"));
                 confirmHelp(marker.get("key"));
                 helpOverlay.style.display = "none";
                 e.stopPropagation();
