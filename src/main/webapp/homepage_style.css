@@ -305,6 +305,17 @@ section {
   display: none;
 }
 
+#search-area-control {
+  background-color: #fff;
+  color: rgb(61,61,61);
+  font-size: 14px;
+  padding: 10px 20px;
+  margin-top: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+  -webkit-font-smoothing: antialiased;
+}
+
 /* Add modal styling */
 .modalWrapper {
   display: none; /* Hidden by default */

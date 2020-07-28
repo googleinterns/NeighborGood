@@ -543,6 +543,20 @@ function getTasksForUserLocation() {
             ],
         });
         map.setTilt(45);
+        map.addListener('dragend', function() {
+            previousNeighborhood = [...neighborhood];
+            console.log("prev" + previousNeighborhood);
+            toNeighborhood(map.getCenter().toJSON()).then(() => {
+                console.log("after" + neighborhood);
+                if (previousNeighborhood[0] != neighborhood[0] || previousNeighborhood[1] != neighborhood[1]) {
+                    console.log("inside if");
+                    let searchNeighborhoodNode = document.createElement("div");
+                    let searchNeighborhood = new SearchAreaControl(searchNeighborhoodNode);
+                    searchNeighborhoodNode.index = 1;
+                    map.controls[google.maps.ControlPosition.TOP_CENTER].push(searchNeighborhoodNode);
+                } 
+            });
+        });
 
         oms = new OverlappingMarkerSpiderfier(map, {
             markersWontMove: true,
@@ -581,6 +595,24 @@ function callEndOfInitFunctions() {
             document.getElementById("loading").style.display = "none";
             document.getElementById("location-missing-message").style.display = "block";
         });
+}
+
+/** Constructs Search Area Map Control */
+function SearchAreaControl(controlNode) {
+    const controlUI = document.createElement("div");
+    controlUI.setAttribute("id", "search-area-control");
+    controlUI.title = "Click to search current neighborhood";
+    controlUI.textContent = "Search current area";
+    controlNode.appendChild(controlUI);
+    controlUI.addEventListener("click", function() {
+        fetchTasks(currentCategory, "clear")
+            .then(response => {
+                    taskGroup = response;
+                    displayTasks();
+                    taskGroup.tasks.forEach(task => displayTaskMarker(task));
+                    controlNode.remove();
+                })
+    });
 }
 
 /* Function that returns a promise to get and return the user's location */
@@ -686,7 +718,6 @@ function displayTasks(append) {
     } else {
         document.getElementById("no-tasks-message").style.display = "block";
         taskList.style.display = "none";
-        taskMap.style.display = "none";
     }
     document.getElementById("loading").style.display = "none";
 }
@@ -754,30 +785,31 @@ function createTaskListNode(task) {
 }
 
 function displayTaskMarker(task) {
-    let lat = task.lat;// + (Math.random() - 0.5) / 3000;
-    let lng = task.lng;// + (Math.random() - 0.5) / 3000;
-    const marker = new google.maps.Marker({
-        position: {lat: lat, lng: lng},
-        map: map,
-        isCurrentUser: task.isOwnerCurrentUser,
-        detail: task.detail,
-        overview: task.overview,
-        category: task.category,
-        owner: task.owner,
-        dateTime: task.dateTime,
-        key: task.keyString});
-    markersMap.set(marker.get("key"), marker);
+    // only adds task that aren't already loaded in map
+    if (!markersMap.has(task.keyString)) {
+        const marker = new google.maps.Marker({
+            position: {lat: task.lat, lng: task.lng},
+            map: map,
+            isCurrentUser: task.isOwnerCurrentUser,
+            detail: task.detail,
+            overview: task.overview,
+            category: task.category,
+            owner: task.owner,
+            dateTime: task.dateTime,
+            key: task.keyString});
+        markersMap.set(marker.get("key"), marker);
 
-    const infoWindow = new google.maps.InfoWindow;
-    infoWindow.addListener("closeclick", () => {
-        infoWindowsOpened--;
-    });
+        const infoWindow = new google.maps.InfoWindow;
+        infoWindow.addListener("closeclick", () => {
+            infoWindowsOpened--;
+        });
 
-    const geocoder = new google.maps.Geocoder;
-    marker.addListener("spider_click", () => {
-        openInfoWindow(map, marker, infoWindow);
-    });
-    oms.addMarker(marker);
+        const geocoder = new google.maps.Geocoder;
+        marker.addListener("spider_click", () => {
+            openInfoWindow(map, marker, infoWindow);
+        });
+        oms.addMarker(marker);
+    }
 }
 
 /** Builds and Opens Info Window */

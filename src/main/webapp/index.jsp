@@ -130,7 +130,7 @@
                   We could not retrieve your location to display your neighborhood tasks.
               </div>
               <div id="no-tasks-message" class="results-message">
-                  Sorry, there are currently no tasks within your neighborhood for you to help with.
+                  Sorry, there are currently no tasks within the neighborhood for you to help with.
               </div>
           </div>
           <!--Listed Tasks Container-->
