@@ -146,6 +146,11 @@
                   </div>
               </div>
             <div id="tasks-map"></div>
+            <div id="map-control-wrapper">
+                <div class="map-control" id="load-more-tasks-control">
+                    Load more tasks
+                </div>
+            </div>
           </div>
       </section>
       <!--Create Tasks Modal-->

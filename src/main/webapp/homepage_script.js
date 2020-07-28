@@ -26,10 +26,6 @@ let markersMap = new Map();
 let infoWindows = [];
 let taskGroup = null;
 
-let loadMoreTasksControlNode = document.createElement("div");
-loadMoreTasksControlNode.setAttribute("id", "load-more-tasks-node");
-loadMoreTasksControlNode.index = 1;
-
 /* Changes navbar background upon resize */
 window.addEventListener("resize", function() {
     let navbar = document.getElementsByTagName("nav")[0];
@@ -114,6 +110,8 @@ function addUIClickHandlers() {
     document.getElementsByClassName("view-option")[1].addEventListener("click", function(e) {
         switchView(e.target);
     });
+
+    document.getElementById("load-more-tasks-control").addEventListener("click", loadMoreTasks);
 }
 
 /* Function implements switch view (to map or to list) click functionality */
@@ -168,10 +166,13 @@ function switchView(element) {
 /* Helper function that switches to map view */
 function switchToMap() {
     document.getElementById("tasks-list").style.display = "none";
-    document.getElementById("tasks-map-wrapper").style.display = "block";
+    document.getElementById("tasks-map-wrapper").style.display = "block"
     currentView = "map";
     map.setCenter(userLocation);
     taskGroup.tasks.forEach(task => displayTaskMarker(task));
+    let loadMoreTasksMapControl = document.getElementById("load-more-tasks-control");
+    if (taskGroup.endOfQuery) loadMoreTasksMapControl.style.display = "none";
+    else loadMoreTasksMapControl.style.display = "block";
 }
 
 /* Helper function that switches to list view */
@@ -247,8 +248,9 @@ function helpOut(element) {
 /* Function sends a fetch request to the edit task servlet when the user
 offers to help out, edits the task's status and helper properties, and
 then reloads the task list */
-function confirmHelp(taskKey) {
-    const url = "/tasks/edit?task-id=" + taskKey + "&action=helpout";
+function confirmHelp(key) {
+    console.log(key);
+    const url = "/tasks/edit?task-id=" + key + "&action=helpout";
     const request = new Request(url, {method: "POST"});
     fetch(request).then((response) => {
         // checks if another user has already claimed the task
@@ -260,10 +262,14 @@ function confirmHelp(taskKey) {
         // hides task from list and map if it was succesfully claimed
         else {
             document.querySelectorAll("[data-key='" + taskKey +"']")[0].style.display = "none";
+            console.log(markersMap);
             let marker = markersMap.get(taskKey);
+            console.log(taskKey);
+            console.log(marker);
             marker.setMap(null);
             oms.forgetMarker(marker);
             markersMap.delete(taskKey);
+            console.log(markersMap);
             if (markersMap.size == 0) {
                 document.getElementById("tasks-list").style.display = "none";
                 document.getElementById("no-tasks-message").style.display = "block";
@@ -725,25 +731,22 @@ function displayTasks(append) {
     if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
         document.getElementById("no-tasks-message").style.display = "none";
 
-        if (!taskGroup.endOfQuery && !taskMap.contains(loadMoreTasksControlNode)) {
-            new LoadMoreTasksControl(loadMoreTasksControlNode);
-            map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(loadMoreTasksControlNode);
-        } else if (taskGroup.endOfQuery && taskMap.contains(loadMoreTasksControlNode)) {
-            loadMoreTasksControlNode.remove();
-        }
-
         if (!append) {
             taskList.innerHTML = "";
         }
         taskGroup.tasks.map(createTaskListNode).forEach(node => taskList.appendChild(node));
         addTasksClickHandlers();
 
+        let loadMoreTasksMapControl = document.getElementById("load-more-tasks-control");
         if (currentView === "list") {
             taskList.style.display = "block";
             taskMap.style.display = "none";
+            loadMoreTasksMapControl.style.display = "none";
         } else if (currentView === "map") {
             taskMap.style.display = "block";
             taskList.style.display = "none";
+            if (taskGroup.endOfQuery) loadMoreTasksMapControl.style.display = "none";
+            else loadMoreTasksMapControl.style.display = "block";
         }
     } else {
         taskList.innerHTML = "";
@@ -816,6 +819,8 @@ function createTaskListNode(task) {
 }
 
 function displayTaskMarker(task) {
+    console.log("task keystring");
+    console.log(task.keyString);
     // only adds task that aren't already loaded in map
     if (!markersMap.has(task.keyString)) {
         const marker = new google.maps.Marker({
@@ -829,6 +834,8 @@ function displayTaskMarker(task) {
             dateTime: task.dateTime,
             key: task.keyString});
         markersMap.set(marker.get("key"), marker);
+        console.log("marker get key inside displayTaskMarker");
+        console.log(marker.get("key"));
 
         const infoWindow = new google.maps.InfoWindow;
         infoWindow.addListener("closeclick", () => {
@@ -837,6 +844,11 @@ function displayTaskMarker(task) {
         const geocoder = new google.maps.Geocoder;
         marker.addListener("spider_click", () => {
             openInfoWindow(map, marker, infoWindow);
+            console.log("marker get key inside click");
+            console.log(marker.get("key"));
+
+            console.log("task key inside click");
+            console.log(task.keyString);
         });
         oms.addMarker(marker);
     }
@@ -875,6 +887,7 @@ function openInfoWindow(map, marker, infoWindow) {
             let helpOverlay = document.getElementById("help-overlay-map");
             helpOverlay.style.display = "block";
             document.getElementById("confirm-map").addEventListener("click", function(e) {
+                console.log(marker.get("key"));
                 confirmHelp(marker.get("key"));
                 helpOverlay.style.display = "none";
                 e.stopPropagation();

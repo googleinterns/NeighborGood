@@ -330,6 +330,11 @@ section {
   height: calc(50% - 0.5em);
 }
 
+#map-control-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
 .map-control {
   background-color: #fff;
   color: rgb(61,61,61);
@@ -345,7 +350,11 @@ section {
 }
 
 #load-more-tasks-control {
-  margin-bottom: 8px;
+  text-align: center;
+  margin-top: -3em;
+  position: absolute;
+  z-index: 4;
+  display: none;
 }
 
 /* Add modal styling */
