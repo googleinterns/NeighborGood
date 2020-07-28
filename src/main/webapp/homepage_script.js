@@ -26,6 +26,10 @@ let markersMap = new Map();
 let infoWindows = [];
 let taskGroup = null;
 
+let loadMoreTasksControlNode = document.createElement("div");
+loadMoreTasksControlNode.setAttribute("id", "load-more-tasks-node");
+loadMoreTasksControlNode.index = 1;
+
 /* Changes navbar background upon resize */
 window.addEventListener("resize", function() {
     let navbar = document.getElementsByTagName("nav")[0];
@@ -184,6 +188,7 @@ function loadMoreTasks() {
                 .then(response => {
                         taskGroup = response;
                         displayTasks(true);
+                        taskGroup.tasks.forEach(task => displayTaskMarker(task));
                     });
         } else if (!document.getElementById("no-more-tasks")) {
             let noMoreTasksDiv = document.createElement("div");
@@ -543,6 +548,7 @@ function getTasksForUserLocation() {
             ],
         });
         map.setTilt(45);
+
         map.addListener('dragend', function() {
             previousNeighborhood = [...neighborhood];
             toNeighborhood(map.getCenter().toJSON()).then(() => {
@@ -605,6 +611,7 @@ function callEndOfInitFunctions() {
 function SearchNeighborhoodMapControl(controlNode) {
     const controlUI = document.createElement("div");
     controlUI.setAttribute("id", "search-area-control");
+    controlUI.className = "map-control";
     controlUI.title = "Click to search current neighborhood";
     controlUI.textContent = "Search current neighborhood";
     controlNode.appendChild(controlUI);
@@ -616,6 +623,18 @@ function SearchNeighborhoodMapControl(controlNode) {
                     taskGroup.tasks.forEach(task => displayTaskMarker(task));
                     controlNode.remove();
                 })
+    });
+}
+
+function LoadMoreTasksControl(controlNode) {
+    const controlUI = document.createElement("div");
+    controlUI.setAttribute("id", "load-more-tasks-control");
+    controlUI.className = "map-control";
+    controlUI.title = "Click to load more tasks";
+    controlUI.textContent = "Load more tasks";
+    controlNode.appendChild(controlUI);
+    controlUI.addEventListener("click", function() {
+        loadMoreTasks();
     });
 }
 
@@ -705,6 +724,13 @@ function displayTasks(append) {
 
     if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
         document.getElementById("no-tasks-message").style.display = "none";
+
+        if (!taskGroup.endOfQuery && !taskMap.contains(loadMoreTasksControlNode)) {
+            new LoadMoreTasksControl(loadMoreTasksControlNode);
+            map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(loadMoreTasksControlNode);
+        } else if (taskGroup.endOfQuery && taskMap.contains(loadMoreTasksControlNode)) {
+            loadMoreTasksControlNode.remove();
+        }
 
         if (!append) {
             taskList.innerHTML = "";
