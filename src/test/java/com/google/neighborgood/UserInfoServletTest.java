@@ -102,6 +102,8 @@ public final class UserInfoServletTest {
     when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
     when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
     when(request.getParameter("country-input")).thenReturn("United States");
+    when(request.getParameter("lat")).thenReturn("47.6912892");
+    when(request.getParameter("lng")).thenReturn("-122.2406845");
 
     new UserInfoServlet().doPost(request, response);
 
@@ -174,6 +176,8 @@ public final class UserInfoServletTest {
     when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
     when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
     when(request.getParameter("country-input")).thenReturn("United States");
+    when(request.getParameter("lat")).thenReturn("47.6912892");
+    when(request.getParameter("lng")).thenReturn("-122.2406845");
 
     new UserInfoServlet().doPost(request, response);
 
@@ -199,6 +203,8 @@ public final class UserInfoServletTest {
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
     assertEquals("1234567890", entity.getKey().getName());
+    assertEquals("47.6912892", String.valueOf(entity.getProperty("lat")));
+    assertEquals("-122.2406845", String.valueOf(entity.getProperty("lng")));
     assertEquals(0, (long) entity.getProperty("points"));
 
     when(request.getParameter("nickname-input")).thenReturn("Leo");
@@ -224,6 +230,8 @@ public final class UserInfoServletTest {
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
     assertEquals("1234567890", entity.getKey().getName());
+    assertEquals("47.6912892", String.valueOf(entity.getProperty("lat")));
+    assertEquals("-122.2406845", String.valueOf(entity.getProperty("lng")));
     assertEquals(0, (long) entity.getProperty("points"));
   }
 
@@ -243,6 +251,8 @@ public final class UserInfoServletTest {
     when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
     when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
     when(request.getParameter("country-input")).thenReturn("United States");
+    when(request.getParameter("lat")).thenReturn("47.6912892");
+    when(request.getParameter("lng")).thenReturn("-122.2406845");
 
     // Try to catch the error message sent by the UserInfoServlet
     System.setErr(new PrintStream(errContent));
@@ -318,6 +328,8 @@ public final class UserInfoServletTest {
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
     assertEquals("1234567890", entity.getKey().getName());
+    assertEquals("47.6912892", String.valueOf(entity.getProperty("lat")));
+    assertEquals("-122.2406845", String.valueOf(entity.getProperty("lng")));
     assertEquals(0, (long) entity.getProperty("points"));
   }
 
