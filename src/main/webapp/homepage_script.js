@@ -628,6 +628,11 @@ function SearchNeighborhoodMapControl(controlNode) {
             .then(response => {
                     taskGroup = response;
                     displayTasks();
+                    markersMap.forEach((marker) => {
+                        oms.forgetMarker(marker);
+                        marker.setMap(null);
+                    });
+                    markersMap.clear();
                     taskGroup.tasks.forEach(task => displayTaskMarker(task));
                     controlNode.remove();
                 })
