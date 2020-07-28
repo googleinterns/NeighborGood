@@ -300,7 +300,8 @@ section {
 }
 
 #tasks-map { 
-  height: calc(100vh - 340px);
+  height: calc(100vh - 330px);
+  max-height: 70vh;
   display: none;
 }
 
@@ -508,7 +509,7 @@ td {
   }
 
   #tasks-map {
-    height: calc(100vh - 320px);
+    height: calc(100vh - 300px);
   }
 }
 

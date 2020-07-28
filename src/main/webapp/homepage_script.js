@@ -113,29 +113,70 @@ function addUIClickHandlers() {
     });
 }
 
+/* Function implements switch view (to map or to list) click functionality */
 function switchView(element) {
-    let buttonElement;
+    let buttonElement = element;
+
+    // If element clicked was icon inside the parent div, it gets the parent div
     if (element.classList.contains("fas")) {
         buttonElement = element.parentNode;
-    } else {
-        buttonElement = element;
     }
+
     document.getElementById("selected-view").removeAttribute("id");
     buttonElement.setAttribute("id", "selected-view");
-    if (buttonElement.value == "map") {
-        document.getElementById("tasks-list").style.display = "none";
-        document.getElementById("tasks-map").style.display = "block";
-        currentView = "map";
-        map.setCenter(userLocation);
-        taskGroup.tasks.forEach(task => displayTaskMarker(task));
+    const loadingElement = document.getElementById("loading");
 
-    } else {
-        document.getElementById("tasks-map").style.display = "none";
-        document.getElementById("tasks-list").style.display = "block";
-        currentView = "list";
+    // Switch to Map view
+    if (buttonElement.value == "map") {
+        // if loading has finished, it switches views
+        if (loadingElement.style.display == "none") switchToMap();
+        // otherwise it creates a mutation observer that will call switchToMap once loading is complete
+        else {
+            let observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName !== "style") return;
+                    if (loadingElement.style.display == "none") {
+                        switchToMap();
+                    }
+                });
+            });
+            observer.observe(document.getElementById("loading"), {attributes: true});
+        }
+
+    // Switch to List View
+    } else if (buttonElement.value == "list") {
+         // if loading has finished, it switches views
+        if (loadingElement.style.display == "none") switchToList();
+        // otherwise it creates a mutation observer that will call switchToList once loading is complete
+        else {
+            let observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName !== "style") return;
+                    if (loadingElement.style.display == "none") {
+                        switchToList();
+                    }
+                });
+            });
+            observer.observe(document.getElementById("loading"), {attributes: true});
+        }
     }
 }
 
+/* Helper function that switches to map view */
+function switchToMap() {
+    document.getElementById("tasks-list").style.display = "none";
+    document.getElementById("tasks-map").style.display = "block";
+    currentView = "map";
+    map.setCenter(userLocation);
+    taskGroup.tasks.forEach(task => displayTaskMarker(task));
+}
+
+/* Helper function that switches to list view */
+function switchToList() {
+    document.getElementById("tasks-map").style.display = "none";
+    document.getElementById("tasks-list").style.display = "block";
+    currentView = "list";
+}
 /* Function loads ten more tasks if there are any more, otherwise it displays a message saying there are no more tasks */
 function loadMoreTasks() {
     if (userNeighborhoodIsKnown()) {
