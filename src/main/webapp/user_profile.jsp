@@ -13,7 +13,7 @@
   <%@ page import = "com.google.neighborgood.helper.RetrieveUserInfo" %>
   <%@ page import = "java.util.List" %>
   <% UserService userService = UserServiceFactory.getUserService();
-  if (!userService.isUserLoggedIn()) { 
+  if (!userService.isUserLoggedIn()) {
       response.sendRedirect(userService.createLoginURL("/account.jsp"));
   } else {
     List<String> userInfo = RetrieveUserInfo.getInfo(userService);
@@ -27,9 +27,9 @@
         String points = userInfo.get(3); %>
   <body>
     <div id="nav-bar">
-        <p id="return-link"><a href="index.jsp">BACK TO HOME</a> |    </p>
+        <p id="return-link"><a href="index.jsp" id="backtohome">BACK TO HOME</a> |    </p>
         <i class="fa fa-cog fa-2x" id="info-setting" onclick="editInfo()"></i>
-        <p id="log-out-link"><%=nickname%> |  <a href="<%=logoutURL%>">Logout</a></p>
+        <p id="log-out-link"><%=nickname%> |  <a href="<%=logoutURL%>" id="logout-href">Logout</a></p>
     </div>
     <div class="empty"></div>
     <div id="header">
@@ -42,7 +42,7 @@
         <div id="container">
             <button class="help-button" id="need-help-button" onclick="showNeedHelp()">Need help</button>
             <button class="help-button" id="offer-help-button" onclick="showOfferHelp()">Offer help</button>
-            <i class="fa fa-plus-circle fa-3x" id="create" onclick="showModal()"></i>
+            <i class="fa fa-plus-circle fa-3x" id="create-task-button" onclick="showModal()"></i>
         </div>
     </div>
     <br/>
@@ -127,7 +127,7 @@
                   <option value="misc">Misc</option>
                 </select>
                 <br/><br/>
-                <input type="submit" />
+                <input type="submit" id="submit-create-task"/>
             </form>
         </div>
     </div>
@@ -221,19 +221,21 @@
             <h1>Task Detail: </h1>
             <div id="task-detail-container"></div>
             <hr/>
-            <h1>Chat: </h1>
+            <div>
+                <h1 id="chat-title">Chat: </h1>
+                <button onclick="refresh()" id="refresh-button"><i class="fa fa-refresh fa-2x"></i></button>
+            </div>
+            <div class="empty"></div>
             <div id="message-container"></div>
-            <form id="chat-box" action="/messages" method="POST" onsubmit="return validateMessage()">
+            <form id="chat-box" action="/messages" method="POST" onsubmit="return sendMessage()">
+                <br/>
                 <div>
-                    <label for="msg">Message</label>
+                    <textarea name="msg" id="msg-input" placeholder="Type message.."></textarea>
+                    <input type="hidden" name="task-id" id="chat-id-input">
                     <br/>
+                    <br/>
+                    <button type="submit" id="send-button"><i class="fa fa-paper-plane fa-2x"></i></button>
                 </div>
-                <br/>
-                <textarea name="msg" id="msg-input" placeholder="Type message.."></textarea>
-                <input type="hidden" name="task-id" id="chat-id-input">
-                <br/>
-                <br/>
-                <input type="submit" />
             </form>
         </div>
     </div>

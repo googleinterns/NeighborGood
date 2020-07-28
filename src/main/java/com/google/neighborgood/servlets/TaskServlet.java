@@ -34,6 +34,8 @@ import com.google.neighborgood.helper.TaskGroup;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -133,7 +135,8 @@ public class TaskServlet extends HttpServlet {
   }
 
   @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doPost(HttpServletRequest request, HttpServletResponse response)
+      throws IOException, ServletException {
     // First check whether the user is logged in
     UserService userService = UserServiceFactory.getUserService();
 
@@ -142,13 +145,11 @@ public class TaskServlet extends HttpServlet {
       return;
     }
 
-    // I will work on a different implementation for this after the MVP since
-    // this implementation forces users to re-input their task details
-    // if they haven't ever inputted their user info and are automatically
-    // logged in when opening the page.
+    // If the user still hasn't save their info, it forwards the request to create an account
     List<String> userInfo = RetrieveUserInfo.getInfo(userService);
     if (userInfo == null) {
-      response.sendRedirect("account.jsp");
+      RequestDispatcher rd = request.getRequestDispatcher("/account.jsp");
+      rd.forward(request, response);
       return;
     }
 

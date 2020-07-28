@@ -161,7 +161,7 @@ section {
   overflow: hidden;
 }
 
-#addtaskbutton {
+#create-task-button {
   font-size: 3.5em;
 }
 
@@ -420,7 +420,7 @@ td {
     margin-top: -1em;
   }
 
-  #addtaskbutton {
+  #create-task-button {
     font-size: 2.5em;
   }
 

@@ -24,6 +24,7 @@ import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
@@ -68,7 +69,8 @@ public class MyTaskServlet extends HttpServlet {
       filter = CompositeFilterOperator.and(filter, statusFilter);
     }
 
-    Query query = new Query("Task").setFilter(filter);
+    Query query =
+        new Query("Task").addSort("timestamp", SortDirection.DESCENDING).setFilter(filter);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
