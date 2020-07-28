@@ -24,7 +24,6 @@ let currentCategory = "all";
 let currentView = "list";
 let markersMap = new Map();
 let infoWindows = [];
-let infoWindowsOpened = 0;
 let taskGroup = null;
 
 /* Changes navbar background upon resize */
@@ -556,6 +555,12 @@ function getTasksForUserLocation() {
                 } 
             });
         });
+        // closes info windows if user clicks anywhere else on the map
+        map.addListener("click", (event) => {
+            infoWindows.forEach(infoWindow => {
+                    infoWindow.close();
+                });
+        });
 
         oms = new OverlappingMarkerSpiderfier(map, {
             markersWontMove: true,
@@ -801,7 +806,6 @@ function displayTaskMarker(task) {
 
         const infoWindow = new google.maps.InfoWindow;
         infoWindow.addListener("closeclick", () => {
-            infoWindowsOpened--;
         });
 
         const geocoder = new google.maps.Geocoder;
@@ -848,7 +852,6 @@ function openInfoWindow(map, marker, infoWindow) {
     infoWindow.setContent(windowNode);
     infoWindow.open(map, marker);
     infoWindows.push(infoWindow);
-    infoWindowsOpened++;
 }
 
 /* Function adds all the necessary tasks 'click' event listeners*/
