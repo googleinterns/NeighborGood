@@ -42,7 +42,7 @@ function validateTaskForm(id) {
 function validateInfoForm(id) {
     var result = true;
     var form = document.getElementById(id);
-    var inputName = ["nickname", "address", "zipcode", "country", "phone"];
+    var inputName = ["nickname", "address", "zipcode", "country"];
     for (var i = 0; i < inputName.length; i++) {
         var name = inputName[i];
         var inputField = form[name.concat("-input")].value.trim();
@@ -147,9 +147,8 @@ async function editInfo() {
     const userInfo = await response.json();
     document.getElementById("edit-nickname-input").value = userInfo[0];
     document.getElementById("edit-address-input").value = userInfo[1];
-    document.getElementById("edit-phone-number-input").value = userInfo[2];
-    document.getElementById("edit-zipcode-input").value = userInfo[3];
-    document.getElementById("edit-country-input").value = userInfo[4];
+    document.getElementById("edit-zipcode-input").value = userInfo[2];
+    document.getElementById("edit-country-input").value = userInfo[3];
     showInfoModal();
 }
 

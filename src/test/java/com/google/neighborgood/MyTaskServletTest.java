@@ -72,7 +72,6 @@ public final class MyTaskServletTest {
     userEntity = new Entity("UserInfo", "1234567890");
     userEntity.setProperty("nickname", "Leonard");
     userEntity.setProperty("address", "xxx");
-    userEntity.setProperty("phone", "xxx");
     userEntity.setProperty("email", "leonardzhang@google.com");
     userEntity.setProperty("userId", "1234567890");
     userEntity.setProperty("country", "US");

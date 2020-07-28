@@ -24,7 +24,7 @@
         String urlToRedirectAfterUserLogsOut = "/index.jsp";
         String logoutURL = userService.createLogoutURL(urlToRedirectAfterUserLogsOut);
         String nickname = userInfo.get(0);
-        String points = userInfo.get(3); %>
+        String points = userInfo.get(2); %>
   <body>
     <div id="nav-bar">
         <p id="return-link"><a href="index.jsp" id="backtohome">BACK TO HOME</a> |    </p>
@@ -203,14 +203,6 @@
                 <br/>
                 <input type="text" name="country-input" id="edit-country-input">
                 <br/><br/>
-                <div>
-                    <label for="edit-phone-number-input">Your phone number<span class="req">*</span></label>
-                    <br/>
-                </div>
-                <br/>
-                <input type="text" name="phone-input" id="edit-phone-number-input">
-                <br/>
-                <br/>
                 <input type="submit"/>
             </form>
         </div>
