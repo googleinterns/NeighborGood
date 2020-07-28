@@ -988,7 +988,13 @@ function addTasksClickHandlers() {
     const tasks = document.getElementsByClassName("task");
     for (let i = 0; i < tasks.length; i++) {
         tasks[i].addEventListener("click", function(e) {
-            showTaskInfo(e.target.dataset.key);
+            let taskElement = e.target;
+
+            // If element clicked was a child element it closest task ancestor instead
+            if (taskElement.className != "task") {
+                taskElement = taskElement.closest(".task");
+            }
+            showTaskInfo(taskElement.dataset.key);
         });
     }
 }
