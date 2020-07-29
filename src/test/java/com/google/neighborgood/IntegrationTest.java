@@ -517,19 +517,69 @@ public class IntegrationTest {
     verifyNewTaskHomepage();
   }
 
-  /** Clears entities from Datastore so `mvn clean` isn't necessary before test class */
+  @Test
+  public void _11_Homepage_AsHelperScollToBottom_LoadMoreTasks() throws InterruptedException {
+
+    goToUserPage();
+    ifLaggingThenRefresh();
+
+    // First add more tasks to have more tasks to load on scroll, at the end there should be 14 open
+    // tasks
+    for (int i = openTotalTaskCount; i < 15; i++) {
+      // Randomizes task contents
+      Random random = new Random();
+      String taskDetail = TASK_DETAIL + random.nextInt(1000);
+      String taskOverview = TASK_OVERVIEW + random.nextInt(1000);
+      String rewardPoints = Integer.toString(random.nextInt(201));
+      int categoryOptionIndex = random.nextInt(TASK_CATEGORIES.length);
+      String taskCategory = TASK_CATEGORIES[categoryOptionIndex];
+
+      addTask(taskDetail, rewardPoints, categoryOptionIndex, taskOverview);
+    }
+
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+    backToHome();
+    ifLaggingThenRefresh();
+
+    // Before scrolling down only 10 tasks should have been fetched and therefore displayed
+    List<WebElement> tasksBeforeScrolling =
+        wait.until(
+            new Function<WebDriver, List<WebElement>>() {
+              public List<WebElement> apply(WebDriver driver) {
+                return driver.findElements(By.xpath("//div[@class='task']"));
+              }
+            });
+    assertEquals((long) 10, tasksBeforeScrolling.size());
+
+    // Scrolls to the bottom of the page
+    js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
+    Thread.sleep(3000);
+
+    // After scrolling all open tasks added should have been fetched and therefore displayed
+    List<WebElement> tasksAfterScrolling =
+        wait.until(
+            new Function<WebDriver, List<WebElement>>() {
+              public List<WebElement> apply(WebDriver driver) {
+                return driver.findElements(By.xpath("//div[@class='task']"));
+              }
+            });
+    assertEquals((long) openTotalTaskCount, tasksAfterScrolling.size());
+  }
+
+  /** Clears entities from Datastore before test class */
   private static void clearAllDatastoreEntities() {
     driver.get("http://localhost:8080/_ah/admin");
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
     // Retrieves number of Entity Kind select options to iterate through them
-    Long numOfSelectOptions =
-        (Long) js.executeScript("return document.getElementById('kind_input').options.length;");
-    System.out.println("\n\n" + numOfSelectOptions);
     WebElement listButtonElement;
     WebElement allKeysElement;
     WebElement deleteButtonElement;
-    for (int j = 0; j < numOfSelectOptions; j++) {
+
+    // Number of entity pages that can be deleted
+    Long numOfSelectOptions =
+        (Long) js.executeScript("return document.getElementById('kind_input').options.length;");
+    while (numOfSelectOptions > 1) {
       // clicks on list button
       wait.until(
               new Function<WebDriver, WebElement>() {
@@ -565,6 +615,8 @@ public class IntegrationTest {
           driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
         }
       }
+      numOfSelectOptions =
+          (Long) js.executeScript("return document.getElementById('kind_input').options.length;");
     }
   }
 
