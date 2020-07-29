@@ -43,6 +43,7 @@ public class MessageServlet extends HttpServlet {
     String taskId = request.getParameter("key");
     if (taskId == null) {
       System.err.println("No task id provided");
+      return;
     }
 
     // Make sure that the user has already logged into his account
@@ -89,7 +90,12 @@ public class MessageServlet extends HttpServlet {
 
     // Get the message content
     String message = request.getParameter("msg");
-    if (message == null || message.trim().equals("")) {
+    if (message == null) {
+      System.err.println("The message is not provided");
+      return;
+    }
+
+    if (message.trim().equals("")) {
       System.err.println("The input message is empty");
       return;
     }

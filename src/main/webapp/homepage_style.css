@@ -19,7 +19,7 @@
 body {
   font-family: 'Roboto', sans-serif;
   margin: auto;
-  padding-bottom: 3em;
+  padding-bottom: 1em;
   color: #222;
 }
 
@@ -46,10 +46,7 @@ nav {
 }
 
 #login-logout {
-  padding-right: 1em;
   padding-top: 0.8em;
-  text-align: right;
-  width: calc(calc(100vw - 60em) / 2);
 }
 
 a {
@@ -79,12 +76,15 @@ i:hover {
   font-size: 4em;
   text-align: center;
   margin-top: 1.2em;
-  margin-bottom: 0;
+  margin-bottom: 0.3em;
 }
 
 .login-messages {
   margin-top: 0;
   margin-bottom: 0.5em;
+  text-align: right;
+  padding-right: 1em;
+  width: calc(calc(100vw - 60em) / 2);
 }
 
 /* Main Content Styling */
@@ -100,19 +100,23 @@ section {
   margin: auto;
   max-width: 55em;
   justify-content: space-between;
-  padding-bottom: 1.5em;
+  padding-bottom: 0.5em;
+}
+
+#search-box {
+  padding: 0.5em 0.5em 1em 0.5em;
+  visibility: hidden;
 }
 
 #control-bar-message-wrapper {
   background-image: linear-gradient(to bottom, white 90%, transparent);
-  padding-top: 1em;
   position: sticky;
-  position: -webkit-sticky;
+  padding-top: 1em;
   top: 0;
   width: 101%;
   z-index: 2;
   margin: -3px;
-  padding-bottom: 1em;
+  padding-bottom: 0;
 }
 
 #categories {
@@ -161,45 +165,6 @@ section {
   font-size: 3.5em;
 }
 
-#pagination-wrapper {
-  display: flex;
-  justify-content: space-between;
-  width: fit-content;
-  margin: auto;
-}
-
-#page-numbers-wrapper {
-  display: flex;
-  justify-content: space-between;
-  line-height: 1.7em;
-}
-
-.pagination-icon {
-  cursor: not-allowed;
-  font-size: 2em;
-  font-weight: bold;
-  line-height: 0.8em;
-  padding: 0 0.2em;
-}
-
-.pagination-icon:hover {
-  color: gray;
-}
-
-.page-number {
-  font-weight: normal;
-  margin: 0 0.5em;
-}
-
-#current-page {
-  font-weight: bold;
-  cursor: default;
-}
-
-#current-page:hover {
-  color: #222;
-}
-
 /* Tasks Styling */
 .results-message {
   display: none;
@@ -207,9 +172,15 @@ section {
   padding-bottom: 0.5em;
 }
 
+#loading {
+  display: block;
+  margin-top: -2em;
+}
+
 #tasks-list {
   display: none;
   transition: 0.5s;
+  padding-top: 0.5em;
 }
 
 .task {
@@ -248,8 +219,8 @@ section {
   color: gray;
 }
 
-.disable-help:hover {
-  cursor: not-allowed;
+.disable-help {
+  display: none;
 }
 
 .task-footer {
@@ -298,7 +269,6 @@ section {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 3; /* Sit on top */
-  padding-top: 200px; /* Location of the box */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -314,6 +284,7 @@ section {
   padding: 20px;
   border: 1px solid #888;
   width: 50%;
+  margin-top: 20vh;
 }
 
 .modal textarea {
@@ -355,7 +326,6 @@ section {
 }
 
 #topScoresModal {
-  width: 70%;
   text-align: center;
   overflow: auto;
 }
@@ -412,11 +382,15 @@ td {
     width: auto;
   }
 
+  .login-messages {
+    width: auto;
+  }
+
   #control-bar {
     display: block;
     width: 95%;
     margin: auto;
-    padding-bottom: 0.7em;
+    padding-bottom: 0;
   }
 
   #categories {
@@ -427,11 +401,12 @@ td {
   }
 
   #control-bar-message-wrapper {
-    top: 70px;
+    top: 80px;
     background-color: white;
     background-image: none;
     width: 102%;
     margin-left: -5px;
+    padding-top: 0;
   }
 
   .categories {
@@ -447,6 +422,15 @@ td {
 
   #create-task-button {
     font-size: 2.5em;
+  }
+
+  #search-box {
+    padding-top: 0;
+    margin-top: -0.5em;
+  }
+
+  #place-input {
+    display: block;
   }
 
   .results-message {
@@ -486,7 +470,12 @@ td {
   }
 
   #control-bar-message-wrapper {
-    top: 70px;
+    top: 80px;
+    padding-top: 0;
+  }
+
+  .login-messages {
+    width: auto;
   }
 
   nav {

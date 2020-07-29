@@ -14,6 +14,7 @@
 
 package com.google.neighborgood.servlets;
 
+import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -23,12 +24,13 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import com.google.neighborgood.helper.RetrieveUserInfo;
 import com.google.neighborgood.helper.RewardingPoints;
-import com.google.neighborgood.helper.TaskPages;
+import com.google.neighborgood.helper.TaskGroup;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /** Servlet that creates new task entity and fetch saved tasks. */
 @WebServlet("/tasks")
@@ -80,21 +83,53 @@ public class TaskServlet extends HttpServlet {
     // Applies filters to query
     query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, filters));
 
-    // As we are now not using geospatial queries, we can now use cursors for this - I will change
-    // this in a different PR
-    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(100));
+    FetchOptions fetchOptions = FetchOptions.Builder.withLimit(10);
 
-    TaskPages taskPages = new TaskPages();
+    // Helper class instance that will store 10 tasks and keep track of some query metadata
+    TaskGroup taskGroup = new TaskGroup();
 
-    // Builds and stores HTML for each task
-    for (Entity entity : results) {
-      taskPages.addTask(entity);
+    // Gets session and passed cursor action
+    HttpSession session = request.getSession();
+    String cursorAction = request.getParameter("cursor");
+
+    // Clears cursors if no cursor action is passed or a clear action is passed
+    if (cursorAction == null || cursorAction.equals("clear")) {
+      session.removeAttribute("startCursor");
+      session.removeAttribute("endCursor");
     }
 
-    taskPages.endPages();
+    // initializes startCursor to the appropriate cursor location
+    String startCursor = null;
+    if (cursorAction.equals("start")) {
+      startCursor = (String) session.getAttribute("startCursor");
+    } else if (cursorAction.equals("end")) {
+      startCursor = (String) session.getAttribute("endCursor");
+    }
+
+    // sets cursor in fetchOptions and stores the new startCursor in the session
+    if (startCursor != null) {
+      fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor));
+      session.setAttribute("startCursor", startCursor);
+    }
+
+    QueryResultList<Entity> results;
+    try {
+      results = datastore.prepare(query).asQueryResultList(fetchOptions);
+    } catch (IllegalArgumentException e) {
+      response.sendRedirect("/index.jsp");
+      return;
+    }
+
+    for (Entity entity : results) {
+      taskGroup.addTask(entity);
+    }
+
+    // Stores end cursor and checks if the end of the query has been reached
+    session.setAttribute("endCursor", results.getCursor().toWebSafeString());
+    taskGroup.checkIfEnd();
 
     Gson gson = new Gson();
-    String json = gson.toJson(taskPages);
+    String json = gson.toJson(taskGroup);
     response.setContentType("application/json;");
     response.getWriter().println(json);
   }

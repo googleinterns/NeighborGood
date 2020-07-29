@@ -207,6 +207,13 @@ table button:hover i {
   overflow-y: auto;
 }
 
+.modal textarea,
+.modal input,
+.modal select {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
 .modal textarea:focus {
   width: 100%;
   border: 4px solid black;
@@ -257,6 +264,7 @@ table button:hover i {
   border: thin solid black;
   height: 400px;
   max-width: 100%;
+  margin-bottom: 20px;
 }
 
 #place-input {
@@ -301,7 +309,7 @@ table button:hover i {
   overflow-y: auto;
   border: 4px solid black;
   border-radius: 2px;
-  margin-bottom: 5px;
+  margin-bottom: 25px;
 }
 
 .sentByOthers {
@@ -339,7 +347,7 @@ table button:hover i {
   overflow: hidden;
   outline: none;
   float: right;
-  margin-bottom: 50px;
+  margin-top: 30px;
 }
 
 #send-button:hover {
@@ -390,4 +398,25 @@ table button:hover i {
 
 #refresh-button:hover {
   color: #0c0;
+}
+
+.submit-button {
+  border: 0;
+  outline: none;
+  border-radius: 0;
+  padding: 15px 0;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  background: #1ab188;
+  color: white;
+  transition: all 0.5s ease;
+  -webkit-appearance: none;
+  width: 100%;
+  cursor: pointer;
+}
+
+.submit-button:hover,
+.submit-button:focus {
+  background: #169674;
 }
