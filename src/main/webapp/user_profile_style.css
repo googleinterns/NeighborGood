@@ -405,3 +405,24 @@ table button:hover i {
 .more-msg-button:hover {
   color: gray;
 }
+
+.submit-button {
+  border: 0;
+  outline: none;
+  border-radius: 0;
+  padding: 15px 0;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  background: #1ab188;
+  color: white;
+  transition: all 0.5s ease;
+  -webkit-appearance: none;
+  width: 100%;
+  cursor: pointer;
+}
+
+.submit-button:hover,
+.submit-button:focus {
+  background: #169674;
+}
