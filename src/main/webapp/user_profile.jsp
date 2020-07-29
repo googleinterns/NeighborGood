@@ -59,6 +59,7 @@
             </thead>
             <tbody id="need-help-body"></tbody>
         </table>
+        <div id="need-help-load"></div>
         <table class="task-table" id="offer-help">
             <thead>
                 <tr>
@@ -72,6 +73,7 @@
             </thead>
             <tbody id="offer-help-body"></tbody>
         </table>
+        <div id="offer-help-load"></div>
         <br/><br/>
         <table class="task-table" id="await-verif">
             <thead>
@@ -85,6 +87,7 @@
             </thead>
             <tbody id="await-verif-body"></tbody>
         </table>
+        <div id="need-help-complete-load"></div>
         <table class="task-table" id="complete-task">
             <thead>
                 <tr>
@@ -96,6 +99,7 @@
             </thead>
             <tbody id="complete-task-body"></tbody>
         </table>
+        <div id="offer-help-complete-load"></div>
     </div>
     <div class="modalWrapper" id="createTaskModalWrapper">
         <div class="modal" id="createTaskModal">
