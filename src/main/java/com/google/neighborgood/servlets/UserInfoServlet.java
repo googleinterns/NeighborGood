@@ -74,7 +74,6 @@ public class UserInfoServlet extends HttpServlet {
     List<String> result = new ArrayList<>();
     result.add((String) entity.getProperty("nickname"));
     result.add((String) entity.getProperty("address"));
-    result.add((String) entity.getProperty("phone"));
     result.add((String) entity.getProperty("zipcode"));
     result.add((String) entity.getProperty("country"));
 
@@ -95,12 +94,10 @@ public class UserInfoServlet extends HttpServlet {
 
     String nickname = "";
     String address = "";
-    String phone = "";
     String zipcode = "";
     String country = "";
     String nicknameInput = request.getParameter("nickname-input");
     String addressInput = request.getParameter("address-input");
-    String phoneInput = request.getParameter("phone-input");
     String zipcodeInput = request.getParameter("zipcode-input");
     String countryInput = request.getParameter("country-input");
     String email = userService.getCurrentUser().getEmail();
@@ -108,15 +105,10 @@ public class UserInfoServlet extends HttpServlet {
 
     if (nicknameInput != null) nickname = nicknameInput.trim();
     if (addressInput != null) address = addressInput.trim();
-    if (phoneInput != null) phone = phoneInput.trim();
     if (zipcodeInput != null) zipcode = zipcodeInput.trim();
     if (countryInput != null) country = countryInput.trim();
 
-    if (nickname.equals("")
-        || address.equals("")
-        || phone.equals("")
-        || country.equals("")
-        || zipcode.equals("")) {
+    if (nickname.equals("") || address.equals("") || country.equals("") || zipcode.equals("")) {
       System.err.println("At least one input field is empty");
       return;
     }
@@ -134,7 +126,6 @@ public class UserInfoServlet extends HttpServlet {
       entity = new Entity("UserInfo", userId);
       entity.setProperty("nickname", nickname);
       entity.setProperty("address", address);
-      entity.setProperty("phone", phone);
       entity.setProperty("email", email);
       entity.setProperty("country", country);
       entity.setProperty("zipcode", zipcode);
@@ -142,7 +133,6 @@ public class UserInfoServlet extends HttpServlet {
     } else {
       entity.setProperty("nickname", nickname);
       entity.setProperty("address", address);
-      entity.setProperty("phone", phone);
       entity.setProperty("country", country);
       entity.setProperty("zipcode", zipcode);
     }
