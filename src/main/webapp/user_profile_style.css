@@ -208,7 +208,8 @@ table button:hover i {
 }
 
 .modal textarea,
-.modal input {
+.modal input,
+.modal select {
   margin-top: 20px;
   margin-bottom: 20px;
 }
@@ -397,4 +398,25 @@ table button:hover i {
 
 #refresh-button:hover {
   color: #0c0;
+}
+
+.submit-button {
+  border: 0;
+  outline: none;
+  border-radius: 0;
+  padding: 15px 0;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  background: #1ab188;
+  color: white;
+  transition: all 0.5s ease;
+  -webkit-appearance: none;
+  width: 100%;
+  cursor: pointer;
+}
+
+.submit-button:hover,
+.submit-button:focus {
+  background: #169674;
 }

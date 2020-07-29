@@ -122,7 +122,7 @@
                   <option value="misc">Misc</option>
                 </select>
                 <br/>
-                <input type="submit" id="submit-create-task"/>
+                <button type="submit" class="submit-button" id="submit-create-task"/>SUBMIT</button>
             </form>
         </div>
     </div>
@@ -152,7 +152,7 @@
                   <option value="misc">Misc</option>
                 </select>
                 <br/>
-                <input type="submit" />
+                <button type="submit" class="submit-button" />SUBMIT</button>
             </form>
         </div>
     </div>
@@ -185,7 +185,7 @@
                 </div>
                 <input type="text" name="phone-input" id="edit-phone-number-input">
                 <br/>
-                <input type="submit"/>
+                <button type="submit" class="submit-button" />SUBMIT</button>
             </form>
         </div>
     </div>
