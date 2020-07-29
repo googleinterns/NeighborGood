@@ -5,6 +5,7 @@
     <title>My Account</title>
     <link rel="stylesheet" href="user_profile_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type='text/javascript' src='map_styles.js'></script>
     <script type='text/javascript' src='config.js'></script>
     <script src="user_profile_script.js"></script>
   </head>
