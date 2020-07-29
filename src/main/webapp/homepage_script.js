@@ -750,6 +750,7 @@ function displayTasks(append) {
             marker.setMap(null);
         });
         markersMap.clear();     
+        taskList.innerHTML = "";
     }
 
     if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
