@@ -47,7 +47,7 @@ window.onscroll = function() {
 
 /* Adds scroll event listener to load more tasks if the user has reached the bottom of the page */
 document.addEventListener("scroll", function() {
-    if (getDocumentHeight() == getVerticalScroll() + window.innerHeight) {
+    if (getDocumentHeight() == getVerticalScroll() + window.innerHeight && currentView == "list") {
         loadMoreTasks();
     }
 })
@@ -201,7 +201,7 @@ function loadMoreTasks() {
                         taskGroup = response;
                         displayTasks(true);
                     });
-        } else if (!document.getElementById("no-more-tasks")) {
+        } else if (!document.getElementById("no-more-tasks") && document.getElementById("no-tasks-message").style.display == "none") {
             let noMoreTasksDiv = document.createElement("div");
             noMoreTasksDiv.setAttribute("id", "no-more-tasks");
             noMoreTasksDiv.classList.add("results-message");
@@ -429,8 +429,11 @@ function getTasksForUserLocation() {
     
         // initialize map
         map = new google.maps.Map(document.getElementById("tasks-map"), {
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: false,
             center: {lat: GOOGLE_KIRKLAND_LAT, lng: GOOGLE_KIRKLAND_LNG},
-            zoom: 13,
+            zoom: 12,
             styles: [
                 {
                     "elementType": "geometry",
