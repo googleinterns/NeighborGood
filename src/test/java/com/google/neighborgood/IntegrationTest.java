@@ -57,6 +57,8 @@ public class IntegrationTest {
   private final String USER_ADDRESS = "123 Street Name, City, ST";
   private final String USER_ZIPCODE = "90036";
   private final String USER_COUNTRY = "United States";
+  private final String USER_LAT = "34.072984";
+  private final String USER_LNG = "-118.349740";
   private final String USER_PHONE = "1231231234";
   private final String TASK_DETAIL =
       "Help! this is a detailed version of the task where I give a lot of random information";
@@ -201,8 +203,8 @@ public class IntegrationTest {
     goToUserPage();
     ifLaggingThenRefresh();
 
-    // Adds 10 tasks
-    for (int i = 0; i < 10; i++) {
+    // Adds 8 tasks
+    for (int i = 0; i < 8; i++) {
       // Randomizes task contents
       Random random = new Random();
       String taskDetail = TASK_DETAIL + random.nextInt(1000);
@@ -601,7 +603,7 @@ public class IntegrationTest {
     // Inputs task details using Javascript Executor
     js.executeScript("document.getElementById('task-detail-input').value='" + details + "';");
     js.executeScript("document.getElementById('task-overview-input').value='" + overview + "';");
-    js.executeScript("document.getElementById('rewarding-point-input').value='" + points + "';");
+    js.executeScript("document.getElementById('reward-input').value='" + points + "';");
     js.executeScript(
         "document.getElementById('category-input').value='"
             + TASK_CATEGORIES[categoryIndex]
@@ -672,34 +674,35 @@ public class IntegrationTest {
     // First task location in homepage
     String taskXPath = "//div[@id='tasks-list']/div[1]";
 
+    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+
     String taskOverviewActual =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(taskXPath + "/div[2]/div[2]"));
-                  }
-                })
-            .getText();
+        (String)
+            js.executeScript("return document.getElementsByClassName('task-content')[0].innerText");
+    /**
+     * wait.until( new Function<WebDriver, WebElement>() { public WebElement apply(WebDriver driver)
+     * { return driver.findElement(By.xpath(taskXPath + "/div[2]/div[2]")); } }) .getText();
+     */
     assertEquals(recentTask.get("overview"), taskOverviewActual);
 
     String taskNicknameActual =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(taskXPath + "/div[2]/div[1]/div[1]"));
-                  }
-                })
-            .getText();
+        (String)
+            js.executeScript(
+                "return document.getElementsByClassName('user-nickname')[0].innerText");
+    /**
+     * wait.until( new Function<WebDriver, WebElement>() { public WebElement apply(WebDriver driver)
+     * { return driver.findElement(By.xpath(taskXPath + "/div[2]/div[1]/div[1]")); } }) .getText();
+     */
     assertEquals(recentTask.get("nickname"), taskNicknameActual);
 
     String taskCategoryActual =
-        wait.until(
-                new Function<WebDriver, WebElement>() {
-                  public WebElement apply(WebDriver driver) {
-                    return driver.findElement(By.xpath(taskXPath + "/div[2]/div[3]/div[1]"));
-                  }
-                })
-            .getText();
+        (String)
+            js.executeScript(
+                "return document.getElementsByClassName('task-category')[0].innerText");
+    /**
+     * wait.until( new Function<WebDriver, WebElement>() { public WebElement apply(WebDriver driver)
+     * { return driver.findElement(By.xpath(taskXPath + "/div[2]/div[3]/div[1]")); } }) .getText();
+     */
     assertEquals(recentTask.get("category"), taskCategoryActual.substring(1));
     // Opens up task details modal to verify its contents
     verifyTaskDetails(taskXPath);
@@ -732,6 +735,8 @@ public class IntegrationTest {
     js.executeScript("document.getElementById('edit-zipcode-input').value='" + zipcode + "';");
     js.executeScript("document.getElementById('edit-country-input').value='" + country + "';");
     js.executeScript("document.getElementById('phone-input').value='" + phone + "';");
+    js.executeScript("document.getElementById('lat-input').value='" + USER_LAT + "';");
+    js.executeScript("document.getElementById('lng-input').value='" + USER_LNG + "';");
 
     // clicks on submit button
     wait.until(

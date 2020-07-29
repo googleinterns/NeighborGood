@@ -14,11 +14,7 @@
 
 package com.google.neighborgood.task;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import java.sql.Timestamp;
@@ -142,5 +138,9 @@ public final class Task {
     String userId = userLoggedIn ? userService.getCurrentUser().getUserId() : "null";
     if (userId.equals(ownerId)) this.isOwnerCurrentUser = true;
     else this.isOwnerCurrentUser = false;
+  }
+
+  public String getOverview() {
+    return this.overview;
   }
 }

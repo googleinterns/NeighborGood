@@ -153,7 +153,4 @@ public final class HelperFunctionTest {
     errContent.reset();
     System.setErr(originalErr);
   }
-
-  @Test
-  public void TaskGroupClassTest() {}
 }

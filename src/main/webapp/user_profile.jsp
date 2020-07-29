@@ -117,7 +117,7 @@
                 <textarea name="task-detail-input" id="task-detail-input" placeholder="Describe your task here:"></textarea>
                 <br/><br/>
                 <label for="rewarding-point-input">Rewarding Points<span class="req">*</span></label>
-                <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50">
+                <input type="number" id="reward-input" name="reward-input" min="0" max="200" value="50">
                 <br/><br/>
                 <label for="category-input">Task Category<span class="req">*</span></label>
                 <select name="category-input" id="category-input" form="new-task-form">
