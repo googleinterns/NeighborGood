@@ -37,13 +37,7 @@ import org.openqa.selenium.support.ui.FluentWait;
 
 @RunWith(JUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-/**
- * Due to how the interactions from one test build up onto the other as part of this integration
- * test, the FixMethodOrder decorator is used to guarantee order of execution of tests. In the
- * future, the setup required from previous tests will be done without the use of webdriver in an
- * attempt to make each test independent of each other and thus eliminating the use of the
- * FixMethodOrder decorator
- */
+/* Due to how the interactions from one test build up onto the other as part of this integration test, the FixMethodOrder decorator is used to guarantee order of execution of tests. */
 public class IntegrationTest {
 
   private static ChromeDriver driver;
@@ -71,10 +65,7 @@ public class IntegrationTest {
   private static HashMap<String, String> recentTask = new HashMap<String, String>();
 
   @BeforeClass
-  /**
-   * Sets up test class by initializing driver, wait, js executor, and clearing all datastore
-   * entities
-   */
+  /* Sets up test class by initializing driver, wait, js executor, and clearing all datastore entities */
   public static void setupClass() {
     WebDriverManager.chromedriver().setup();
     driver = new ChromeDriver();
@@ -107,10 +98,7 @@ public class IntegrationTest {
   }
 
   @Test
-  /**
-   * Tests functionality of a guest user who logs in for the first time in the site and has to input
-   * their new user info
-   */
+  /* Tests functionality of a guest user who logs in for the first time in the site and has to input their new user info */
   public void _01_Homepage_AsNewGuestUser_LoginAndInputUserInfo() {
     driver.navigate().to("http://localhost:8080/");
     ifLaggingThenRefresh();
@@ -168,7 +156,7 @@ public class IntegrationTest {
   }
 
   @Test
-  /** Tests functionality of adding tasks from the homepage */
+  /* Tests functionality of adding tasks from the homepage */
   public void _02_Homepage_AsLoggedUser_AddTask() {
     // Confirm that the user is still logged in
     verifyLoggedUser(USER_NICKNAME, "login-logout");
@@ -198,7 +186,7 @@ public class IntegrationTest {
   }
 
   @Test
-  /** Tests functionality of adding tasks from the userpage */
+  /* Tests functionality of adding tasks from the userpage */
   public void _03_UserPage_AsLoggedUser_AddTask() {
     goToUserPage();
     ifLaggingThenRefresh();
@@ -231,7 +219,7 @@ public class IntegrationTest {
   }
 
   @Test
-  /** Tests functionality of logging out */
+  /* Tests functionality of logging out */
   public void _04_Homepage_AsLoggedUser_LogOut() {
     // Logs out by using 'loginLogoutMessage' element id;
     logOut("loginLogoutMessage");
@@ -247,7 +235,7 @@ public class IntegrationTest {
   }
 
   @Test
-  /** Tests functionality of a helper helping out with a task */
+  /* Tests functionality of a helper helping out with a task */
   public void _05_Homepage_AsLoggedHelper_HelpOut() {
     loginNewUser(
         USER_EMAIL_HELPER,
@@ -272,7 +260,7 @@ public class IntegrationTest {
   }
 
   @Test
-  /** Tests functionality of having a helper mark a task as complete */
+  /* Tests functionality of having a helper mark a task as complete */
   public void _06_Userpage_AsLoggedHelper_CompleteTask() {
     completeTaskAsHelper();
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
@@ -307,7 +295,7 @@ public class IntegrationTest {
   }
 
   @Test
-  /** Tests functionality of neighbor user verifying that helper did indeed complete a task */
+  /* Tests functionality of neighbor user verifying that helper did indeed complete a task */
   public void _07_Userpage_AsLoggedUser_VerifyCompletedTask() {
     // Logs out by using 'logout-href' element id;
     logOut("logout-href");
@@ -381,7 +369,7 @@ public class IntegrationTest {
   }
 
   @Test
-  /** Verifies that the completed task shows as completed on the helper's user profile */
+  /* Verifies that the completed task shows as completed on the helper's user profile */
   public void _08_Userpage_AsHelper_CompletedTask() {
     logOut("logout-href");
     ifLaggingThenRefresh();
@@ -414,7 +402,7 @@ public class IntegrationTest {
   }
 
   @Test
-  /** Test functionality of disapproving a helper's completed task */
+  /* Test functionality of disapproving a helper's completed task */
   public void _09_Userpage_AsLoggedUser_DisapproveTask() {
     backToHome();
     ifLaggingThenRefresh();
@@ -481,7 +469,7 @@ public class IntegrationTest {
   }
 
   @Test
-  /** Test functionality of a helper abandoning a task */
+  /* Test functionality of a helper abandoning a task */
   public void _10_UserPage_AsHelper_AbandonTask() {
     logOut("logout-href");
     ifLaggingThenRefresh();
@@ -566,7 +554,7 @@ public class IntegrationTest {
     assertEquals((long) openTotalTaskCount, tasksAfterScrolling.size());
   }
 
-  /** Clears entities from Datastore before test class */
+  /* Clears entities from Datastore before test class */
   private static void clearAllDatastoreEntities() {
     driver.get("http://localhost:8080/_ah/admin");
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
@@ -620,7 +608,7 @@ public class IntegrationTest {
     }
   }
 
-  /** Adds task with provided details, points, and category index */
+  /* Adds task with provided details, points, and category index */
   private void addTask(String details, String points, int categoryIndex, String overview) {
 
     // Stores recentTask contents so tests can reference it
@@ -676,9 +664,7 @@ public class IntegrationTest {
     openTotalTaskCount++;
   }
 
-  /**
-   * Verifies that newly added task's details are correctly display in userpage's need help table
-   */
+  /* Verifies that newly added task's details are correctly display in userpage's need help table */
   private void verifyNewTaskUserPage() {
     // Location of most recent task in user page's need help
     String taskRowXPath = "//table[@id='need-help']/tbody/tr[1]";
@@ -720,7 +706,7 @@ public class IntegrationTest {
     assertEquals(userTaskCount, notCompletedTasks.size() + completedTasks.size());
   }
 
-  /** Verifies that newly added tasks are displayed properply in homepage */
+  /* Verifies that newly added tasks are displayed properply in homepage */
   private void verifyNewTaskHomepage() {
 
     // First task location in homepage
@@ -731,30 +717,21 @@ public class IntegrationTest {
     String taskOverviewActual =
         (String)
             js.executeScript("return document.getElementsByClassName('task-content')[0].innerText");
-    /**
-     * wait.until( new Function<WebDriver, WebElement>() { public WebElement apply(WebDriver driver)
-     * { return driver.findElement(By.xpath(taskXPath + "/div[2]/div[2]")); } }) .getText();
-     */
+
     assertEquals(recentTask.get("overview"), taskOverviewActual);
 
     String taskNicknameActual =
         (String)
             js.executeScript(
                 "return document.getElementsByClassName('user-nickname')[0].innerText");
-    /**
-     * wait.until( new Function<WebDriver, WebElement>() { public WebElement apply(WebDriver driver)
-     * { return driver.findElement(By.xpath(taskXPath + "/div[2]/div[1]/div[1]")); } }) .getText();
-     */
+
     assertEquals(recentTask.get("nickname"), taskNicknameActual);
 
     String taskCategoryActual =
         (String)
             js.executeScript(
                 "return document.getElementsByClassName('task-category')[0].innerText");
-    /**
-     * wait.until( new Function<WebDriver, WebElement>() { public WebElement apply(WebDriver driver)
-     * { return driver.findElement(By.xpath(taskXPath + "/div[2]/div[3]/div[1]")); } }) .getText();
-     */
+
     assertEquals(recentTask.get("category"), taskCategoryActual.substring(1));
     // Opens up task details modal to verify its contents
     verifyTaskDetails(taskXPath);
@@ -769,7 +746,7 @@ public class IntegrationTest {
     assertEquals(openTotalTaskCount, tasks.size());
   }
 
-  /** Logs a new user in and provides the user info details to fill out in the form */
+  /* Logs a new user in and provides the user info details to fill out in the form */
   private void loginNewUser(
       String email, String nickname, String address, String phone, String zipcode, String country) {
     loginUser(email);
@@ -801,7 +778,7 @@ public class IntegrationTest {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
-  /** Logs in users that already have their information saved (not new users) */
+  /* Logs in users that already have their information saved (not new users) */
   private void loginUser(String email) {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     // clicks on login link element
@@ -831,7 +808,7 @@ public class IntegrationTest {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
-  /** Sends driver back to the homepage */
+  /* Sends driver back to the homepage */
   private void backToHome() {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     // clicks on back to home button
@@ -845,7 +822,7 @@ public class IntegrationTest {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
-  /** Sends driver to User Page */
+  /* Sends driver to User Page */
   private void goToUserPage() {
     // clicks on userpage button
     wait.until(
@@ -858,7 +835,7 @@ public class IntegrationTest {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
-  /** Sends driver to the offer help table within the user page */
+  /* Sends driver to the offer help table within the user page */
   private void goToOfferHelp() {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     // clicks on offer help button
@@ -872,11 +849,7 @@ public class IntegrationTest {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
-  /**
-   * Verifies that logged user's details are correctly displayed. Takes in the user nickname as an
-   * argument and the elementId for the login display message, which will depend on whether the user
-   * is in the userpage or homepage
-   */
+  /* Verifies that logged user's details are correctly displayed */
   private void verifyLoggedUser(String nickname, String elementId) {
     String logoutActualMessage =
         wait.until(
@@ -890,7 +863,7 @@ public class IntegrationTest {
     assertEquals(nickname + " | Logout", logoutActualMessage);
   }
 
-  /** Helper claims a task from the homepage */
+  /* Function that has Helper claim a task from the homepage */
   private void helpOut() {
     String taskXPath = "//div[@id='tasks-list']/div[1]";
 
@@ -943,10 +916,7 @@ public class IntegrationTest {
     openTotalTaskCount--;
   }
 
-  /**
-   * Verifies that after claiming a task/offering help with a task, that it displays correctly in
-   * the user page's offer help table
-   */
+  /* Verifies that after claiming a task/offering help with a task, that it displays correctly in the user page's offer help table */
   private void verifyOfferHelpTask() {
     // Location of most recent task in offer help table in userpage
     String offerHelpRowXPath = "//tbody[@id='offer-help-body']/tr[1]";
@@ -971,7 +941,7 @@ public class IntegrationTest {
     verifyTaskDetails(offerHelpRowXPath + "/td[1]");
   }
 
-  /** Logs out user - takes logout link id as a parameter */
+  /*  Logs out user - takes logout link id as a parameter */
   private void logOut(String logoutId) {
     // clicks on logout button
     wait.until(
@@ -984,10 +954,7 @@ public class IntegrationTest {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
   }
 
-  /**
-   * Updates the stored instance of recentTask with the most recent open task's contents displayed
-   * in the homepage
-   */
+  /* Updates the stored instance of recentTask with the most recent open task's contents displayed in the homepage */
   private void updateRecentTask() {
     recentTask.clear();
 
@@ -1031,7 +998,7 @@ public class IntegrationTest {
     recentTask.put("helper", "N/A");
   }
 
-  /** Has helper mark a task as complete */
+  /* Has helper mark a task as complete */
   private void completeTaskAsHelper() {
     // Location of most recent task in offer help table
     String taskMarkCompleteXPath = "//tbody[@id='offer-help-body']/tr[1]/td[5]/button";
@@ -1058,7 +1025,7 @@ public class IntegrationTest {
     recentTask.put("status", "COMPLETE: AWAIT VERIFICATION");
   }
 
-  /** Attempts to auto refresh the page if the page is lagging */
+  /* Attempts to auto refresh the page if the page is lagging */
   private void ifLaggingThenRefresh() {
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     while (js.executeScript("return document.readyState").equals("loading")) {
@@ -1067,7 +1034,7 @@ public class IntegrationTest {
     }
   }
 
-  /** clicks on task overview to open up task detail modal */
+  /* clicks on task overview to open up task detail modal */
   private void verifyTaskDetails(String taskXpath) {
     String taskDetail = getTaskDetails(taskXpath);
     assertEquals(recentTask.get("detail"), taskDetail);

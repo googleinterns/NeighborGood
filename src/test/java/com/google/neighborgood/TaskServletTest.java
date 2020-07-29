@@ -65,6 +65,8 @@ public final class TaskServletTest {
   private HttpSession session;
   private HttpServletResponse response;
   private Entity userEntity;
+  private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+  private final PrintStream originalErr = System.err;
 
   @Before
   public void setUp() {
@@ -316,6 +318,131 @@ public final class TaskServletTest {
     jsonObject = new JsonParser().parse(stringWriter.toString()).getAsJsonObject();
 
     // Response should have 5 tasks and should be the end of the query
+    taskCount = jsonObject.get("currentTaskCount").getAsInt();
+    endOfQuery = jsonObject.get("endOfQuery").getAsBoolean();
+    assertEquals(5, taskCount);
+    assertEquals(true, endOfQuery);
+  }
+
+  @Test
+  public void missingNeighborhoodDoGetTest() throws IOException, ServletException {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    // Check whether there are no entities before test
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    assertEquals(0, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
+
+    when(request.getParameter("cursor")).thenReturn("clear");
+    when(request.getSession()).thenReturn(session);
+
+    System.setErr(new PrintStream(errContent));
+
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    new TaskServlet().doGet(request, response);
+
+    writer.flush();
+
+    // Captures System error printed out when zipcode and country parameters are missing
+    assertEquals("Zipcode and Country details are missing\n", errContent.toString());
+
+    errContent.reset();
+    System.setErr(originalErr);
+
+    // Verifies correct error code and message got sent out
+    verify(response).sendError(400, "Zipcode and Country details are missing");
+  }
+
+  @Test
+  public void categoryFilterDoGetTest() throws IOException, ServletException {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    // Check whether there are no entities before test
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    assertEquals(0, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
+
+    String[] categories = {"Garden", "Pets", "Shopping", "Misc"};
+
+    // Adds 20 task entities, 5 of each category
+    for (int i = 0; i < 20; i++) {
+      Entity taskEntity = new Entity("Task", userEntity.getKey());
+      taskEntity.setProperty("detail", "Test task detail");
+      taskEntity.setProperty("overview", "Test task overview" + i);
+      taskEntity.setProperty("timestamp", System.currentTimeMillis());
+      taskEntity.setProperty("reward", (long) 50);
+      taskEntity.setProperty("status", "OPEN");
+      taskEntity.setProperty("Owner", "1234567890");
+      taskEntity.setProperty("Helper", "N/A");
+      taskEntity.setProperty("Address", "xxx");
+      taskEntity.setProperty("zipcode", "98033");
+      taskEntity.setProperty("country", "United States");
+      taskEntity.setProperty("category", categories[(i % 4)]);
+      ds.put(taskEntity);
+    }
+
+    // Adds 2 more task entities of Shopping category
+    for (int i = 0; i < 2; i++) {
+      Entity taskEntity = new Entity("Task", userEntity.getKey());
+      taskEntity.setProperty("detail", "Test task detail");
+      taskEntity.setProperty("overview", "Test task overview" + i);
+      taskEntity.setProperty("timestamp", System.currentTimeMillis());
+      taskEntity.setProperty("reward", (long) 50);
+      taskEntity.setProperty("status", "OPEN");
+      taskEntity.setProperty("Owner", "1234567890");
+      taskEntity.setProperty("Helper", "N/A");
+      taskEntity.setProperty("Address", "xxx");
+      taskEntity.setProperty("zipcode", "98033");
+      taskEntity.setProperty("country", "United States");
+      taskEntity.setProperty("category", "Shopping");
+      ds.put(taskEntity);
+    }
+
+    when(request.getParameter("zipcode")).thenReturn("98033");
+    when(request.getParameter("country")).thenReturn("United States");
+    when(request.getParameter("cursor")).thenReturn("clear");
+    when(request.getParameter("category")).thenReturn("Shopping");
+    Map<String, String[]> dummyReturn = new HashMap<>();
+    dummyReturn.put("zipcode", new String[] {"dummy1"});
+    dummyReturn.put("country", new String[] {"dummy1"});
+    dummyReturn.put("category", new String[] {"dummy1"});
+    when(request.getParameterMap()).thenReturn(dummyReturn);
+    when(request.getSession()).thenReturn(session);
+
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    new TaskServlet().doGet(request, response);
+
+    writer.flush();
+
+    // parses response as a json object
+    JsonObject jsonObject = new JsonParser().parse(stringWriter.toString()).getAsJsonObject();
+
+    // Response should have 7 shopping tasks and should be end of query
+    int taskCount = jsonObject.get("currentTaskCount").getAsInt();
+    boolean endOfQuery = jsonObject.get("endOfQuery").getAsBoolean();
+    assertEquals(7, taskCount);
+    assertEquals(true, endOfQuery);
+
+    when(request.getParameter("category")).thenReturn("Misc");
+
+    stringWriter = new StringWriter();
+    writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    new TaskServlet().doGet(request, response);
+
+    writer.flush();
+
+    // parses response as a json object
+    jsonObject = new JsonParser().parse(stringWriter.toString()).getAsJsonObject();
+
+    // Response should have 5 misc tasks and should be end of query
     taskCount = jsonObject.get("currentTaskCount").getAsInt();
     endOfQuery = jsonObject.get("endOfQuery").getAsBoolean();
     assertEquals(5, taskCount);
