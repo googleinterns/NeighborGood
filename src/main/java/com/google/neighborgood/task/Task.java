@@ -17,11 +17,8 @@ package com.google.neighborgood.task;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.api.datastore.Query.FilterPredicate;
 
 public final class Task {
   private final String detail;
@@ -79,12 +76,10 @@ public final class Task {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     String ownerId = (String) entity.getProperty("Owner");
     String helperId = (String) entity.getProperty("Helper");
-    Query ownerQuery =
-        new Query("UserInfo")
-            .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, ownerId));
-    PreparedQuery results = datastore.prepare(ownerQuery);
-    Entity ownerEntity = results.asSingleEntity();
-    if (ownerEntity == null) {
+    Entity ownerEntity = null;
+    try {
+      ownerEntity = datastore.get(KeyFactory.createKey("UserInfo", ownerId));
+    } catch (EntityNotFoundException e) {
       System.err.println("Unable to find the owner of the task in the database");
       this.owner = ownerId;
       this.helper = helperId;
@@ -94,13 +89,11 @@ public final class Task {
     // If the task status is still "OPEN", the input helper should be "N/A".
     // Otherwise, we will show the nickname of the helper.
     if (!helperId.equals("N/A")) {
-      Query helperQuery =
-          new Query("UserInfo")
-              .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, helperId));
-      results = datastore.prepare(helperQuery);
-      Entity helperEntity = results.asSingleEntity();
-      if (helperEntity == null) {
-        System.err.println("Unable to find the owner of the task in the database");
+      Entity helperEntity = null;
+      try {
+        helperEntity = datastore.get(KeyFactory.createKey("UserInfo", helperId));
+      } catch (EntityNotFoundException e) {
+        System.err.println("Unable to find the helper of the task in the database");
         this.helper = helperId;
         return;
       }

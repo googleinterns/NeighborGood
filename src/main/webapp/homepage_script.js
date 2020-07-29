@@ -14,47 +14,72 @@
 
 const MAPSKEY = config.MAPS_KEY
 let neighborhood = [null , null];
+let userLocation = null;
+let userActualLocation = null;
 let currentCategory = "all";
+let taskGroup = null;
 
-window.onscroll = stickyControlBar;
+/* Changes navbar background upon resize */
+window.addEventListener("resize", function() {
+    let navbar = document.getElementsByTagName("nav")[0];
+    if (window.innerWidth < 1204) navbar.style.backgroundColor = "white";
+    else navbar.style.backgroundColor = "transparent";
+});
 
-/* Scroll function so that the control bar sticks to the top of the page */
-function stickyControlBar() {
-    let controlBarWrapper = document.getElementById("control-bar-message-wrapper");
-    let taskListDiv = document.getElementById("tasks-list");
-
-    // Scrolling behavior in screens smaller than 1204 will result in overlapping DOM elements
-    // therefore this scrolling function only applies to screens as big or bigger than that
+/* Changes navbar background upon scroll */
+window.onscroll = function() {
     if (window.innerWidth >= 1204) {
-        const OFFSET = 190; //Distance from top of page to top of control (categories) bar
+        let navbar = document.getElementsByTagName("nav")[0];
+        OFFSET = 180; // approx distance from top of page to top of control (categories) bar
         if (window.pageYOffset >= OFFSET || document.body.scrollTop >= OFFSET || document.documentElement.scrollTop >= OFFSET) {
-            controlBarWrapper.style.position = "fixed";
-            // adjust task list container so it appears like it's in the same position
-            // after controlBarWrapper's position is changed to 'fixed' 
-            taskListDiv.style.marginTop = "165px"; 
-        } else {
-            controlBarWrapper.style.position = "relative";
-            taskListDiv.style.marginTop = "auto";
-        }
+            navbar.style.backgroundColor = "white";
+        } else navbar.style.backgroundColor = "transparent";
     }
 }
 
-/* Calls addUIClickHandlers and getUserNeighborhood once page has loaded */
+/* Adds scroll event listener to load more tasks if the user has reached the bottom of the page */
+document.addEventListener("scroll", function() {
+    if (getDocumentHeight() == getVerticalScroll() + window.innerHeight) {
+        loadMoreTasks();
+    }
+})
+
+/* Returns document height using different methods of doing so that differ by browser */
+function getDocumentHeight() {
+    return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight,
+        document.body.offsetHeight, document.documentElement.offsetHeight,
+        document.body.clientHeight, document.documentElement.clientHeight);
+}
+
+/* Returns the vertical scroll the user has gone using different methods of doing so that differ by browser */
+function getVerticalScroll() {
+    let verticalScroll = 0;
+    if( typeof( window.pageYOffset ) == 'number' ) {
+        verticalScroll = window.pageYOffset;
+    } else if( document.body && document.body.scrollTop) {
+        verticalScroll = document.body.scrollTop;
+    } else if( document.documentElement && document.documentElement.scrollTop) {
+        verticalScroll = document.documentElement.scrollTop;
+    }
+    return verticalScroll;
+}
+
+/* Calls addUIClickHandlers and getTasksForUserLocation once page has loaded */
 if (document.readyState === 'loading') {
     // adds on load event listeners if document hasn't yet loaded
-    document.addEventListener('DOMContentLoaded', addUIClickHandlers)
-    document.addEventListener('DOMContentLoaded', getUserNeighborhood);
+    document.addEventListener('DOMContentLoaded', addUIClickHandlers);
+    document.addEventListener('DOMContentLoaded', getTasksForUserLocation);
 } else {
     // if DOMContentLoaded has already fired, it simply calls the functions
     addUIClickHandlers();
-    getUserNeighborhood();
+    getTasksForUserLocation();
 }
 
 /* Function adds all the necessary UI 'click' event listeners*/
 function addUIClickHandlers() {
     // adds showCreateTaskModal and closeCreateTaskModal click events for the add task button
-    if (document.body.contains(document.getElementById("addtaskbutton"))) {
-        document.getElementById("addtaskbutton").addEventListener("click", showCreateTaskModal);
+    if ((document.getElementById("create-task-button") !== null)) {
+        document.getElementById("create-task-button").addEventListener("click", showCreateTaskModal);
     	document.getElementById("close-addtask-button").addEventListener("click", closeCreateTaskModal);
     }
 
@@ -65,19 +90,45 @@ function addUIClickHandlers() {
             filterTasksBy(e.target.id);
         });
     }
-    // adds showTopScoresModal click event 
+    // adds showTopScoresModal and closeTopScoresModal click event
     document.getElementById("topscore-button").addEventListener("click", showTopScoresModal);
     document.getElementById("close-topscore-button").addEventListener("click", closeTopScoresModal);
+
+    // adds closeTaskInfoModal click event
+    document.getElementById("task-info-close-button").addEventListener("click", closeTaskInfoModal);
+}
+
+/* Function loads ten more tasks if there are any more, otherwise it displays a message saying there are no more tasks */
+function loadMoreTasks() {
+    if (userNeighborhoodIsKnown()) {
+        if (!taskGroup.endOfQuery) {
+            fetchTasks(currentCategory, "end")
+                .then(response => {
+                        taskGroup = response;
+                        displayTasks(true);
+                    });
+        } else if (!document.getElementById("no-more-tasks")) {
+            let noMoreTasksDiv = document.createElement("div");
+            noMoreTasksDiv.setAttribute("id", "no-more-tasks");
+            noMoreTasksDiv.classList.add("results-message");
+            noMoreTasksDiv.innerText = "There are no more tasks in your neighborhood";
+            noMoreTasksDiv.style.display = "block";
+            document.getElementById("tasks-list").appendChild(noMoreTasksDiv);
+        }                
+    } 
 }
 
 /* Function filters tasks by categories and styles selected categories */
 function filterTasksBy(category) {
     currentCategory = category;
 
-    // only fetches tasks if user's neighborhood has been retrieved
+    // only fetches tasks if user's location has been retrieved
     if (userNeighborhoodIsKnown()) {
-        fetchTasks(category)
-            .then(response => displayTasks(response));
+        fetchTasks(currentCategory, "clear")
+            .then(response => {
+                    taskGroup = response;
+                    displayTasks();
+                });
     }
 	// Unhighlights and resets styling for all category buttons
     const categoryButtons = document.getElementsByClassName("categories");
@@ -124,9 +175,9 @@ function confirmHelp(element) {
                 ("We're sorry, but the task you're trying to help with has already been claimed by another user.");
             window.location.href = '/';
         }
-        // fetches tasks again if user's current neighborhood was successfully retrieved and stored
-        else if (userNeighborhoodIsKnown()) {
-            fetchTasks(currentCategory).then(response => displayTasks(response));
+        // hides task from list if it was succesfully claimed
+        else {
+            element.closest(".task").style.display = "none";
         }
     });
 }
@@ -168,12 +219,12 @@ function validateTaskForm(id) {
     return true;
 }
 
-/* Function that calls the loadTopScorersBy functions
+/* Function that calls the loadTopScorers functions
    and then shows the top scores modal */
 function showTopScoresModal() {
-    loadTopScorersBy("world");
+    loadTopScorers("world");
     if (userNeighborhoodIsKnown()){
-      loadTopScorersBy("neighborhood");
+      loadTopScorers("neighborhood");
     }
     document.getElementById("topScoresModalWrapper").style.display = "block";
 }
@@ -184,7 +235,7 @@ function closeTopScoresModal() {
 }
 
 /* Function loads the data for the top scorers table */
-function loadTopScorersBy(location) {
+function loadTopScorers(location) {
     let url = "/account?action=topscorers";
     if (location === "neighborhood") {
       url += "&zipcode=" + neighborhood[0] + "&country=" + neighborhood[1];
@@ -237,8 +288,9 @@ async function getTaskInfo(keyString) {
     return info;
 }
 
-async function showTaskInfo(keyString) {
-    const info = await getTaskInfo(keyString);
+async function showTaskInfo(element) {
+    const task = element.closest(".task");
+    const info = await getTaskInfo(task.dataset.key);
     var detailContainer = document.getElementById("task-detail-container");
     detailContainer.innerHTML = "";
     detailContainer.appendChild(document.createTextNode(info.detail));
@@ -252,25 +304,50 @@ function closeTaskInfoModal() {
 }
 
 /* Function dynamically adds Maps API and
-begins the processes of retrieving the user's neighborhood*/
-function getUserNeighborhood() {
+begins the processes of retrieving the user's location*/
+function getTasksForUserLocation() {
     const script = document.createElement("script");
     script.type = "text/javascript";
-    script.src =  "https://maps.googleapis.com/maps/api/js?key=" + MAPSKEY + "&callback=initialize&language=en";
+    script.src =  "https://maps.googleapis.com/maps/api/js?key=" + MAPSKEY + "&callback=initialize&libraries=places&language=en";
     script.defer = true;
     script.async = true;
     document.head.appendChild(script);
-	
-    // Once the Maps API script has dynamically loaded it gets the user location,
-    // waits until it gets an answer and then calls toNeighborhood passing the location
-    // as an argument, updates the global neighborhood variable and then calls
-    // fetchTasks and displayTasks
+
 	window.initialize = function () {
-        getUserLocation().then(location => toNeighborhood(location))
-        	.then(() => fetchTasks())
-            .then((response) => displayTasks(response))
+        // Once the Maps API script has dynamically loaded it initializes the place autocomplete searchbox
+        let placeAutocomplete = new google.maps.places.Autocomplete(document.getElementById("place-input"));
+        // 'geometry' field specifies that returned data will include the place's viewport and lat/lng
+        placeAutocomplete.setFields(['geometry']);
+
+        // listener will use the inputted place to retrieve and display tasks
+        google.maps.event.addListener(placeAutocomplete, 'place_changed', function() {
+                let place = placeAutocomplete.getPlace();
+                if (place.geometry != undefined) {
+                    userLocation = place.geometry.location.toJSON();
+                } else {
+                    userLocation = userActualLocation;
+                }
+                toNeighborhood(userLocation)
+                        .then(() => fetchTasks(currentCategory, "clear"))
+                        .then(response => {
+                                taskGroup = response;
+                                displayTasks(response);
+                            })
+                        .catch(() => {
+                            document.getElementById("loading").style.display = "none";
+                            document.getElementById("location-missing-message").style.display = "block";
+                        });
+              });
+        // Once the Maps API script has dynamically loaded it initializes it gets the user location,
+        // retrieves the neighborhood from the location coordinates, fetches the tasks, and displays them
+         getUserLocation().then(location => toNeighborhood(location))
+        	.then(() => fetchTasks(currentCategory, "clear"))
+            .then(response => {
+                    taskGroup = response;
+                    displayTasks();
+                })
             .catch(() => {
-                console.error("User location and/or neighborhood could not be retrieved");
+                document.getElementById("loading").style.display = "none";
                 document.getElementById("location-missing-message").style.display = "block";
             });
 	}
@@ -278,30 +355,42 @@ function getUserNeighborhood() {
 
 /* Function that returns a promise to get and return the user's location */
 function getUserLocation() {
+    let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
+    const request = new Request(url, {method: "POST"});
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
-                var location = {lat: position.coords.latitude, lng: position.coords.longitude};
-                resolve(location);
-            }, function(err) {
-                let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
-                const request = new Request(url, {method: "POST"});
+                userLocation = {lat: position.coords.latitude, lng: position.coords.longitude};
+                userActualLocation = userLocation;
+                resolve(userLocation);
+            }, function() {
                 fetch(request).then(response => {
                     if (response.status == 400 || response.status == 403 || response.status == 404) {
                         reject("User location failed");
                     } else {
                         response.json().then(jsonresponse => {
-                            resolve(jsonresponse["location"]);
+                            userLocation = jsonresponse["location"];
+                            userActualLocation = userLocation;
+                            resolve(userLocation);
                         });
                     }
                 });
             });
         } else {
-            reject("User location is not supported by this browser");
+            fetch(request).then(response => {
+                    if (response.status == 400 || response.status == 403 || response.status == 404) {
+                        reject("User location failed");
+                    } else {
+                        response.json().then(jsonresponse => {
+                            userLocation = jsonresponse["location"];
+                            userActualLocation = userLocation;
+                            resolve(userLocation);
+                        });
+                    }
+                });
         }
     });
 }
-       
 
 /* Function that returns a promise to return a neighborhood
 array that includes the postal code and country */
@@ -332,30 +421,33 @@ function toNeighborhood(latlng) {
     });
 }
 
-/* Fetches tasks from servlet by neighborhood and category */
-function fetchTasks(category) {
-    let url = "/tasks?zipcode=" + neighborhood[0]+ "&country=" + neighborhood[1];
+/* Fetches tasks from servlet by category and cursor action.
+   Cursor can pick up from the last start, the endpoint, or clear
+   the cursor and start from beginning of query */
+function fetchTasks(category, cursorAction) {
+    let url = "/tasks?zipcode=" + neighborhood[0]+ "&country=" + neighborhood[1] +"&cursor=" + cursorAction;
     if (category !== undefined && category != "all") {
         url += "&category=" + category;
     }
-    return fetch(url);
+    return fetch(url).then(response => response.json());
 }
 
 /* Displays the tasks received from the server response */
-function displayTasks(response) {
-    response.json().then(html => {
-        if (html){
-            document.getElementById("no-tasks-message").style.display = "none";
-            document.getElementById("tasks-message").style.display = "block";
-            document.getElementById("tasks-list").innerHTML = html;
-            document.getElementById("tasks-list").style.display = "block";
-            addTasksClickHandlers();
-        } else {
-            document.getElementById("no-tasks-message").style.display = "block";
-            document.getElementById("tasks-message").style.display = "none";
-            document.getElementById("tasks-list").style.display = "none";
-        }
-    });
+function displayTasks(append) {
+    if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
+        document.getElementById("no-tasks-message").style.display = "none";
+        document.getElementById("tasks-message").style.display = "block";
+        if (append) document.getElementById("tasks-list").innerHTML += taskGroup.tasks;
+        else document.getElementById("tasks-list").innerHTML = taskGroup.tasks;
+        document.getElementById("tasks-list").style.display = "block";
+        addTasksClickHandlers();
+    } else {
+        document.getElementById("no-tasks-message").style.display = "block";
+        document.getElementById("tasks-message").style.display = "none";
+        document.getElementById("tasks-list").style.display = "none";
+    }
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("search-box").style.visibility = "visible";
 }
 
 /* Function adds all the necessary tasks 'click' event listeners*/
@@ -366,25 +458,45 @@ function addTasksClickHandlers() {
     for (let i = 0; i < confirmHelpButtons.length; i++){
         confirmHelpButtons[i].addEventListener("click", function(e) {
             confirmHelp(e.target);
+            e.stopPropagation();
         });
-        
+
     }
     // adds exitHelp click event listener to exit help buttons
     const exitHelpButtons = document.getElementsByClassName("exit-help");
     for (let i = 0; i < exitHelpButtons.length; i++) {
         exitHelpButtons[i].addEventListener("click", function(e) {
             exitHelp(e.target);
+            e.stopPropagation();
         });
     }
+
     // adds helpOut click event listener to help out buttons
     const helpOutButtons = document.getElementsByClassName("help-out");
-        for (let i = 0; i < helpOutButtons.length; i++) {
-            if (!helpOutButtons[i].classList.contains("disable-help")) {
-                helpOutButtons[i].addEventListener("click", function(e) {
-                    helpOut(e.target);
-                });
-            }
+    for (let i = 0; i < helpOutButtons.length; i++) {
+        if (!helpOutButtons[i].classList.contains("disable-help")) {
+            helpOutButtons[i].addEventListener("click", function(e) {
+                helpOut(e.target);
+                e.stopPropagation();
+            });
         }
+    }
+
+    // adds stopPropagation on help overlay to prevent opening task details when clicking on it
+    const helpOverlays = document.getElementsByClassName("help-overlay");
+    for (let i = 0; i < helpOverlays.length; i++) {
+        helpOverlays[i].addEventListener("click", function(e) {
+            e.stopPropagation();
+        });
+    }
+    
+    // adds task click event listener to open up task details
+    const tasks = document.getElementsByClassName("task");
+    for (let i = 0; i < tasks.length; i++) {
+        tasks[i].addEventListener("click", function(e) {
+            showTaskInfo(e.target);
+        });
+    }
 }
 
 /* Helper function that determines if the current user's neighborhood is known */

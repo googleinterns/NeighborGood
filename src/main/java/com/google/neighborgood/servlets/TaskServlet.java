@@ -14,6 +14,7 @@
 
 package com.google.neighborgood.servlets;
 
+import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -23,19 +24,23 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import com.google.neighborgood.helper.RetrieveUserInfo;
 import com.google.neighborgood.helper.RewardingPoints;
+import com.google.neighborgood.helper.TaskGroup;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /** Servlet that creates new task entity and fetch saved tasks. */
 @WebServlet("/tasks")
@@ -78,79 +83,60 @@ public class TaskServlet extends HttpServlet {
     // Applies filters to query
     query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, filters));
 
-    // limits results to the 20 most recent tasks
-    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(20));
+    FetchOptions fetchOptions = FetchOptions.Builder.withLimit(10);
 
-    StringBuilder out = new StringBuilder();
+    // Helper class instance that will store 10 tasks and keep track of some query metadata
+    TaskGroup taskGroup = new TaskGroup();
 
-    // Stores task owner's user info to prevent querying multiple
-    // times in datastore for the same user's info
-    HashMap<String, String> usersNicknames = new HashMap<String, String>();
+    // Gets session and passed cursor action
+    HttpSession session = request.getSession();
+    String cursorAction = request.getParameter("cursor");
 
-    // Builds and stores HTML for each task
-    for (Entity entity : results) {
-      out.append("<div class='task' data-key='")
-          .append(KeyFactory.keyToString(entity.getKey()))
-          .append("'>");
-      if (userLoggedIn) {
-        out.append("<div class='help-overlay'>");
-        out.append("<div class='exit-help'><a>&times</a></div>");
-        out.append("<a class='confirm-help'>CONFIRM</a>");
-        out.append("</div>");
-      }
-      out.append("<div class='task-container'>");
-      out.append("<div class='task-header'>");
-      out.append("<div class='user-nickname'>");
-
-      // Checks if tasks's user nickname has already been retrieved,
-      // otherwise retrieves it and temporarily stores it
-      String taskOwner = (String) entity.getProperty("Owner");
-      if (usersNicknames.containsKey(taskOwner)) {
-        out.append(usersNicknames.get(taskOwner));
-      } else {
-        Key taskOwnerKey = entity.getParent();
-        try {
-          Entity userEntity = datastore.get(taskOwnerKey);
-          String userNickname = (String) userEntity.getProperty("nickname");
-          usersNicknames.put(taskOwner, userNickname);
-          out.append(userNickname);
-        } catch (EntityNotFoundException e) {
-          System.err.println(
-              "Unable to find the task's owner info to retrieve the owner's nickname. Setting a default nickname.");
-          out.append("Neighbor");
-        }
-      }
-      out.append("</div>");
-      if (userLoggedIn) {
-        // changes the Help Button div if the current user is the owner of the task
-        if (!userId.equals(taskOwner)) {
-          out.append("<div class='help-out'>HELP OUT</div>");
-        } else {
-          out.append(
-              "<div class='help-out disable-help' title='This is your own task'>HELP OUT</div>");
-        }
-      }
-      out.append("</div>");
-      out.append(
-              "<div class='task-content' onclick='showTaskInfo(\""
-                  + KeyFactory.keyToString(entity.getKey())
-                  + "\")'>")
-          .append((String) entity.getProperty("overview"))
-          .append("</div>");
-      out.append("<div class='task-footer'><div class='task-category'>#")
-          .append((String) entity.getProperty("category"))
-          .append("</div></div>");
-      out.append("</div></div>");
+    // Clears cursors if no cursor action is passed or a clear action is passed
+    if (cursorAction == null || cursorAction.equals("clear")) {
+      session.removeAttribute("startCursor");
+      session.removeAttribute("endCursor");
     }
 
+    // initializes startCursor to the appropriate cursor location
+    String startCursor = null;
+    if (cursorAction.equals("start")) {
+      startCursor = (String) session.getAttribute("startCursor");
+    } else if (cursorAction.equals("end")) {
+      startCursor = (String) session.getAttribute("endCursor");
+    }
+
+    // sets cursor in fetchOptions and stores the new startCursor in the session
+    if (startCursor != null) {
+      fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor));
+      session.setAttribute("startCursor", startCursor);
+    }
+
+    QueryResultList<Entity> results;
+    try {
+      results = datastore.prepare(query).asQueryResultList(fetchOptions);
+    } catch (IllegalArgumentException e) {
+      response.sendRedirect("/index.jsp");
+      return;
+    }
+
+    for (Entity entity : results) {
+      taskGroup.addTask(entity);
+    }
+
+    // Stores end cursor and checks if the end of the query has been reached
+    session.setAttribute("endCursor", results.getCursor().toWebSafeString());
+    taskGroup.checkIfEnd();
+
     Gson gson = new Gson();
-    String json = gson.toJson(out.toString());
+    String json = gson.toJson(taskGroup);
     response.setContentType("application/json;");
     response.getWriter().println(json);
   }
 
   @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doPost(HttpServletRequest request, HttpServletResponse response)
+      throws IOException, ServletException {
     // First check whether the user is logged in
     UserService userService = UserServiceFactory.getUserService();
 
@@ -159,13 +145,11 @@ public class TaskServlet extends HttpServlet {
       return;
     }
 
-    // I will work on a different implementation for this after the MVP since
-    // this implementation forces users to re-input their task details
-    // if they haven't ever inputted their user info and are automatically
-    // logged in when opening the page.
+    // If the user still hasn't save their info, it forwards the request to create an account
     List<String> userInfo = RetrieveUserInfo.getInfo(userService);
     if (userInfo == null) {
-      response.sendRedirect("account.jsp");
+      RequestDispatcher rd = request.getRequestDispatcher("/account.jsp");
+      rd.forward(request, response);
       return;
     }
 
