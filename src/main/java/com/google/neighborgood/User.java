@@ -35,7 +35,7 @@ public final class User {
     this.country = (String) entity.getProperty("country");
     this.phone = (String) entity.getProperty("phone");
     this.email = (String) entity.getProperty("email");
-    this.userId = (String) entity.getProperty("userId");
+    this.userId = entity.getKey().getName();
     this.points = (Long) entity.getProperty("points");
     this.isCurrentUser = false;
   }
