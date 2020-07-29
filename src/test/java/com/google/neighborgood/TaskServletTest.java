@@ -15,23 +15,24 @@
 package com.google.neighborgood.servlets;
 
 import static com.google.appengine.api.datastore.FetchOptions.Builder.withLimit;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.*;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalUserServiceTestConfig;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import org.junit.After;
@@ -61,6 +62,7 @@ public final class TaskServletTest {
   private UserService userService;
   private DatastoreService ds;
   private HttpServletRequest request;
+  private HttpSession session;
   private HttpServletResponse response;
   private Entity userEntity;
 
@@ -71,6 +73,7 @@ public final class TaskServletTest {
     ds = DatastoreServiceFactory.getDatastoreService();
     request = mock(HttpServletRequest.class);
     response = mock(HttpServletResponse.class);
+    session = mock(HttpSession.class);
     userEntity = new Entity("UserInfo", "1234567890");
     userEntity.setProperty("nickname", "Leonard");
     userEntity.setProperty("address", "xxx");
@@ -80,6 +83,8 @@ public final class TaskServletTest {
     userEntity.setProperty("country", "US");
     userEntity.setProperty("zipcode", "15213");
     userEntity.setProperty("points", 0);
+    userEntity.setProperty("lat", 47.674400);
+    userEntity.setProperty("lng", -122.175798);
     ds.put(userEntity);
   }
 
@@ -164,5 +169,156 @@ public final class TaskServletTest {
         assertEquals(50, (long) entity.getProperty("reward"));
       }
     }
+  }
+
+  @Test
+  public void lessThanTenTasksDoGetTest() throws IOException, ServletException {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    // Check whether there are no entities before test
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    assertEquals(0, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
+
+    // Adds 5 task entities
+    for (int i = 0; i < 5; i++) {
+      Entity taskEntity = new Entity("Task", userEntity.getKey());
+      taskEntity.setProperty("detail", "Test task detail");
+      taskEntity.setProperty("overview", "Test task overview" + i);
+      taskEntity.setProperty("timestamp", System.currentTimeMillis());
+      taskEntity.setProperty("reward", (long) 50);
+      taskEntity.setProperty("status", "OPEN");
+      taskEntity.setProperty("Owner", "1234567890");
+      taskEntity.setProperty("Helper", "N/A");
+      taskEntity.setProperty("Address", "xxx");
+      taskEntity.setProperty("zipcode", "98033");
+      taskEntity.setProperty("country", "United States");
+      taskEntity.setProperty("category", "Garden");
+      ds.put(taskEntity);
+    }
+
+    when(request.getParameter("zipcode")).thenReturn("98033");
+    when(request.getParameter("country")).thenReturn("United States");
+    when(request.getParameter("cursor")).thenReturn("clear");
+    Map<String, String[]> dummyReturn = new HashMap<>();
+    dummyReturn.put("zipcode", new String[] {"dummy1"});
+    dummyReturn.put("country", new String[] {"dummy1"});
+    when(request.getParameterMap()).thenReturn(dummyReturn);
+    when(request.getSession()).thenReturn(session);
+
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    new TaskServlet().doGet(request, response);
+
+    writer.flush();
+
+    // parses response as a json object
+    JsonObject jsonObject = new JsonParser().parse(stringWriter.toString()).getAsJsonObject();
+
+    // Response should have 5 tasks and should be the end of the query (that is there are no more
+    // tasks left
+    // on that query to return
+    int taskCount = jsonObject.get("currentTaskCount").getAsInt();
+    boolean endOfQuery = jsonObject.get("endOfQuery").getAsBoolean();
+    assertEquals(5, taskCount);
+    assertEquals(true, endOfQuery);
+
+    verify(response).setContentType("application/json;");
+  }
+
+  @Test
+  public void moreThanTenTasksDoGetTest() throws IOException, ServletException {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    // Check whether there are no entities before test
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    assertEquals(0, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
+
+    // Adds 15 task entities
+    for (int i = 0; i < 15; i++) {
+      Entity taskEntity = new Entity("Task", userEntity.getKey());
+      taskEntity.setProperty("detail", "Test task detail");
+      taskEntity.setProperty("overview", "Test task overview" + i);
+      taskEntity.setProperty("timestamp", System.currentTimeMillis());
+      taskEntity.setProperty("reward", (long) 50);
+      taskEntity.setProperty("status", "OPEN");
+      taskEntity.setProperty("Owner", "1234567890");
+      taskEntity.setProperty("Helper", "N/A");
+      taskEntity.setProperty("Address", "xxx");
+      taskEntity.setProperty("zipcode", "98033");
+      taskEntity.setProperty("country", "United States");
+      taskEntity.setProperty("category", "Garden");
+      ds.put(taskEntity);
+    }
+
+    when(request.getParameter("zipcode")).thenReturn("98033");
+    when(request.getParameter("country")).thenReturn("United States");
+    when(request.getParameter("cursor")).thenReturn("clear");
+    Map<String, String[]> dummyReturn = new HashMap<>();
+    dummyReturn.put("zipcode", new String[] {"dummy1"});
+    dummyReturn.put("country", new String[] {"dummy1"});
+    when(request.getParameterMap()).thenReturn(dummyReturn);
+    when(request.getSession()).thenReturn(session);
+
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    new TaskServlet().doGet(request, response);
+
+    writer.flush();
+
+    // parses response as a json object
+    JsonObject jsonObject = new JsonParser().parse(stringWriter.toString()).getAsJsonObject();
+
+    // Response should have 10 tasks and should not be the end of the query
+    int taskCount = jsonObject.get("currentTaskCount").getAsInt();
+    boolean endOfQuery = jsonObject.get("endOfQuery").getAsBoolean();
+    assertEquals(10, taskCount);
+    assertEquals(false, endOfQuery);
+
+    // I generated this query just as like the previous servlet doGet would do for the sole purpose
+    // of retrieving the endCursor for the next test
+    Query query = new Query("Task").addSort("timestamp", SortDirection.DESCENDING);
+    List<Query.Filter> filters = new ArrayList<Query.Filter>();
+    filters.add(new Query.FilterPredicate("zipcode", Query.FilterOperator.EQUAL, "98033"));
+    filters.add(new Query.FilterPredicate("country", Query.FilterOperator.EQUAL, "United States"));
+    filters.add(new Query.FilterPredicate("status", Query.FilterOperator.EQUAL, "OPEN"));
+    query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, filters));
+    FetchOptions fetchOptions = FetchOptions.Builder.withLimit(10);
+    QueryResultList<Entity> results;
+    try {
+      results = ds.prepare(query).asQueryResultList(fetchOptions);
+    } catch (IllegalArgumentException e) {
+      System.err.println(e);
+      return;
+    }
+    String endCursor = results.getCursor().toWebSafeString();
+
+    // passes the endCursor to the mocked session instance as it were stored in the real session
+    when(request.getSession().getAttribute("endCursor")).thenReturn(endCursor);
+
+    verify(response).setContentType("application/json;");
+
+    stringWriter = new StringWriter();
+    writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    when(request.getParameter("cursor")).thenReturn("end");
+    new TaskServlet().doGet(request, response);
+
+    writer.flush();
+
+    // parses response as a json object
+    jsonObject = new JsonParser().parse(stringWriter.toString()).getAsJsonObject();
+
+    // Response should have 5 tasks and should be the end of the query
+    taskCount = jsonObject.get("currentTaskCount").getAsInt();
+    endOfQuery = jsonObject.get("endOfQuery").getAsBoolean();
+    assertEquals(5, taskCount);
+    assertEquals(true, endOfQuery);
   }
 }
