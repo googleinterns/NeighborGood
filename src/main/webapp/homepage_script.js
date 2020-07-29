@@ -753,8 +753,6 @@ function displayTasks(append) {
     }
 
     if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
-
-        if (!append) taskList.innerHTML = "";
         
         document.getElementById("no-tasks-message").style.display = "none";
 
@@ -778,9 +776,11 @@ function displayTasks(append) {
             else loadMoreTasksMapControl.style.display = "block";
         }
     } else {
-        taskList.innerHTML = "";
-        document.getElementById("no-tasks-message").style.display = "block";
-        taskList.style.display = "none";
+        if (!append) {
+            taskList.innerHTML = "";
+            document.getElementById("no-tasks-message").style.display = "block";
+            taskList.style.display = "none";
+        }
     }
     document.getElementById("loading").style.display = "none";
 }
