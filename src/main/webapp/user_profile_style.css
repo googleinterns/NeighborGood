@@ -50,6 +50,10 @@ body {
   color: #cdcdcd;
 }
 
+#notification-list a {
+  cursor: pointer;
+}
+
 #log-out-link a:hover {
   color: blue;
 }
@@ -431,10 +435,6 @@ table button:hover i {
 #notification-list li {
   margin-top: 10px;
   margin-bottom: 10px;
-}
-
-#notification-list a {
-  cursor: pointer;
 }
 
 #notification-list a:hover {
