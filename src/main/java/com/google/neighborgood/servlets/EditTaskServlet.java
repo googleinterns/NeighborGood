@@ -63,41 +63,14 @@ public class EditTaskServlet extends HttpServlet {
     if (request.getParameterMap().containsKey("action")
         && request.getParameter("action").equals("helpout")) {
 
-      // Makes use of Transactions to prevent race condition
-      Transaction transaction = datastore.beginTransaction();
-
+      // claims task for the current user
       try {
-        task = datastore.get(taskKey);
-
-        if (!task.getProperty("status").equals("OPEN")) {
-          transaction.rollback();
-          System.err.println("Task must be open to be claimed by a helper");
-          response.sendError(
-              HttpServletResponse.SC_CONFLICT, "Task has already been claimed by another helper");
-        }
-
-        String userId = userService.getCurrentUser().getUserId();
-        task.setProperty("Helper", userId);
-        task.setProperty("status", "IN PROGRESS");
-        datastore.put(transaction, task);
-        transaction.commit();
-
-      } catch (EntityNotFoundException e) {
-        transaction.rollback();
-        System.err.println("Unable to find the entity based on the input key");
-        response.sendError(
-            HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
+        claimTaskForUser(datastore, taskKey, userService, response);
+      } catch (Exception e) {
+        System.err.println(e);
         return;
-
-      } finally {
-        if (transaction.isActive()) {
-          transaction.rollback();
-          System.err.println("Task must be open to be claimed by a helper");
-          response.sendError(
-              HttpServletResponse.SC_CONFLICT, "Task has already been claimed by another helper");
-          return;
-        }
       }
+
       // When a user takes a new task, send the user notifications for the messages that the owner
       // writes before they takes the task
       getPastNotificationsForClaimedTasks(keyString, response);
@@ -202,6 +175,47 @@ public class EditTaskServlet extends HttpServlet {
     for (Entity notificationEntity : results.asIterable()) {
       notificationEntity.setProperty("receiver", userService.getCurrentUser().getUserId());
       datastore.put(notificationEntity);
+    }
+  }
+
+  private void claimTaskForUser(
+      DatastoreService datastore,
+      Key taskKey,
+      UserService userService,
+      HttpServletResponse response)
+      throws IOException, Exception {
+    // Makes use of Transactions to prevent race condition
+    Transaction transaction = datastore.beginTransaction();
+    String userId = userService.getCurrentUser().getUserId();
+
+    Entity task;
+    try {
+      task = datastore.get(taskKey);
+
+      if (!task.getProperty("status").equals("OPEN")) {
+        transaction.rollback();
+        System.err.println("Task must be open to be claimed by a helper");
+        response.sendError(
+            HttpServletResponse.SC_CONFLICT, "Task has already been claimed by another helper");
+      }
+
+      task.setProperty("Helper", userId);
+      task.setProperty("status", "IN PROGRESS");
+      datastore.put(transaction, task);
+      transaction.commit();
+
+    } catch (EntityNotFoundException e) {
+      transaction.rollback();
+      response.sendError(HttpServletResponse.SC_NOT_FOUND, "The requested task could not be found");
+      throw new Exception("The requested task could not be found");
+
+    } finally {
+      if (transaction.isActive()) {
+        transaction.rollback();
+        response.sendError(
+            HttpServletResponse.SC_CONFLICT, "Task has already been claimed by another helper");
+        throw new Exception("Task has already been claimed by another helper");
+      }
     }
   }
 }
