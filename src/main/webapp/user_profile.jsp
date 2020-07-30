@@ -37,6 +37,7 @@
         <p id="points">My current points: <%=points%>pts</p>
     </div>
     <div class="empty"><div/>
+    <div id="notice-container"></div>
     <hr/>
     <div id="button-container-wrap">
         <div id="container">
@@ -205,6 +206,12 @@
                     <button type="submit" id="send-button"><i class="fa fa-paper-plane fa-2x"></i></button>
                 </div>
             </form>
+        </div>
+    </div>
+    <div class="modalWrapper" id="notificationModalWrapper">
+        <div class="modal" id="notificationModal">
+            <span class="close-button" id="notification-close-button" onclick="closeNotificationModal()">&times;</span>
+            <ul id="notification-list"></ul>
         </div>
     </div>
   </body>

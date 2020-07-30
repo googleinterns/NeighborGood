@@ -179,9 +179,11 @@ async function loadMoreMessages(key, messageDiv) {
 // deleteMessages(taskId) will delete all the messages stored in datastore related
 // with the task corresponds to the given taskId
 async function deleteMessages(taskId) {
-    const queryURL = "messages?task-id=" + taskId;
+    const queryURL = "/messages?task-id=" + taskId;
     const request = new Request(queryURL, {method: "DELETE"});
     const response = await fetch(request);
+    // After deleting the messages, remove the notifications
+    removeNotifications(taskId);
     return;
 }
 
@@ -304,6 +306,15 @@ async function showTaskInfo(keyString) {
     var modal = document.getElementById("taskInfoModalWrapper");
     modal.style.display = "block";
     loadMessages(keyString);
+    removeNotifications(keyString);
+}
+
+async function removeNotifications(taskId) {
+    const queryURL = "/notifications?task-id=" + taskId;
+    const request = new Request(queryURL, {method: "DELETE"});
+    const response = await fetch(request);
+    showNotifications();
+    return;
 }
 
 function showNeedHelp() {
@@ -370,6 +381,56 @@ window.onclick = function(event) {
             modal.style.display = "none";
         }
     }
+}
+
+async function showNotifications() {
+    const request = new Request("/notifications", {method: "GET"});
+    const response = await fetch(request);
+    const notifiResponse = await response.json();
+    const notiList = document.getElementById("notification-list");
+    notiList.innerHTML = "";
+    const noticeContainer = document.getElementById("notice-container");
+    noticeContainer.innerHTML = "";
+    if (notifiResponse.length === 0) return;
+    let totalCnt = 0;
+    for (var index = 0; index < notifiResponse.length; index++) {
+        var li = document.createElement("li");
+        var notification = notifiResponse[index];
+        var overview = notification.overview;
+        var count = notification.count;
+        var id = notification.taskId;
+        // Create a copy for taskId to prevent alias
+        const idCopy = id.slice();
+        totalCnt += count;
+        var taskLink = document.createElement("a");
+        taskLink.setAttribute("class", "notification-element");
+        taskLink.appendChild(
+            document.createTextNode("You have " + count.toString() + " new notificatioins for Task: "
+            + overview));
+        taskLink.addEventListener("click", function() {
+            closeNotificationModal();
+            showTaskInfo(idCopy);
+        });
+        li.appendChild(taskLink);
+        notiList.appendChild(li);
+    }
+    var notiMsg = document.createElement("span");
+    notiMsg.appendChild(document.createTextNode("You have " + totalCnt.toString() + " new notifications"));
+    notiMsg.addEventListener("click", function() {
+        showNotificationList();
+    });
+    notiMsg.setAttribute("class", "notification-text");
+    noticeContainer.appendChild(notiMsg);
+}
+
+function showNotificationList() {
+    var modal = document.getElementById("notificationModalWrapper");
+    modal.style.display = "block";
+}
+
+function closeNotificationModal() {
+    var modal = document.getElementById("notificationModalWrapper");
+    modal.style.display = "none";
 }
 
 async function displayNeedHelpTasks() {
@@ -518,11 +579,13 @@ async function displayOfferHelpCompleteTasks() {
 if (document.readyState === 'loading') {
     // adds on load event listeners if document hasn't yet loaded
     document.addEventListener('DOMContentLoaded', initMap);
-    document.addEventListener('DOMContentLoaded', showNeedHelp)
+    document.addEventListener('DOMContentLoaded', showNeedHelp);
+    document.addEventListener('DOMContentLoaded', showNotifications);
 } else {
     // if DOMContentLoaded has already fired, it simply calls the functions
     initMap();
     showNeedHelp();
+    showNotifications();
 }
 
 /**

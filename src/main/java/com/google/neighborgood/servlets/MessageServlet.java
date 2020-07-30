@@ -18,8 +18,10 @@ import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
@@ -137,7 +139,44 @@ public class MessageServlet extends HttpServlet {
     msgEntity.setProperty("sentTime", System.currentTimeMillis());
 
     datastore.put(msgEntity);
+
+    // After storing the message, create a notification entity to notify the receiver
+    notifyReceiver(taskId);
+
     response.sendRedirect(request.getHeader("Referer"));
+  }
+
+  // Notify the receiver of a certain message according to the given task id information
+  private void notifyReceiver(String taskId) {
+    Key taskKey = KeyFactory.stringToKey(taskId);
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    UserService userService = UserServiceFactory.getUserService();
+    Entity taskEntity;
+    try {
+      taskEntity = datastore.get(taskKey);
+    } catch (EntityNotFoundException e) {
+      System.err.println(
+          String.format(
+              "Unable to find the entity based on the input key %s for task %s", taskKey, taskId));
+      return;
+    }
+
+    String owner = (String) taskEntity.getProperty("Owner");
+    String helper = (String) taskEntity.getProperty("Helper");
+    String currentUser = userService.getCurrentUser().getUserId();
+
+    Entity notificationEntity = new Entity("Notification");
+    notificationEntity.setProperty("taskId", taskId);
+    if (currentUser.equals(helper)) {
+      notificationEntity.setProperty("receiver", owner);
+    } else if (currentUser.equals(owner)) {
+      notificationEntity.setProperty("receiver", helper);
+    } else {
+      System.err.println("The message is not sent by the owner or helper of the task");
+      return;
+    }
+    datastore.put(notificationEntity);
   }
 
   @Override
