@@ -54,19 +54,14 @@ public class MyTaskServlet extends HttpServlet {
       return;
     }
 
-    List<FetchOptions> fetchOptions = new ArrayList<>();
-    FetchOptions firstFetchOption = FetchOptions.Builder.withLimit(PAGE_SIZE);
-    FetchOptions secondFetchOption = FetchOptions.Builder.withLimit(PAGE_SIZE);
+    FetchOptions fetchOption = FetchOptions.Builder.withLimit(PAGE_SIZE);
 
     // If the client requires for a cursor, get the cursor string given
     String firstStartCursor = request.getParameter("firstcursor");
     String secondStartCursor = request.getParameter("secondcursor");
-    if (firstStartCursor != null && secondStartCursor != null) {
-      firstFetchOption.startCursor(Cursor.fromWebSafeString(firstStartCursor));
-      secondFetchOption.startCursor(Cursor.fromWebSafeString(secondStartCursor));
+    if (firstStartCursor != null) {
+      fetchOption.startCursor(Cursor.fromWebSafeString(firstStartCursor));
     }
-    fetchOptions.add(firstFetchOption);
-    fetchOptions.add(secondFetchOption);
 
     String complete = request.getParameter("complete");
     String[] trueStatus = new String[] {"COMPLETE: AWAIT VERIFICATION", "COMPLETE"};
@@ -97,7 +92,7 @@ public class MyTaskServlet extends HttpServlet {
 
       QueryResultList<Entity> results;
       try {
-        results = pq.asQueryResultList(fetchOptions.get(i));
+        results = pq.asQueryResultList(fetchOption);
       } catch (IllegalArgumentException e) {
         System.err.println("Invalid cursor is provided");
         return;
@@ -109,6 +104,13 @@ public class MyTaskServlet extends HttpServlet {
 
       String cursorString = results.getCursor().toWebSafeString();
       cursorStrings.add(cursorString);
+
+      // If there are less then 5 tasks fetched in the first loop, fetch more tasks in the second
+      // loop
+      fetchOption = FetchOptions.Builder.withLimit(PAGE_SIZE - myTasks.size());
+      if (secondStartCursor != null) {
+        fetchOption.startCursor(Cursor.fromWebSafeString(secondStartCursor));
+      }
     }
 
     Gson gson = new Gson();
