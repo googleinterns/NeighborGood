@@ -100,7 +100,6 @@ public final class UserInfoServletTest {
 
     when(request.getParameter("nickname-input")).thenReturn("Leonard");
     when(request.getParameter("address-input")).thenReturn("4xxx Centre Avenue");
-    when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
     when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
     when(request.getParameter("country-input")).thenReturn("United States");
     when(request.getParameter("lat")).thenReturn("47.6912892");
@@ -119,7 +118,6 @@ public final class UserInfoServletTest {
     // Test the stored personal information
     assertEquals("Leonard", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
-    assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
     assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
@@ -141,7 +139,6 @@ public final class UserInfoServletTest {
     // Test the stored personal information
     assertEquals("Leo", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
-    assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
     assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
@@ -159,7 +156,6 @@ public final class UserInfoServletTest {
     Entity dummy = new Entity("UserInfo", "1234567");
     dummy.setProperty("nickname", "Leonardo");
     dummy.setProperty("address", "xxx");
-    dummy.setProperty("phone", "xxx");
     dummy.setProperty("email", "test@example.com");
     dummy.setProperty("points", 0);
 
@@ -167,14 +163,12 @@ public final class UserInfoServletTest {
     Entity dummy_2 = new Entity("UserInfo", "12345");
     dummy_2.setProperty("nickname", "Leonar");
     dummy_2.setProperty("address", "xxx");
-    dummy_2.setProperty("phone", "xxx");
     dummy_2.setProperty("email", "test2@example.com");
     dummy_2.setProperty("points", 50);
     ds.put(dummy_2);
 
     when(request.getParameter("nickname-input")).thenReturn("Leonard");
     when(request.getParameter("address-input")).thenReturn("4xxx Centre Avenue");
-    when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
     when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
     when(request.getParameter("country-input")).thenReturn("United States");
     when(request.getParameter("lat")).thenReturn("47.6912892");
@@ -199,7 +193,6 @@ public final class UserInfoServletTest {
     // Test the stored personal information
     assertEquals("Leonard", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
-    assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
     assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
@@ -226,7 +219,6 @@ public final class UserInfoServletTest {
     // Test the stored personal information
     assertEquals("Leo", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
-    assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
     assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
@@ -249,7 +241,6 @@ public final class UserInfoServletTest {
     // Set the nickname input to be empty
     when(request.getParameter("nickname-input")).thenReturn("");
     when(request.getParameter("address-input")).thenReturn("4xxx Centre Avenue");
-    when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
     when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
     when(request.getParameter("country-input")).thenReturn("United States");
     when(request.getParameter("lat")).thenReturn("47.6912892");
@@ -301,16 +292,8 @@ public final class UserInfoServletTest {
     errContent.reset();
     System.setErr(originalErr);
 
-    // Now we give the servlet an invalid phone number input
+    // Now we give the servlet a valid address number input
     when(request.getParameter("address-input")).thenReturn("4xxx Centre Avenue");
-    when(request.getParameter("phone-input")).thenReturn("");
-
-    new UserInfoServlet().doPost(request, response);
-
-    assertEquals(0, ds.prepare(new Query("UserInfo")).countEntities(withLimit(10)));
-
-    // Finally we give the servlet a valid phone number input
-    when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
 
     new UserInfoServlet().doPost(request, response);
 
@@ -324,7 +307,6 @@ public final class UserInfoServletTest {
     // Test the stored personal information
     assertEquals("Leonard", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
-    assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
     assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
@@ -346,7 +328,6 @@ public final class UserInfoServletTest {
     Entity dummy = new Entity("UserInfo", "1234567890");
     dummy.setProperty("nickname", "Leonard");
     dummy.setProperty("address", "xxx");
-    dummy.setProperty("phone", "xxx");
     dummy.setProperty("email", "test@example.com");
     dummy.setProperty("points", 0);
     dummy.setProperty("zipcode", "xxxxx");
@@ -361,7 +342,7 @@ public final class UserInfoServletTest {
 
     // After sending the GET request, the doGet function should output the json string
     writer.flush();
-    assertTrue(stringWriter.toString().contains("[\"Leonard\",\"xxx\",\"xxx\",\"xxxxx\",\"US\"]"));
+    assertTrue(stringWriter.toString().contains("[\"Leonard\",\"xxx\",\"xxxxx\",\"US\"]"));
 
     // Finally, ensure that the servlet file has set the content type to json
     verify(response).setContentType("application/json;");

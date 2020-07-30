@@ -55,15 +55,8 @@
                 <br/>
                 <input type="text" name="country-input" id="edit-country-input" placeholder="Input your country here:">
                 <br/><br/>
-                <div>
-                    <label for="phone-input">Your Phone Number<span class="req">*</span></label>
-                    <br/>
-                </div>
-                <br/>
-                <input type="text" name="phone-input" id="phone-input" placeholder="Input your phone number here:">
                 <input type="hidden" name="lat" id="lat-input">
                 <input type="hidden" name="lng" id="lng-input">
-
                 <!-- If account.jsp was loaded after being forwarded from /tasks, we pass on the task parameters as well -->
                 <%
                 if (request.getAttribute("javax.servlet.forward.request_uri") != null && request.getAttribute("javax.servlet.forward.request_uri").equals("/tasks")) {
@@ -79,7 +72,6 @@
                 <%     
                 }
                 %>
-                <br/><br/>
                 <button type="submit" id="submit-button"/>GET STARTED</button>
                 <br/><br/>
             </form>
