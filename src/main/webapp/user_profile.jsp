@@ -163,7 +163,7 @@
                 </select>
                 <br/>
                 <br/>
-                <input type="submit" />
+                <input type="submit" id="submit-user-info"/>
             </form>
         </div>
     </div>

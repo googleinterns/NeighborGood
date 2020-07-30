@@ -33,6 +33,7 @@ import org.junit.runners.JUnit4;
 import org.junit.runners.MethodSorters;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.FluentWait;
 
 @RunWith(JUnit4.class)
@@ -45,14 +46,19 @@ public class IntegrationTest {
   private static JavascriptExecutor js;
 
   private final String USER_NICKNAME = "Mafe";
+  private final String USER_NICKNAME_FARAWAY = "Faraway User";
   private final String USER_NICKNAME_HELPER = "Helper";
   private final String USER_EMAIL = "123456@example.com";
   private final String USER_EMAIL_HELPER = "helper@example.com";
+  private final String USER_EMAIL_FARAWAY = "faraway@example.com";
   private final String USER_ADDRESS = "123 Street Name, City, ST";
   private final String USER_ZIPCODE = "90036";
   private final String USER_COUNTRY = "United States";
   private final String USER_LAT = "34.072984";
   private final String USER_LNG = "-118.349740";
+  private final String FARAWAY_ZIPCODE = "59715";
+  private final String FARAWAY_LAT = "45.681153";
+  private final String FARAWAY_LNG = "-111.041873";
   private final String USER_PHONE = "1231231234";
   private final String TASK_DETAIL =
       "Help! this is a detailed version of the task where I give a lot of random information";
@@ -142,7 +148,15 @@ public class IntegrationTest {
     // yet in the site
     assertTrue("No tasks in neighborhood message should be displayed", taskResultsMessageDisplayed);
 
-    loginNewUser(USER_EMAIL, USER_NICKNAME, USER_ADDRESS, USER_PHONE, USER_ZIPCODE, USER_COUNTRY);
+    loginNewUser(
+        USER_EMAIL,
+        USER_NICKNAME,
+        USER_ADDRESS,
+        USER_PHONE,
+        USER_ZIPCODE,
+        USER_COUNTRY,
+        USER_LAT,
+        USER_LNG);
     ifLaggingThenRefresh();
 
     // After new user fills out user info, they should be redirected to userpage
@@ -169,7 +183,7 @@ public class IntegrationTest {
     int categoryOptionIndex = random.nextInt(TASK_CATEGORIES.length);
     String taskCategory = TASK_CATEGORIES[categoryOptionIndex];
 
-    addTask(taskDetail, rewardPoints, categoryOptionIndex, taskOverview);
+    addTask(taskDetail, rewardPoints, categoryOptionIndex, taskOverview, USER_NICKNAME);
 
     // User should be redirected to user profile page after adding a task
     assertTrue(
@@ -182,7 +196,7 @@ public class IntegrationTest {
     backToHome();
     ifLaggingThenRefresh();
     // Verifies that newly added tasks are displayed properply in homepage
-    verifyNewTaskHomepage();
+    verifyNewTaskHomepage(openTotalTaskCount);
   }
 
   @Test
@@ -201,7 +215,7 @@ public class IntegrationTest {
       int categoryOptionIndex = random.nextInt(TASK_CATEGORIES.length);
       String taskCategory = TASK_CATEGORIES[categoryOptionIndex];
 
-      addTask(taskDetail, rewardPoints, categoryOptionIndex, taskOverview);
+      addTask(taskDetail, rewardPoints, categoryOptionIndex, taskOverview, USER_NICKNAME);
     }
 
     // User should be redirected to user profile page after adding a task
@@ -215,7 +229,7 @@ public class IntegrationTest {
     backToHome();
     ifLaggingThenRefresh();
     // Verifies that newly added tasks are displayed properply in homepage
-    verifyNewTaskHomepage();
+    verifyNewTaskHomepage(openTotalTaskCount);
   }
 
   @Test
@@ -243,7 +257,9 @@ public class IntegrationTest {
         USER_ADDRESS,
         USER_PHONE,
         USER_ZIPCODE,
-        USER_COUNTRY);
+        USER_COUNTRY,
+        USER_LAT,
+        USER_LNG);
     ifLaggingThenRefresh();
     // Verifies logged user in userpage and then in homepage
     verifyLoggedUser(USER_NICKNAME_HELPER, "log-out-link");
@@ -502,7 +518,7 @@ public class IntegrationTest {
     backToHome();
     ifLaggingThenRefresh();
     // verifies that abandoned task is now the most recent task in homepage
-    verifyNewTaskHomepage();
+    verifyNewTaskHomepage(openTotalTaskCount);
   }
 
   @Test
@@ -522,7 +538,7 @@ public class IntegrationTest {
       int categoryOptionIndex = random.nextInt(TASK_CATEGORIES.length);
       String taskCategory = TASK_CATEGORIES[categoryOptionIndex];
 
-      addTask(taskDetail, rewardPoints, categoryOptionIndex, taskOverview);
+      addTask(taskDetail, rewardPoints, categoryOptionIndex, taskOverview, USER_NICKNAME_HELPER);
     }
 
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
@@ -554,15 +570,59 @@ public class IntegrationTest {
     assertEquals((long) openTotalTaskCount, tasksAfterScrolling.size());
   }
 
+  @Test
+  public void _12_Homepage_AsFarawayUser_SearchByDiffLocation() throws InterruptedException {
+
+    logOut("loginLogoutMessage");
+    loginNewUser(
+        USER_EMAIL_FARAWAY,
+        USER_NICKNAME_FARAWAY,
+        USER_ADDRESS,
+        USER_PHONE,
+        FARAWAY_ZIPCODE,
+        USER_COUNTRY,
+        FARAWAY_LAT,
+        FARAWAY_LNG);
+
+    // Adds three new tasks
+    for (int i = 0; i < 3; i++) {
+      // Randomizes task contents
+      Random random = new Random();
+      String taskDetail = TASK_DETAIL + random.nextInt(1000);
+      String taskOverview = TASK_OVERVIEW + random.nextInt(1000);
+      String rewardPoints = Integer.toString(random.nextInt(201));
+      int categoryOptionIndex = random.nextInt(TASK_CATEGORIES.length);
+      String taskCategory = TASK_CATEGORIES[categoryOptionIndex];
+
+      addTask(taskDetail, rewardPoints, categoryOptionIndex, taskOverview, USER_NICKNAME_FARAWAY);
+    }
+    backToHome();
+
+    // Enters zipcode of a different neighborhood and waits for autocomplete suggestions to load
+    WebElement placeInput =
+        wait.until(
+            new Function<WebDriver, WebElement>() {
+              public WebElement apply(WebDriver driver) {
+                return driver.findElement(By.id("place-input"));
+              }
+            });
+    placeInput.click();
+    placeInput.sendKeys("59715");
+    Thread.sleep(2000);
+
+    // clicks first option from place autocomplete search box
+    Actions act = new Actions(driver);
+    act.moveToElement(placeInput).moveByOffset(20, 20).click().perform();
+    Thread.sleep(1000);
+
+    // verifies most recently added task and that the total expected displayed tasks is 3
+    verifyNewTaskHomepage(3);
+  }
+
   /* Clears entities from Datastore before test class */
   private static void clearAllDatastoreEntities() {
     driver.get("http://localhost:8080/_ah/admin");
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-
-    // Retrieves number of Entity Kind select options to iterate through them
-    WebElement listButtonElement;
-    WebElement allKeysElement;
-    WebElement deleteButtonElement;
 
     // Number of entity pages that can be deleted
     Long numOfSelectOptions =
@@ -609,14 +669,15 @@ public class IntegrationTest {
   }
 
   /* Adds task with provided details, points, and category index */
-  private void addTask(String details, String points, int categoryIndex, String overview) {
+  private void addTask(
+      String details, String points, int categoryIndex, String overview, String userNickname) {
 
     // Stores recentTask contents so tests can reference it
     recentTask.put("detail", details);
     recentTask.put("overview", overview);
     recentTask.put("points", points);
     recentTask.put("category", TASK_CATEGORIES[categoryIndex]);
-    recentTask.put("nickname", USER_NICKNAME);
+    recentTask.put("nickname", userNickname);
     recentTask.put("status", "OPEN");
     recentTask.put("helper", "N/A");
 
@@ -707,7 +768,7 @@ public class IntegrationTest {
   }
 
   /* Verifies that newly added tasks are displayed properply in homepage */
-  private void verifyNewTaskHomepage() {
+  private void verifyNewTaskHomepage(int expectedNumOfTasksDisplayed) {
 
     // First task location in homepage
     String taskXPath = "//div[@id='tasks-list']/div[1]";
@@ -743,12 +804,19 @@ public class IntegrationTest {
                 return driver.findElements(By.xpath("//div[@class='task']"));
               }
             });
-    assertEquals(openTotalTaskCount, tasks.size());
+    assertEquals(expectedNumOfTasksDisplayed, tasks.size());
   }
 
   /* Logs a new user in and provides the user info details to fill out in the form */
   private void loginNewUser(
-      String email, String nickname, String address, String phone, String zipcode, String country) {
+      String email,
+      String nickname,
+      String address,
+      String phone,
+      String zipcode,
+      String country,
+      String lat,
+      String lng) {
     loginUser(email);
     ifLaggingThenRefresh();
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
@@ -764,8 +832,8 @@ public class IntegrationTest {
     js.executeScript("document.getElementById('edit-zipcode-input').value='" + zipcode + "';");
     js.executeScript("document.getElementById('edit-country-input').value='" + country + "';");
     js.executeScript("document.getElementById('phone-input').value='" + phone + "';");
-    js.executeScript("document.getElementById('lat-input').value='" + USER_LAT + "';");
-    js.executeScript("document.getElementById('lng-input').value='" + USER_LNG + "';");
+    js.executeScript("document.getElementById('lat-input').value='" + lat + "';");
+    js.executeScript("document.getElementById('lng-input').value='" + lng + "';");
 
     // clicks on submit button
     wait.until(
