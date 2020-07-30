@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>My Personal Info</title>
     <link rel="stylesheet" href="account_style.css">
+    <script type='text/javascript' src='map_styles.js'></script>
     <script type='text/javascript' src='config.js'></script>
     <script src="user_profile_script.js"></script>
   </head>
