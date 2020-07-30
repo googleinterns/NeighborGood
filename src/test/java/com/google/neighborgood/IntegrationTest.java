@@ -38,7 +38,8 @@ import org.openqa.selenium.support.ui.FluentWait;
 
 @RunWith(JUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-/* Due to how the interactions from one test build up onto the other as part of this integration test, the FixMethodOrder decorator is used to guarantee order of execution of tests. */
+/* Due to how the interactions from one test build up onto the other as part of this integration test,
+the FixMethodOrder decorator is used to guarantee order of execution of tests. */
 public class IntegrationTest {
 
   private static ChromeDriver driver;
@@ -978,7 +979,8 @@ public class IntegrationTest {
     openTotalTaskCount--;
   }
 
-  /* Verifies that after claiming a task/offering help with a task, that it displays correctly in the user page's offer help table */
+  /* Verifies that after claiming a task/offering help with a task,
+  that it displays correctly in the user page's offer help table */
   private void verifyOfferHelpTask() {
     // Location of most recent task in offer help table in userpage
     String offerHelpRowXPath = "//tbody[@id='offer-help-body']/tr[1]";
