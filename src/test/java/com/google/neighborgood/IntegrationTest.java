@@ -700,7 +700,7 @@ public class IntegrationTest {
     // Inputs task details using Javascript Executor
     js.executeScript("document.getElementById('task-detail-input').value='" + details + "';");
     js.executeScript("document.getElementById('task-overview-input').value='" + overview + "';");
-    js.executeScript("document.getElementById('reward-input').value='" + points + "';");
+    js.executeScript("document.getElementById('rewarding-point-input').value='" + points + "';");
     js.executeScript(
         "document.getElementById('category-input').value='"
             + TASK_CATEGORIES[categoryIndex]
