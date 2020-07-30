@@ -59,7 +59,6 @@ public class IntegrationTest {
   private final String FARAWAY_ZIPCODE = "59715";
   private final String FARAWAY_LAT = "45.681153";
   private final String FARAWAY_LNG = "-111.041873";
-  private final String USER_PHONE = "1231231234";
   private final String TASK_DETAIL =
       "Help! this is a detailed version of the task where I give a lot of random information";
   private final String TASK_OVERVIEW = "Help!";
@@ -149,14 +148,7 @@ public class IntegrationTest {
     assertTrue("No tasks in neighborhood message should be displayed", taskResultsMessageDisplayed);
 
     loginNewUser(
-        USER_EMAIL,
-        USER_NICKNAME,
-        USER_ADDRESS,
-        USER_PHONE,
-        USER_ZIPCODE,
-        USER_COUNTRY,
-        USER_LAT,
-        USER_LNG);
+        USER_EMAIL, USER_NICKNAME, USER_ADDRESS, USER_ZIPCODE, USER_COUNTRY, USER_LAT, USER_LNG);
     ifLaggingThenRefresh();
 
     // After new user fills out user info, they should be redirected to userpage
@@ -255,7 +247,6 @@ public class IntegrationTest {
         USER_EMAIL_HELPER,
         USER_NICKNAME_HELPER,
         USER_ADDRESS,
-        USER_PHONE,
         USER_ZIPCODE,
         USER_COUNTRY,
         USER_LAT,
@@ -582,7 +573,6 @@ public class IntegrationTest {
         USER_EMAIL_FARAWAY,
         USER_NICKNAME_FARAWAY,
         USER_ADDRESS,
-        USER_PHONE,
         FARAWAY_ZIPCODE,
         USER_COUNTRY,
         FARAWAY_LAT,
@@ -818,7 +808,6 @@ public class IntegrationTest {
       String email,
       String nickname,
       String address,
-      String phone,
       String zipcode,
       String country,
       String lat,
@@ -837,7 +826,6 @@ public class IntegrationTest {
     js.executeScript("document.getElementById('edit-address-input').value='" + address + "';");
     js.executeScript("document.getElementById('edit-zipcode-input').value='" + zipcode + "';");
     js.executeScript("document.getElementById('edit-country-input').value='" + country + "';");
-    js.executeScript("document.getElementById('phone-input').value='" + phone + "';");
     js.executeScript("document.getElementById('lat-input').value='" + lat + "';");
     js.executeScript("document.getElementById('lng-input').value='" + lng + "';");
 
