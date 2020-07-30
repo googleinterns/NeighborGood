@@ -10,9 +10,16 @@
   <%@ page import = "com.google.appengine.api.users.UserService" %>
   <%@ page import = "com.google.appengine.api.users.UserServiceFactory" %>
   <%@ page import = "com.google.neighborgood.helper.RetrieveUserInfo" %>
+  <%@ page import = "java.util.concurrent.TimeUnit" %>
   <% UserService userService = UserServiceFactory.getUserService();
   if (!userService.isUserLoggedIn()) {
        response.sendRedirect(userService.createLoginURL("/account.jsp"));
+  } else if (!userService.getCurrentUser().getEmail().contains("@google.com")) { %>
+  <body>
+      <h1>Sorry, our website only supports Google corporate accounts</h1>
+  </body>
+  <% TimeUnit.SECONDS.sleep(5);
+  response.sendRedirect(userService.createLogoutURL("/index.jsp"));
   } else if (RetrieveUserInfo.getInfo(userService) == null) { %>
   <body>
     <div id="container">
