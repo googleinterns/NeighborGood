@@ -25,20 +25,22 @@ import com.google.neighborgood.User;
 import com.google.neighborgood.task.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Helper class that stores the HTML depiction of tasks in groups of 10 or less along with whether
  * or not the end of the query has been reached
  */
 public class TaskGroup {
-  private static HashMap<String, User>
+  private static Map<String, User>
       usersInfo; // Stores task owner's user info to prevent querying multiple times in
   // datastore for the same user's info
   private static DatastoreService datastore;
   private final boolean userLoggedIn;
   private int currentTaskCount;
   private boolean endOfQuery;
-  private ArrayList<Task> tasks;
+  private List<Task> tasks;
 
   public TaskGroup() {
     this.usersInfo = new HashMap<String, User>();
@@ -73,7 +75,7 @@ public class TaskGroup {
       } catch (EntityNotFoundException e) {
         System.err.println(
             "Unable to find the task's owner info to retrieve the owner's nickname. Setting a default nickname.");
-        taskOwnerNickname = "Neighbor";
+        taskOwnerNickname = "Your Friendly Neighbor";
       }
     }
     Task task = new Task(entity, taskOwnerId, taskOwnerNickname, taskLat, taskLng);
