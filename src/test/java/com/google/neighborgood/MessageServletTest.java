@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.users.UserService;
@@ -51,7 +52,7 @@ public final class MessageServletTest {
               new LocalDatastoreServiceTestConfig(), new LocalUserServiceTestConfig())
           .setEnvIsAdmin(true)
           .setEnvIsLoggedIn(true)
-          .setEnvEmail("leonardzhang@google.com")
+          .setEnvEmail("leo@xxx.com")
           .setEnvAuthDomain("1234567890")
           .setEnvAttributes(
               ImmutableMap.of(
@@ -63,6 +64,9 @@ public final class MessageServletTest {
   private DatastoreService ds;
   private HttpServletRequest request;
   private HttpServletResponse response;
+  private Entity userEntity;
+  private Entity taskEntity;
+  private String keyString;
 
   @Before
   public void setUp() {
@@ -71,6 +75,31 @@ public final class MessageServletTest {
     ds = DatastoreServiceFactory.getDatastoreService();
     request = mock(HttpServletRequest.class);
     response = mock(HttpServletResponse.class);
+
+    userEntity = new Entity("UserInfo", "1234567890");
+    userEntity.setProperty("nickname", "Leonard");
+    userEntity.setProperty("address", "xxx");
+    userEntity.setProperty("email", "leo@xxx.com");
+    userEntity.setProperty("userId", "1234567890");
+    userEntity.setProperty("country", "US");
+    userEntity.setProperty("zipcode", "15213");
+    userEntity.setProperty("points", 0);
+    ds.put(userEntity);
+
+    taskEntity = new Entity("Task", userEntity.getKey());
+    taskEntity.setProperty("detail", "Test task");
+    taskEntity.setProperty("timestamp", 123);
+    taskEntity.setProperty("reward", 50);
+    taskEntity.setProperty("status", "IN PROGRESS");
+    taskEntity.setProperty("Owner", "1234567890");
+    taskEntity.setProperty("Helper", "1234567890");
+    taskEntity.setProperty("Address", "xxx");
+    taskEntity.setProperty("zipcode", "15213");
+    taskEntity.setProperty("country", "US");
+    taskEntity.setProperty("category", "Garden");
+    ds.put(taskEntity);
+
+    keyString = KeyFactory.keyToString(taskEntity.getKey());
   }
 
   @After
@@ -96,7 +125,7 @@ public final class MessageServletTest {
     // Check whether the datastore is empty before the test
     assertEquals(0, ds.prepare(new Query("Message")).countEntities(withLimit(10)));
 
-    when(request.getParameter("task-id")).thenReturn("1234567890");
+    when(request.getParameter("task-id")).thenReturn(keyString);
     when(request.getParameter("msg")).thenReturn("Testing message");
 
     new MessageServlet().doPost(request, response);
@@ -111,8 +140,20 @@ public final class MessageServletTest {
 
     // Test the stored message information
     assertEquals("Testing message", (String) entity.getProperty("message"));
-    assertEquals("1234567890", (String) entity.getProperty("taskId"));
+    assertEquals(keyString, (String) entity.getProperty("taskId"));
     assertEquals("1234567890", (String) entity.getProperty("sender"));
+
+    // Also, there should be one corresponding notification entity created
+    assertEquals(1, ds.prepare(new Query("Notification")).countEntities(withLimit(10)));
+    results = ds.prepare(new Query("Notification"));
+    entity = results.asSingleEntity();
+
+    // The entity can't be null
+    assertNotNull(entity);
+
+    // Test the stored notification information
+    assertEquals(keyString, (String) entity.getProperty("taskId"));
+    assertEquals("1234567890", (String) entity.getProperty("receiver"));
   }
 
   @Test
@@ -122,12 +163,13 @@ public final class MessageServletTest {
 
     for (int i = 1; i < 11; i++) {
       String index = Integer.toString(i);
-      when(request.getParameter("task-id")).thenReturn("1234567890" + index);
+      when(request.getParameter("task-id")).thenReturn(keyString);
       when(request.getParameter("msg")).thenReturn("Testing message " + index);
 
       new MessageServlet().doPost(request, response);
 
       assertEquals(i, ds.prepare(new Query("Message")).countEntities(withLimit(10)));
+      assertEquals(i, ds.prepare(new Query("Notification")).countEntities(withLimit(10)));
     }
   }
 
@@ -144,11 +186,12 @@ public final class MessageServletTest {
     // This will lead to the first error handling clause of the doPost function of MessageServlet
     assertEquals("The task id is not included\n", errContent.toString());
     assertEquals(0, ds.prepare(new Query("Message")).countEntities(withLimit(10)));
+    assertEquals(0, ds.prepare(new Query("Notification")).countEntities(withLimit(10)));
 
     errContent.reset();
     System.setErr(originalErr);
 
-    when(request.getParameter("task-id")).thenReturn("1234567890");
+    when(request.getParameter("task-id")).thenReturn(keyString);
 
     // Now test the situation the message is not provided
     System.setErr(new PrintStream(errContent));
@@ -158,6 +201,7 @@ public final class MessageServletTest {
     // This will lead to the second error handling clause of doPost() in MessageServlet
     assertEquals("The message is not provided\n", errContent.toString());
     assertEquals(0, ds.prepare(new Query("Message")).countEntities(withLimit(10)));
+    assertEquals(0, ds.prepare(new Query("Notification")).countEntities(withLimit(10)));
 
     errContent.reset();
     System.setErr(originalErr);
@@ -171,6 +215,7 @@ public final class MessageServletTest {
     // This will lead to the second error handling clause of doPost() in MessageServlet
     assertEquals("The input message is empty\n", errContent.toString());
     assertEquals(0, ds.prepare(new Query("Message")).countEntities(withLimit(10)));
+    assertEquals(0, ds.prepare(new Query("Notification")).countEntities(withLimit(10)));
 
     errContent.reset();
     System.setErr(originalErr);
@@ -190,8 +235,20 @@ public final class MessageServletTest {
 
     // Test the stored message information
     assertEquals("Testing message", (String) entity.getProperty("message"));
-    assertEquals("1234567890", (String) entity.getProperty("taskId"));
+    assertEquals(keyString, (String) entity.getProperty("taskId"));
     assertEquals("1234567890", (String) entity.getProperty("sender"));
+
+    // Also, there should be one corresponding notification entity created
+    assertEquals(1, ds.prepare(new Query("Notification")).countEntities(withLimit(10)));
+    results = ds.prepare(new Query("Notification"));
+    entity = results.asSingleEntity();
+
+    // The entity can't be null
+    assertNotNull(entity);
+
+    // Test the stored notification information
+    assertEquals(keyString, (String) entity.getProperty("taskId"));
+    assertEquals("1234567890", (String) entity.getProperty("receiver"));
   }
 
   @Test
