@@ -285,6 +285,8 @@ section {
   border: 1px solid #888;
   width: 50%;
   margin-top: 20vh;
+  max-height: 80%;
+  overflow-y: auto;
 }
 
 .modal textarea {
@@ -295,6 +297,12 @@ section {
   font-size: 16px;
   padding: 10px 20px 10px 20px;
   transition: width 0.5s ease-in-out;
+}
+
+.modal input,
+.modal select {
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .modal textarea:focus {
@@ -481,4 +489,25 @@ td {
   nav {
     background-color: white;
   }
+}
+
+.submit-button {
+  border: 0;
+  outline: none;
+  border-radius: 0;
+  padding: 15px 0;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  background: #1ab188;
+  color: white;
+  transition: all 0.5s ease;
+  -webkit-appearance: none;
+  width: 100%;
+  cursor: pointer;
+}
+
+.submit-button:hover,
+.submit-button:focus {
+  background: #169674;
 }
