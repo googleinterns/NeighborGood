@@ -21,7 +21,6 @@ public final class User {
   private final String address;
   private final String zipcode;
   private final String country;
-  private final String phone;
   private final String email;
   private final String userId;
   private final long points;
@@ -33,9 +32,8 @@ public final class User {
     this.address = (String) entity.getProperty("address");
     this.zipcode = (String) entity.getProperty("zipcode");
     this.country = (String) entity.getProperty("country");
-    this.phone = (String) entity.getProperty("phone");
     this.email = (String) entity.getProperty("email");
-    this.userId = (String) entity.getProperty("userId");
+    this.userId = entity.getKey().getName();
     this.points = (Long) entity.getProperty("points");
     this.isCurrentUser = false;
   }

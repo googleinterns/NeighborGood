@@ -77,7 +77,6 @@ public final class TaskInfoServletTest {
     userEntity = new Entity("UserInfo", "1234567890");
     userEntity.setProperty("nickname", "Leonard");
     userEntity.setProperty("address", "xxx");
-    userEntity.setProperty("phone", "xxx");
     userEntity.setProperty("email", "leonardzhang@google.com");
     userEntity.setProperty("userId", "1234567890");
     userEntity.setProperty("country", "US");
@@ -210,7 +209,6 @@ public final class TaskInfoServletTest {
     // Test whether the stored personal information has been updated
     assertEquals("Leonard", (String) entity.getProperty("nickname"));
     assertEquals("xxx", (String) entity.getProperty("address"));
-    assertEquals("xxx", (String) entity.getProperty("phone"));
     assertEquals("15213", (String) entity.getProperty("zipcode"));
     assertEquals("US", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));

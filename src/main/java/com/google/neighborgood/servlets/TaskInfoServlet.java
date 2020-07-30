@@ -20,10 +20,6 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.gson.Gson;
 import com.google.neighborgood.task.Task;
 import java.io.IOException;
@@ -83,19 +79,16 @@ public class TaskInfoServlet extends HttpServlet {
       entity.setProperty("Helper", "N/A");
     } else if (newStatus.equals("COMPLETE")) {
       String userId = (String) entity.getProperty("Helper");
-      Query query =
-          new Query("UserInfo")
-              .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, userId));
-      PreparedQuery results = datastore.prepare(query);
-      Entity userEntity = results.asSingleEntity();
-      if (userEntity == null) {
+      Entity userEntity = null;
+      try {
+        userEntity = datastore.get(KeyFactory.createKey("UserInfo", userId));
+      } catch (EntityNotFoundException e) {
         System.err.println("Unable to find the helper of the task");
         response.sendError(
             HttpServletResponse.SC_NOT_FOUND,
             "The helper of the task could not be found in the database");
         return;
       }
-
       long points = (long) userEntity.getProperty("points");
       long reward = (long) entity.getProperty("reward");
       userEntity.setProperty("points", points + reward);

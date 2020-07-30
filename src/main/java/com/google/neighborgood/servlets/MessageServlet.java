@@ -52,6 +52,7 @@ public class MessageServlet extends HttpServlet {
     String taskId = request.getParameter("key");
     if (taskId == null) {
       System.err.println("No task id provided");
+      return;
     }
 
     // Make sure that the user has already logged into his account
@@ -118,7 +119,12 @@ public class MessageServlet extends HttpServlet {
 
     // Get the message content
     String message = request.getParameter("msg");
-    if (message == null || message.trim().equals("")) {
+    if (message == null) {
+      System.err.println("The message is not provided");
+      return;
+    }
+
+    if (message.trim().equals("")) {
       System.err.println("The input message is empty");
       return;
     }
@@ -191,7 +197,7 @@ public class MessageServlet extends HttpServlet {
       return;
     }
 
-    // Get all stored entity ke related with the task that corresponds to the given taskId
+    // Get all stored entity keys related with the task that corresponds to the given taskId
     Filter filter = new FilterPredicate("taskId", FilterOperator.EQUAL, taskId);
     Query query = new Query("Message").setFilter(filter).setKeysOnly();
 

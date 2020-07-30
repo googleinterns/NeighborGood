@@ -23,10 +23,11 @@ import static org.mockito.Mockito.*;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
@@ -34,6 +35,7 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalUserServiceTestConfig;
 import com.google.common.collect.ImmutableMap;
 import java.io.*;
+import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import org.junit.After;
 import org.junit.Before;
@@ -88,7 +90,7 @@ public final class UserInfoServletTest {
   }
 
   @Test
-  public void normalSingleInputTest() throws IOException {
+  public void normalSingleInputTest() throws IOException, ServletException {
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -98,7 +100,6 @@ public final class UserInfoServletTest {
 
     when(request.getParameter("nickname-input")).thenReturn("Leonard");
     when(request.getParameter("address-input")).thenReturn("4xxx Centre Avenue");
-    when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
     when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
     when(request.getParameter("country-input")).thenReturn("United States");
 
@@ -115,11 +116,10 @@ public final class UserInfoServletTest {
     // Test the stored personal information
     assertEquals("Leonard", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
-    assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
     assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
-    assertEquals("1234567890", (String) entity.getProperty("userId"));
+    assertEquals("1234567890", entity.getKey().getName());
     assertEquals(0, (long) entity.getProperty("points"));
 
     when(request.getParameter("nickname-input")).thenReturn("Leo");
@@ -137,41 +137,36 @@ public final class UserInfoServletTest {
     // Test the stored personal information
     assertEquals("Leo", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
-    assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
     assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
-    assertEquals("1234567890", (String) entity.getProperty("userId"));
+    assertEquals("1234567890", entity.getKey().getName());
     assertEquals(0, (long) entity.getProperty("points"));
   }
 
   @Test
-  public void normalMultipleInputTest() throws IOException {
+  public void normalMultipleInputTest() throws IOException, ServletException {
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
 
     // Put two hard-coded entities into datastore in advance
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    Entity dummy = new Entity("UserInfo");
+    Entity dummy = new Entity("UserInfo", "1234567");
     dummy.setProperty("nickname", "Leonardo");
     dummy.setProperty("address", "xxx");
-    dummy.setProperty("phone", "xxx");
     dummy.setProperty("email", "test@example.com");
-    dummy.setProperty("userId", "1234567");
     dummy.setProperty("points", 0);
+
     ds.put(dummy);
-    Entity dummy_2 = new Entity("UserInfo");
+    Entity dummy_2 = new Entity("UserInfo", "12345");
     dummy_2.setProperty("nickname", "Leonar");
     dummy_2.setProperty("address", "xxx");
-    dummy_2.setProperty("phone", "xxx");
     dummy_2.setProperty("email", "test2@example.com");
-    dummy_2.setProperty("userId", "12345");
     dummy_2.setProperty("points", 50);
     ds.put(dummy_2);
 
     when(request.getParameter("nickname-input")).thenReturn("Leonard");
     when(request.getParameter("address-input")).thenReturn("4xxx Centre Avenue");
-    when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
     when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
     when(request.getParameter("country-input")).thenReturn("United States");
 
@@ -181,23 +176,23 @@ public final class UserInfoServletTest {
     assertEquals(3, ds.prepare(new Query("UserInfo")).countEntities(withLimit(10)));
 
     // Filter out the entity that has the userId of 1234567890
-    PreparedQuery results =
-        ds.prepare(
-            new Query("UserInfo")
-                .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, "1234567890")));
-    Entity entity = results.asSingleEntity();
-
+    Key userEntityKey = KeyFactory.createKey("UserInfo", "1234567890");
+    Entity entity = null;
+    try {
+      entity = ds.get(userEntityKey);
+    } catch (EntityNotFoundException e) {
+      System.err.println("The entity cannot be null");
+    }
     // The entity can't be null
     assertNotNull(entity);
 
     // Test the stored personal information
     assertEquals("Leonard", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
-    assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
     assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
-    assertEquals("1234567890", (String) entity.getProperty("userId"));
+    assertEquals("1234567890", entity.getKey().getName());
     assertEquals(0, (long) entity.getProperty("points"));
 
     when(request.getParameter("nickname-input")).thenReturn("Leo");
@@ -206,29 +201,28 @@ public final class UserInfoServletTest {
 
     // After sending the second POST request, there should be still three entities in the datastore
     assertEquals(3, ds.prepare(new Query("UserInfo")).countEntities(withLimit(10)));
-    results =
-        ds.prepare(
-            new Query("UserInfo")
-                .setFilter(new FilterPredicate("userId", FilterOperator.EQUAL, "1234567890")));
-    entity = results.asSingleEntity();
 
+    try {
+      entity = ds.get(userEntityKey);
+    } catch (EntityNotFoundException e) {
+      System.err.println("The entity cannot be null");
+    }
     // The entity can't be null
     assertNotNull(entity);
 
     // Test the stored personal information
     assertEquals("Leo", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
-    assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
     assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
-    assertEquals("1234567890", (String) entity.getProperty("userId"));
+    assertEquals("1234567890", entity.getKey().getName());
     assertEquals(0, (long) entity.getProperty("points"));
   }
 
   /** Test the edge case where at least one of the three input fields are empty or spaces. */
   @Test
-  public void emptyInputTest() throws IOException {
+  public void emptyInputTest() throws IOException, ServletException {
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -239,7 +233,6 @@ public final class UserInfoServletTest {
     // Set the nickname input to be empty
     when(request.getParameter("nickname-input")).thenReturn("");
     when(request.getParameter("address-input")).thenReturn("4xxx Centre Avenue");
-    when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
     when(request.getParameter("zipcode-input")).thenReturn("xxxxx");
     when(request.getParameter("country-input")).thenReturn("United States");
 
@@ -289,16 +282,8 @@ public final class UserInfoServletTest {
     errContent.reset();
     System.setErr(originalErr);
 
-    // Now we give the servlet an invalid phone number input
+    // Now we give the servlet a valid address number input
     when(request.getParameter("address-input")).thenReturn("4xxx Centre Avenue");
-    when(request.getParameter("phone-input")).thenReturn("");
-
-    new UserInfoServlet().doPost(request, response);
-
-    assertEquals(0, ds.prepare(new Query("UserInfo")).countEntities(withLimit(10)));
-
-    // Finally we give the servlet a valid phone number input
-    when(request.getParameter("phone-input")).thenReturn("4xxxxxxxxx");
 
     new UserInfoServlet().doPost(request, response);
 
@@ -312,11 +297,10 @@ public final class UserInfoServletTest {
     // Test the stored personal information
     assertEquals("Leonard", (String) entity.getProperty("nickname"));
     assertEquals("4xxx Centre Avenue", (String) entity.getProperty("address"));
-    assertEquals("4xxxxxxxxx", (String) entity.getProperty("phone"));
     assertEquals("xxxxx", (String) entity.getProperty("zipcode"));
     assertEquals("United States", (String) entity.getProperty("country"));
     assertEquals("leonardzhang@google.com", (String) entity.getProperty("email"));
-    assertEquals("1234567890", (String) entity.getProperty("userId"));
+    assertEquals("1234567890", entity.getKey().getName());
     assertEquals(0, (long) entity.getProperty("points"));
   }
 
@@ -329,12 +313,10 @@ public final class UserInfoServletTest {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     assertEquals(0, ds.prepare(new Query("UserInfo")).countEntities(withLimit(10)));
 
-    Entity dummy = new Entity("UserInfo");
+    Entity dummy = new Entity("UserInfo", "1234567890");
     dummy.setProperty("nickname", "Leonard");
     dummy.setProperty("address", "xxx");
-    dummy.setProperty("phone", "xxx");
     dummy.setProperty("email", "test@example.com");
-    dummy.setProperty("userId", "1234567890");
     dummy.setProperty("points", 0);
     dummy.setProperty("zipcode", "xxxxx");
     dummy.setProperty("country", "US");
@@ -348,7 +330,7 @@ public final class UserInfoServletTest {
 
     // After sending the GET request, the doGet function should output the json string
     writer.flush();
-    assertTrue(stringWriter.toString().contains("[\"Leonard\",\"xxx\",\"xxx\",\"xxxxx\",\"US\"]"));
+    assertTrue(stringWriter.toString().contains("[\"Leonard\",\"xxx\",\"xxxxx\",\"US\"]"));
 
     // Finally, ensure that the servlet file has set the content type to json
     verify(response).setContentType("application/json;");

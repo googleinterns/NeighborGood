@@ -43,7 +43,7 @@ function validateTaskForm(id) {
 function validateInfoForm(id) {
     var result = true;
     var form = document.getElementById(id);
-    var inputName = ["nickname", "address", "zipcode", "country", "phone"];
+    var inputName = ["nickname", "address", "zipcode", "country"];
     for (var i = 0; i < inputName.length; i++) {
         var name = inputName[i];
         var inputField = form[name.concat("-input")].value.trim();
@@ -103,11 +103,11 @@ async function loadMessages(keyString) {
     const msgContainer = document.getElementById("message-container");
     msgContainer.innerHTML = "";
     if (msgResponse.length === 10) {
-        var msg = msgResponse[9];
-        var newMessage = document.createElement("div");
+        let msg = msgResponse[9];
+        let newMessage = document.createElement("div");
         newMessage.className = msg.className;
         newMessage.appendChild(document.createTextNode(msg.message)); 
-        var moreMessageBtn = document.createElement("button");
+        let moreMessageBtn = document.createElement("button");
         moreMessageBtn.setAttribute("class", "more-msg-button");
         moreMessageBtn.textContent = "Load 10 more messages";
         moreMessageBtn.addEventListener("click", function() { 
@@ -198,7 +198,7 @@ async function getTaskInfo(keyString) {
 async function deleteTask(keyString) {
     const info = await getTaskInfo(keyString);
     if (info.status !== "OPEN") {
-        window.alert("You can only delete an 'OPEN' task.")
+        window.alert("You can only delete an 'OPEN' task.");
     } else {
         if (confirm("Are you sure that you want to delete the task?")) {
             const queryURL = "/tasks?key=" + keyString;
@@ -232,9 +232,8 @@ async function editInfo() {
     const userInfo = await response.json();
     document.getElementById("edit-nickname-input").value = userInfo[0];
     document.getElementById("edit-address-input").value = userInfo[1];
-    document.getElementById("edit-phone-number-input").value = userInfo[2];
-    document.getElementById("edit-zipcode-input").value = userInfo[3];
-    document.getElementById("edit-country-input").value = userInfo[4];
+    document.getElementById("edit-zipcode-input").value = userInfo[2];
+    document.getElementById("edit-country-input").value = userInfo[3];
     showInfoModal();
 }
 
@@ -321,7 +320,7 @@ async function removeNotifications(taskId) {
 function showNeedHelp() {
     if (document.getElementById("need-help") == null) return;
     document.getElementById("need-help").style.display = "table";
-    document.getElementById("create").style.display = "block";
+    document.getElementById("create-task-button").style.display = "block";
     document.getElementById("offer-help").style.display = "none";
     document.getElementById("await-verif").style.display = "table";
     document.getElementById("complete-task").style.display = "none";
@@ -333,7 +332,7 @@ function showNeedHelp() {
 
 function showOfferHelp() {
     document.getElementById("need-help").style.display = "none";
-    document.getElementById("create").style.display = "none";
+    document.getElementById("create-task-button").style.display = "none";
     document.getElementById("offer-help").style.display = "table";
     document.getElementById("await-verif").style.display = "none";
     document.getElementById("complete-task").style.display = "table";
@@ -543,7 +542,7 @@ async function displayOfferHelpTasks() {
         var abandonBtn = document.createElement("button");
         abandonBtn.className = "abandon-task";
         abandonBtn.addEventListener("click", function () { abandonTask(keyStringCopy) });
-        abandonBtn.innerHTML = (task.status === "IN PROGRESS") ? '<i class="fa fa-times"></i>':'<i class="fa fa-ban"></i>';;
+        abandonBtn.innerHTML = (task.status === "IN PROGRESS") ? '<i class="fa fa-times"></i>':'<i class="fa fa-ban"></i>';
         abandonTd.appendChild(abandonBtn);
         tr.appendChild(completeTd);
         tr.appendChild(abandonTd);
@@ -782,7 +781,17 @@ async function initMap() {
         });
 
         function onError() {
-            console.log("Unable to resolve the user's current location");
+            let url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + MAPSKEY;
+            const request = new Request(url, {method: "POST"});
+            fetch(request).then(response => {
+                if (response.status == 400 || response.status == 403 || response.status == 404) {
+                    console.log("Unable to resolve the user's current location");
+                } else {
+                    response.json().then(jsonresponse => {
+                        map.setCenter(jsonresponse["location"]);
+                    });
+                }
+            });
         }
 
         function onSuccess(geo) {
@@ -796,7 +805,7 @@ async function initMap() {
         }
 
         if (!navigator.geolocation) {
-            onError();
+            console.log("Unable to resolve the user's current location");
         } else {
             await navigator.geolocation.getCurrentPosition(onSuccess, onError);
         }
@@ -828,9 +837,10 @@ function displayMarker(position) {
     // There is at most one marker displayed on the map
     if (markers.length > 0) {
         markers[0].setMap(null);
-    }
+    } 
     markers = [];
     markers.push(marker);
+
     return marker;
 }
 

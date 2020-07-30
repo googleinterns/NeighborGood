@@ -32,6 +32,7 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalUserServiceTestConfig;
 import com.google.common.collect.ImmutableMap;
 import java.io.*;
+import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import org.junit.After;
 import org.junit.Before;
@@ -73,7 +74,6 @@ public final class TaskServletTest {
     userEntity = new Entity("UserInfo", "1234567890");
     userEntity.setProperty("nickname", "Leonard");
     userEntity.setProperty("address", "xxx");
-    userEntity.setProperty("phone", "xxx");
     userEntity.setProperty("email", "leonardzhang@google.com");
     userEntity.setProperty("userId", "1234567890");
     userEntity.setProperty("country", "US");
@@ -101,7 +101,7 @@ public final class TaskServletTest {
   }
 
   @Test
-  public void singleInputDoPostTest() throws IOException {
+  public void singleInputDoPostTest() throws IOException, ServletException {
     // Check whether the datastore is empty before the test
     assertEquals(0, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
 
@@ -128,7 +128,7 @@ public final class TaskServletTest {
   }
 
   @Test
-  public void multipleInputDoPostTest() throws IOException {
+  public void multipleInputDoPostTest() throws IOException, ServletException {
     // Check whether the datastore is empty before the test
     assertEquals(0, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
 
