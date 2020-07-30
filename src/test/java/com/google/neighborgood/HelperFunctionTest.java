@@ -71,7 +71,6 @@ public final class HelperFunctionTest {
     userEntity = new Entity("UserInfo", "1234567890");
     userEntity.setProperty("nickname", "Leonard");
     userEntity.setProperty("address", "4xxx Cxxxxx Avenue");
-    userEntity.setProperty("phone", "xxx2282760");
     userEntity.setProperty("email", "leonardzhang@google.com");
     userEntity.setProperty("userId", "1234567890");
     userEntity.setProperty("country", "US");
@@ -83,11 +82,10 @@ public final class HelperFunctionTest {
   @Test
   public void retrieveUserInfoTest() {
     // Given the userId 1234567890, the result should be a list of correct nickname,
-    // address, phone number and rewarding points
+    // address, and rewarding points
     List<String> expected = new ArrayList<>();
     expected.add("Leonard");
     expected.add("4xxx Cxxxxx Avenue");
-    expected.add("xxx2282760");
     expected.add("0");
 
     List<String> actual = new RetrieveUserInfo().getInfoFromId("1234567890");

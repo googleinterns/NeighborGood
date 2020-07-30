@@ -14,6 +14,7 @@
 
 var markers = [];
 var map;
+var cursorString;
 const GOOGLE_KIRKLAND_LAT = 47.669846;
 const GOOGLE_KIRKLAND_LNG = -122.1996099;
 const MAPSKEY = config.MAPS_KEY;
@@ -74,11 +75,17 @@ function sendMessage() {
     } else {
         document.getElementById("msg-input").classList.remove("highlight");
         var form = document.getElementById("chat-box");
+        var messageContent = form["msg"].value;
         const queryURL = "/messages?task-id=" + form["task-id"].value 
-                        + "&msg=" + encodeURIComponent(form["msg"].value);
+                        + "&msg=" + encodeURIComponent(messageContent);
         const request = new Request(queryURL, {method: "POST"});
         fetch(request).then((response) => {
-            loadMessages(form["task-id"].value);
+            const msgContainer = document.getElementById("message-container");
+            var newMessage = document.createElement("div");
+            newMessage.className = "sentByMe";
+            newMessage.appendChild(document.createTextNode(messageContent)); 
+            msgContainer.appendChild(newMessage);
+            msgContainer.scrollTop = msgContainer.scrollHeight;
         });
         form["msg"].value = "";
     }
@@ -89,24 +96,101 @@ async function refresh() {
     loadMessages(document.getElementById("chat-id-input").value);
 }
 
+// To address the scaling issue and avoid loading too many messages at a time,
+// the chat box would first load at most 10 most recent messages.
 async function loadMessages(keyString) {
     const queryURL = "/messages?key=" + keyString;
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
-    const msgResponse = await response.json();
+    const result = await response.json();
+    const msgResponse = result.messages;
+    cursorString = result.cursorString;
 
     const msgContainer = document.getElementById("message-container");
     msgContainer.innerHTML = "";
-    for (var index = 0; index < msgResponse.length; index++) {
-        var msg = msgResponse[index];
-        var newMessage = document.createElement("div");
+    if (msgResponse.length === 10) {
+        let msg = msgResponse[9];
+        let newMessage = document.createElement("div");
         newMessage.className = msg.className;
         newMessage.appendChild(document.createTextNode(msg.message)); 
+        let moreMessageBtn = document.createElement("button");
+        moreMessageBtn.setAttribute("class", "more-msg-button");
+        moreMessageBtn.textContent = "Load 10 more messages";
+        moreMessageBtn.addEventListener("click", function() { 
+            loadMoreMessages(keyString, newMessage)
+        });
+        msgContainer.appendChild(moreMessageBtn);
         msgContainer.appendChild(newMessage);
+        for (var index = 8; index >= 0; index--) {
+            var message = msgResponse[index];
+            var newMessageDiv = document.createElement("div");
+            newMessageDiv.className = message.className;
+            newMessageDiv.appendChild(document.createTextNode(message.message)); 
+            msgContainer.appendChild(newMessageDiv);
+        }
+    } else {
+        for (var index = msgResponse.length - 1; index >= 0; index--) {
+            var msg = msgResponse[index];
+            var newMessage = document.createElement("div");
+            newMessage.className = msg.className;
+            newMessage.appendChild(document.createTextNode(msg.message)); 
+            msgContainer.appendChild(newMessage);
+        }
     }
 
     // Keep message container scrolled to bottom at the beginning
     msgContainer.scrollTop = msgContainer.scrollHeight;
+}
+
+// loadMoreMessages(key, messageDiv) will load 10 more messages of
+// task with keyString equals to key. After loading, scroll to element messageDiv
+async function loadMoreMessages(key, messageDiv) {
+    const queryURL = "/messages?key=" + key + "&cursor=" + cursorString;
+    const request = new Request(queryURL, {method: "GET"});
+    const response = await fetch(request);
+    const result = await response.json();
+    const msgResponse = result.messages;
+    cursorString = result.cursorString;
+
+    const msgContainer = document.getElementById("message-container");
+    msgContainer.removeChild(msgContainer.childNodes[0]);
+    if (msgResponse.length === 10) {
+        var newMessageDiv;
+        for (var index = 0; index < 10; index++) {
+            var message = msgResponse[index];
+            newMessageDiv = document.createElement("div");
+            newMessageDiv.className = message.className;
+            newMessageDiv.appendChild(document.createTextNode(message.message)); 
+            msgContainer.insertBefore(newMessageDiv, msgContainer.childNodes[0]);
+        }
+        var moreMessageBtn = document.createElement("button");
+        moreMessageBtn.setAttribute("class", "more-msg-button");
+        moreMessageBtn.textContent = "Load 10 more messages";
+        moreMessageBtn.addEventListener("click", function() { 
+            loadMoreMessages(key, newMessageDiv);
+        });
+        msgContainer.insertBefore(moreMessageBtn, msgContainer.childNodes[0]);
+    } else {
+        for (var index = 0; index < msgResponse.length; index++) {
+            var message = msgResponse[index];
+            newMessageDiv = document.createElement("div");
+            newMessageDiv.className = message.className;
+            newMessageDiv.appendChild(document.createTextNode(message.message)); 
+            msgContainer.insertBefore(newMessageDiv, msgContainer.childNodes[0]);
+        } 
+    }
+    messageDiv.scrollIntoView();
+}
+
+// deleteMessages(taskId) will delete all the messages stored in datastore related
+// with the task corresponds to the given taskId
+async function deleteMessages(taskId) {
+    const queryURL = "/messages?task-id=" + taskId;
+    const request = new Request(queryURL, {method: "DELETE"});
+    const response = await fetch(request);
+    // After deleting the messages, remove the notifications
+    removeNotifications(taskId);
+    return;
 }
 
 async function getTaskInfo(keyString) {
@@ -126,6 +210,7 @@ async function deleteTask(keyString) {
             const queryURL = "/tasks?key=" + keyString;
             const request = new Request(queryURL, {method: "DELETE"});
             const response = await fetch(request);
+            deleteMessages(keyString);
             showNeedHelp();
         }
     }
@@ -153,9 +238,8 @@ async function editInfo() {
     const userInfo = await response.json();
     document.getElementById("edit-nickname-input").value = userInfo[0];
     document.getElementById("edit-address-input").value = userInfo[1];
-    document.getElementById("edit-phone-number-input").value = userInfo[2];
-    document.getElementById("edit-zipcode-input").value = userInfo[3];
-    document.getElementById("edit-country-input").value = userInfo[4];
+    document.getElementById("edit-zipcode-input").value = userInfo[2];
+    document.getElementById("edit-country-input").value = userInfo[3];
     showInfoModal();
 }
 
@@ -184,6 +268,7 @@ async function abandonTask(keyString) {
             const queryURL = "/tasks/info?key=" + keyString + "&status=" + "OPEN";
             const request = new Request(queryURL, {method: "POST"});
             const response = await fetch(request);
+            deleteMessages(keyString);
             showOfferHelp();
         }
     }
@@ -198,6 +283,7 @@ async function verifyTask(keyString) {
             const queryURL = "/tasks/info?key=" + keyString + "&status=" + "COMPLETE";
             const request = new Request(queryURL, {method: "POST"});
             const response = await fetch(request);
+            deleteMessages(keyString);
             showNeedHelp();
         }
     }
@@ -226,6 +312,15 @@ async function showTaskInfo(keyString) {
     var modal = document.getElementById("taskInfoModalWrapper");
     modal.style.display = "block";
     loadMessages(keyString);
+    removeNotifications(keyString);
+}
+
+async function removeNotifications(taskId) {
+    const queryURL = "/notifications?task-id=" + taskId;
+    const request = new Request(queryURL, {method: "DELETE"});
+    const response = await fetch(request);
+    showNotifications();
+    return;
 }
 
 function showNeedHelp() {
@@ -292,6 +387,56 @@ window.onclick = function(event) {
             modal.style.display = "none";
         }
     }
+}
+
+async function showNotifications() {
+    const request = new Request("/notifications", {method: "GET"});
+    const response = await fetch(request);
+    const notifiResponse = await response.json();
+    const notiList = document.getElementById("notification-list");
+    notiList.innerHTML = "";
+    const noticeContainer = document.getElementById("notice-container");
+    noticeContainer.innerHTML = "";
+    if (notifiResponse.length === 0) return;
+    let totalCnt = 0;
+    for (var index = 0; index < notifiResponse.length; index++) {
+        var li = document.createElement("li");
+        var notification = notifiResponse[index];
+        var overview = notification.overview;
+        var count = notification.count;
+        var id = notification.taskId;
+        // Create a copy for taskId to prevent alias
+        const idCopy = id.slice();
+        totalCnt += count;
+        var taskLink = document.createElement("a");
+        taskLink.setAttribute("class", "notification-element");
+        taskLink.appendChild(
+            document.createTextNode("You have " + count.toString() + " new notificatioins for Task: "
+            + overview));
+        taskLink.addEventListener("click", function() {
+            closeNotificationModal();
+            showTaskInfo(idCopy);
+        });
+        li.appendChild(taskLink);
+        notiList.appendChild(li);
+    }
+    var notiMsg = document.createElement("span");
+    notiMsg.appendChild(document.createTextNode("You have " + totalCnt.toString() + " new notifications"));
+    notiMsg.addEventListener("click", function() {
+        showNotificationList();
+    });
+    notiMsg.setAttribute("class", "notification-text");
+    noticeContainer.appendChild(notiMsg);
+}
+
+function showNotificationList() {
+    var modal = document.getElementById("notificationModalWrapper");
+    modal.style.display = "block";
+}
+
+function closeNotificationModal() {
+    var modal = document.getElementById("notificationModalWrapper");
+    modal.style.display = "none";
 }
 
 async function displayNeedHelpTasks() {
@@ -440,11 +585,13 @@ async function displayOfferHelpCompleteTasks() {
 if (document.readyState === 'loading') {
     // adds on load event listeners if document hasn't yet loaded
     document.addEventListener('DOMContentLoaded', initMap);
-    document.addEventListener('DOMContentLoaded', showNeedHelp)
+    document.addEventListener('DOMContentLoaded', showNeedHelp);
+    document.addEventListener('DOMContentLoaded', showNotifications);
 } else {
     // if DOMContentLoaded has already fired, it simply calls the functions
     initMap();
     showNeedHelp();
+    showNotifications();
 }
 
 /**
