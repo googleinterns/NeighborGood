@@ -178,10 +178,6 @@ public final class TaskServletTest {
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
 
-    // Check whether there are no entities before test
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    assertEquals(0, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
-
     // Adds 5 task entities
     for (int i = 0; i < 5; i++) {
       Entity taskEntity = new Entity("Task", userEntity.getKey());
@@ -220,8 +216,7 @@ public final class TaskServletTest {
     JsonObject jsonObject = new JsonParser().parse(stringWriter.toString()).getAsJsonObject();
 
     // Response should have 5 tasks and should be the end of the query (that is there are no more
-    // tasks left
-    // on that query to return
+    // tasks left on that query to return
     int taskCount = jsonObject.get("currentTaskCount").getAsInt();
     boolean endOfQuery = jsonObject.get("endOfQuery").getAsBoolean();
     assertEquals(5, taskCount);
@@ -234,10 +229,6 @@ public final class TaskServletTest {
   public void moreThanTenTasksDoGetTest() throws IOException, ServletException {
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
-
-    // Check whether there are no entities before test
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    assertEquals(0, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
 
     // Adds 15 task entities
     for (int i = 0; i < 15; i++) {
@@ -276,14 +267,15 @@ public final class TaskServletTest {
     // parses response as a json object
     JsonObject jsonObject = new JsonParser().parse(stringWriter.toString()).getAsJsonObject();
 
-    // Response should have 10 tasks and should not be the end of the query
+    // Response should have 10 tasks (as only at most 10 get fetched at once) and should not be the
+    // end of the query
     int taskCount = jsonObject.get("currentTaskCount").getAsInt();
     boolean endOfQuery = jsonObject.get("endOfQuery").getAsBoolean();
     assertEquals(10, taskCount);
     assertEquals(false, endOfQuery);
 
-    // I generated this query just as like the previous servlet doGet would do for the sole purpose
-    // of retrieving the endCursor for the next test
+    // I am generating this query just as like the previous servlet doGet would do for the sole
+    // purpose of retrieving the endCursor for the next test
     Query query = new Query("Task").addSort("timestamp", SortDirection.DESCENDING);
     List<Query.Filter> filters = new ArrayList<Query.Filter>();
     filters.add(new Query.FilterPredicate("zipcode", Query.FilterOperator.EQUAL, "98033"));
@@ -317,7 +309,7 @@ public final class TaskServletTest {
     // parses response as a json object
     jsonObject = new JsonParser().parse(stringWriter.toString()).getAsJsonObject();
 
-    // Response should have 5 tasks and should be the end of the query
+    // Response should have 5 remaining tasks out of the 15 added and should be the end of the query
     taskCount = jsonObject.get("currentTaskCount").getAsInt();
     endOfQuery = jsonObject.get("endOfQuery").getAsBoolean();
     assertEquals(5, taskCount);
@@ -328,10 +320,6 @@ public final class TaskServletTest {
   public void missingNeighborhoodDoGetTest() throws IOException, ServletException {
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
-
-    // Check whether there are no entities before test
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    assertEquals(0, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
 
     when(request.getParameter("cursor")).thenReturn("clear");
     when(request.getSession()).thenReturn(session);
@@ -360,10 +348,6 @@ public final class TaskServletTest {
   public void categoryFilterDoGetTest() throws IOException, ServletException {
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
-
-    // Check whether there are no entities before test
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    assertEquals(0, ds.prepare(new Query("Task")).countEntities(withLimit(10)));
 
     String[] categories = {"Garden", "Pets", "Shopping", "Misc"};
 
@@ -423,7 +407,7 @@ public final class TaskServletTest {
     // parses response as a json object
     JsonObject jsonObject = new JsonParser().parse(stringWriter.toString()).getAsJsonObject();
 
-    // Response should have 7 shopping tasks and should be end of query
+    // Response should have the 7 shopping tasks and should be end of query
     int taskCount = jsonObject.get("currentTaskCount").getAsInt();
     boolean endOfQuery = jsonObject.get("endOfQuery").getAsBoolean();
     assertEquals(7, taskCount);
@@ -442,7 +426,7 @@ public final class TaskServletTest {
     // parses response as a json object
     jsonObject = new JsonParser().parse(stringWriter.toString()).getAsJsonObject();
 
-    // Response should have 5 misc tasks and should be end of query
+    // Response should have the 5 misc tasks and should be end of query
     taskCount = jsonObject.get("currentTaskCount").getAsInt();
     endOfQuery = jsonObject.get("endOfQuery").getAsBoolean();
     assertEquals(5, taskCount);

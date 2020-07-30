@@ -522,7 +522,8 @@ public class IntegrationTest {
   }
 
   @Test
-  public void _11_Homepage_AsHelperScollToBottom_LoadMoreTasks() throws InterruptedException {
+  /* Test functionality of a user scrolling to bottom of page to load more tasks  */
+  public void _11_Homepage_ScollToBottom_LoadMoreTasks() throws InterruptedException {
 
     goToUserPage();
     ifLaggingThenRefresh();
@@ -571,9 +572,12 @@ public class IntegrationTest {
   }
 
   @Test
+  /* Test functionality of a user searching tasks by a different location */
   public void _12_Homepage_AsFarawayUser_SearchByDiffLocation() throws InterruptedException {
 
     logOut("loginLogoutMessage");
+
+    // logins and creates a new user with faraway user info (in this case using a 59715 zipcode)
     loginNewUser(
         USER_EMAIL_FARAWAY,
         USER_NICKNAME_FARAWAY,
@@ -584,7 +588,7 @@ public class IntegrationTest {
         FARAWAY_LAT,
         FARAWAY_LNG);
 
-    // Adds three new tasks
+    // Adds three new tasks - these tasks will all be in 59715, US neighborhood
     for (int i = 0; i < 3; i++) {
       // Randomizes task contents
       Random random = new Random();
@@ -598,7 +602,8 @@ public class IntegrationTest {
     }
     backToHome();
 
-    // Enters zipcode of a different neighborhood and waits for autocomplete suggestions to load
+    // Enters zipcode of a different neighborhood (59715) and waits for autocomplete suggestions to
+    // load
     WebElement placeInput =
         wait.until(
             new Function<WebDriver, WebElement>() {
@@ -610,10 +615,11 @@ public class IntegrationTest {
     placeInput.sendKeys("59715");
     Thread.sleep(2000);
 
-    // clicks first option from place autocomplete search box
+    // clicks first option from place autocomplete search box and waits for newly fetched tasks to
+    // be displayed
     Actions act = new Actions(driver);
     act.moveToElement(placeInput).moveByOffset(20, 20).click().perform();
-    Thread.sleep(1000);
+    Thread.sleep(2000);
 
     // verifies most recently added task and that the total expected displayed tasks is 3
     verifyNewTaskHomepage(3);
