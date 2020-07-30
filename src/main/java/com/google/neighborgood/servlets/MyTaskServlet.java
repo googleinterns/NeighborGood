@@ -54,9 +54,11 @@ public class MyTaskServlet extends HttpServlet {
       return;
     }
 
+    // Initiate a fetchOption with a fetch limit equals to 5
     FetchOptions fetchOption = FetchOptions.Builder.withLimit(PAGE_SIZE);
 
-    // If the client requires for a cursor, get the cursor string given
+    // If the client requires for a cursor, get the cursor string given. The user should provide
+    // two cursor strings, one for the first query, and another one for the second query.
     String firstStartCursor = request.getParameter("firstcursor");
     String secondStartCursor = request.getParameter("secondcursor");
     if (firstStartCursor != null) {
@@ -106,7 +108,7 @@ public class MyTaskServlet extends HttpServlet {
       cursorStrings.add(cursorString);
 
       // If there are less then 5 tasks fetched in the first loop, fetch more tasks in the second
-      // loop
+      // loop. Also, set the cursor to the second cursor string provided for the second query.
       fetchOption = FetchOptions.Builder.withLimit(PAGE_SIZE - myTasks.size());
       if (secondStartCursor != null) {
         fetchOption.startCursor(Cursor.fromWebSafeString(secondStartCursor));
