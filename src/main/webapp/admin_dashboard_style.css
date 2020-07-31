@@ -197,7 +197,7 @@ main h1 {
   width: 100%;
 }
 
-#popup-overlay {
+.popup-overlay {
   position: fixed;
   z-index: 1;
   top: 0;
@@ -211,7 +211,7 @@ main h1 {
   opacity: 0;
 }
 
-#popup-overlay:target {
+.popup-overlay:target {
   visibility: visible;
   opacity: 1;
 }

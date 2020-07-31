@@ -33,6 +33,7 @@
 						<h2>Administrator Tasks</h2>
 						<div id="card-div">
 							<ul id="admin-tasks">
+                                <a href="#admin-popup">
 								<li class="admin-task">
 									<h3>New Homepage Design</h3>
 									<h4>Mafe Ponce</h4>
@@ -41,6 +42,7 @@
 										<p class="time"><i class="far fa-clock"></i> 3:30pm</p>
 									</div>
 								</li>
+                                </a>
 								<li class="admin-task">
 									<h3>User Tasks Design</h3>
 									<h4>Leonard Zhang</h4>
@@ -104,7 +106,7 @@
 				</div>
 			</main>
 		</div>
-		<div id="popup-overlay">
+		<div class="popup-overlay" id="user-popup">
 			<div id="popup">
 				<h2>Edit Task</h2>
 				<form action="/admin-user-tasks" method="POST">
@@ -120,7 +122,18 @@
 					<input type="hidden" name="task-id" id="task-id-input">
 				</form>
 				<a href="#" id="popup-close">&times;</a>
-                
+			</div>
+		</div>
+        <div class="popup-overlay" id="admin-popup">
+			<div id="popup">
+				<h2>Admin Task</h2>
+				<form action="/admin-tasks" method="POST">
+					Task: <input type="text" id="admin-task-input" name="admin-task-input">
+                    Owner: <input type="text" id="admin-owner-input" name="admin-owner-input">
+					Due Date: <input type="date" id="admin-date" name="admin-date" min="0" max="200">
+                    <input type="submit" value="Submit">
+				</form>
+				<a href="#" id="popup-close">&times;</a>
 			</div>
 		</div>
 	</body>

@@ -199,7 +199,7 @@ function getUserTasks() {
 }
 
 function addTask(task) {
-	let string = `<a href="#popup-overlay"><li class="admin-user-task"  onclick="openWithPopup('${task.keyString}')"><span><h3> ${task.category} </h3>`;
+	let string = `<a href="#user-popup"><li class="admin-user-task"  onclick="openWithPopup('${task.keyString}')"><span><h3> ${task.category} </h3>`;
 	string += `<h4> ${task.owner} </h4></span> <a href="#"><span id="delete-btn" onclick=deleteTask('${task.keyString}')><i class="fas fa-trash fa-2x"></i></span></a></li></a>`;
 	return string;
 }
