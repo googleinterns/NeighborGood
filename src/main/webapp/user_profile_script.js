@@ -445,7 +445,7 @@ async function displayNeedHelpTasks() {
     if (taskResponse.length === 5) {
         var moreTaskBtn = document.createElement("button");
         moreTaskBtn.setAttribute("class", "more-task-button");
-        moreTaskBtn.textContent = "Load 5 more tasks";
+        moreTaskBtn.textContent = "Load more tasks";
         moreTaskBtn.addEventListener("click", function() { 
             displayNeedHelpTasks();
         });
@@ -503,7 +503,7 @@ async function displayNeedHelpCompleteTasks() {
     if (taskResponse.length === 5) {
         var moreTaskBtn = document.createElement("button");
         moreTaskBtn.setAttribute("class", "more-task-button");
-        moreTaskBtn.textContent = "Load 5 more tasks";
+        moreTaskBtn.textContent = "Load more tasks";
         moreTaskBtn.addEventListener("click", function() { 
             displayNeedHelpCompleteTasks();
         });
@@ -561,7 +561,7 @@ async function displayOfferHelpTasks() {
     if (taskResponse.length === 5) {
         var moreTaskBtn = document.createElement("button");
         moreTaskBtn.setAttribute("class", "more-task-button");
-        moreTaskBtn.textContent = "Load 5 more tasks";
+        moreTaskBtn.textContent = "Load more tasks";
         moreTaskBtn.addEventListener("click", function() { 
             displayOfferHelpTasks();
         });
@@ -605,7 +605,7 @@ async function displayOfferHelpCompleteTasks() {
     if (taskResponse.length === 5) {
         var moreTaskBtn = document.createElement("button");
         moreTaskBtn.setAttribute("class", "more-task-button");
-        moreTaskBtn.textContent = "Load 5 more tasks";
+        moreTaskBtn.textContent = "Load more tasks";
         moreTaskBtn.addEventListener("click", function() { 
             displayOfferHelpCompleteTasks();
         });
