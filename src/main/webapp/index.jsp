@@ -22,6 +22,8 @@
     <title>NeighborGood</title>
     <link rel="stylesheet" href="homepage_style.css">
     <script type='text/javascript' src='config.js'></script>
+    <script type='text/javascript' src='map_styles.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier/1.0.3/oms.min.js"></script>
     <script src="homepage_script.js"></script>
     <script src="https://kit.fontawesome.com/71105f4105.js" crossorigin="anonymous"></script>
   </head>
@@ -105,9 +107,21 @@
                   }
                   %>
               </div>
-              <div id="search-box">
-                <label for="place-input">Search tasks in a different location:</label>
-                <input id="place-input" name="place-input" type="text" placeholder=" Type an address here" autocomplete="off">
+              <div id="search-and-view-wrapper">
+                <!--Search By Different Location Input-->
+                <div id="search-box">
+                    <label for="place-input">Search from a different location:</label>
+                    <input id="place-input" name="place-input" type="text" placeholder=" Type an address here" autocomplete="off">
+                </div>
+                <!-- View toggle buttons -->
+                <div id="list-map-view">
+                    <button id="selected-view" value="list" class="view-option" aria-label="List View">
+                        <i class="fas fa-list" aria-hidden="true"></i>
+                    </button>
+                    <button class="view-option" value="map" aria-label="Map View">
+                        <i class="fas fa-map" aria-hidden="true"></i>
+                    </button>
+                </div>
               </div>
 
               <!--Results Messages-->
@@ -117,15 +131,29 @@
               <div id="location-missing-message" class="results-message">
                   We could not retrieve your location to display your neighborhood tasks. Please use the search box to manually enter a location.
               </div>
-              <div id="tasks-message" class="results-message">
-                  These are the most recent tasks in your neighborhood:
-              </div>
               <div id="no-tasks-message" class="results-message">
-                  Sorry, there are currently no tasks within your neighborhood for you to help with.
+                  Sorry, there are currently no tasks within the neighborhood for you to help with.
               </div>
           </div>
           <!--Listed Tasks Container-->
           <div id="tasks-list"></div>
+          <!--Map Tasks Container-->
+          <div id="tasks-map-wrapper">
+              <div class="help-overlay" id="help-overlay-map">
+                  <div id="exit-help-map"><a>&times</a></div>
+                  <div id="confirm-wrapper">
+                      <a class="confirm-help" id="confirm-map">
+                          CONFIRM
+                      </a>
+                  </div>
+              </div>
+            <div id="tasks-map"></div>
+            <div id="map-control-wrapper">
+                <div class="map-control" id="load-more-tasks-control">
+                    Load more tasks
+                </div>
+            </div>
+          </div>
       </section>
       <!--Create Tasks Modal-->
       <div class="modalWrapper" id="createTaskModalWrapper">

@@ -96,6 +96,8 @@ public class UserInfoServlet extends HttpServlet {
     String address = "";
     String zipcode = "";
     String country = "";
+    Double lat = null;
+    Double lng = null;
     String nicknameInput = request.getParameter("nickname-input");
     String addressInput = request.getParameter("address-input");
     String zipcodeInput = request.getParameter("zipcode-input");
@@ -107,6 +109,14 @@ public class UserInfoServlet extends HttpServlet {
     if (addressInput != null) address = addressInput.trim();
     if (zipcodeInput != null) zipcode = zipcodeInput.trim();
     if (countryInput != null) country = countryInput.trim();
+
+    try {
+      lat = Double.parseDouble(request.getParameter("lat"));
+      lng = Double.parseDouble(request.getParameter("lng"));
+    } catch (NumberFormatException e) {
+      System.err.println("Invalid location coordinates");
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid location coordinates");
+    }
 
     if (nickname.equals("") || address.equals("") || country.equals("") || zipcode.equals("")) {
       System.err.println("At least one input field is empty");
@@ -129,12 +139,16 @@ public class UserInfoServlet extends HttpServlet {
       entity.setProperty("email", email);
       entity.setProperty("country", country);
       entity.setProperty("zipcode", zipcode);
+      entity.setProperty("lat", lat);
+      entity.setProperty("lng", lng);
       entity.setProperty("points", 0);
     } else {
       entity.setProperty("nickname", nickname);
       entity.setProperty("address", address);
       entity.setProperty("country", country);
       entity.setProperty("zipcode", zipcode);
+      entity.setProperty("lat", lat);
+      entity.setProperty("lng", lng);
     }
     datastore.put(entity);
 
