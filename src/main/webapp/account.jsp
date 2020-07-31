@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>My Personal Info</title>
     <link rel="stylesheet" href="account_style.css">
+    <script type='text/javascript' src='map_styles.js'></script>
     <script type='text/javascript' src='config.js'></script>
     <script src="user_profile_script.js"></script>
   </head>
@@ -13,6 +14,8 @@
   <% UserService userService = UserServiceFactory.getUserService();
   if (!userService.isUserLoggedIn()) {
        response.sendRedirect(userService.createLoginURL("/account.jsp"));
+  } else if (!userService.getCurrentUser().getEmail().contains("@google.com")) {
+       response.sendRedirect(userService.createLogoutURL("/401.html"));
   } else if (RetrieveUserInfo.getInfo(userService) == null) { %>
   <body>
     <div id="container">
@@ -36,7 +39,7 @@
                 </div>
                 <br/>
                 <textarea name="address-input" id="edit-address-input" placeholder="Input your address here:"></textarea>
-                <p id="rest-map">Click to mark your personal address on the map!</p>
+                <p id="rest-map">Click to mark your personal address on the map!<span class="req">*</span></p>
                 <input id="place-input" class="controls" type="text" placeholder="Search Box">
                 <div id="map"></div>
                 <br/><br/>
@@ -54,6 +57,8 @@
                 <br/>
                 <input type="text" name="country-input" id="edit-country-input" placeholder="Input your country here:">
                 <br/><br/>
+                <input type="hidden" name="lat" id="lat-input">
+                <input type="hidden" name="lng" id="lng-input">
                 <!-- If account.jsp was loaded after being forwarded from /tasks, we pass on the task parameters as well -->
                 <%
                 if (request.getAttribute("javax.servlet.forward.request_uri") != null && request.getAttribute("javax.servlet.forward.request_uri").equals("/tasks")) {

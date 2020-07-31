@@ -269,7 +269,6 @@ table button:hover i {
 }
 
 #map {
-  border: thin solid black;
   height: 400px;
   max-width: 100%;
   margin-bottom: 20px;

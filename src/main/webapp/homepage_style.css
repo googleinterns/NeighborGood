@@ -103,15 +103,39 @@ section {
   padding-bottom: 0.5em;
 }
 
-#search-box {
+#search-and-view-wrapper {
+  display: flex;
+  justify-content: space-between;
   padding: 0.5em 0.5em 1em 0.5em;
-  visibility: hidden;
+}
+
+#search-box {
+  padding-top: 0.4em;
+}
+
+#list-map-view {
+  display: flex;
+}
+
+.view-option {
+  border: solid 1px #bbb;
+  background-color: #eee;
+  font-size: 1.2em;
+  padding: 0.2em 0.5em 0.2em 0.5em;
+  margin-right: -0.5px;
+}
+
+#selected-view {
+  background-color: #bbb;
+}
+
+#selected-view:hover > i {
+  color: #222;
 }
 
 #control-bar-message-wrapper {
   background-image: linear-gradient(to bottom, white 90%, transparent);
   position: sticky;
-  padding-top: 1em;
   top: 0;
   width: 101%;
   z-index: 2;
@@ -174,7 +198,6 @@ section {
 
 #loading {
   display: block;
-  margin-top: -2em;
 }
 
 #tasks-list {
@@ -206,8 +229,13 @@ section {
   padding: 1em;
 }
 
+.task-content-marker {
+  padding: 1em 0;
+}
+
 .user-nickname {
   width: 70%;
+  font-weight: bold;
 }
 
 .help-out {
@@ -224,12 +252,15 @@ section {
 }
 
 .task-footer {
-  font-style: italic;
   display: flex;
   justify-content: space-between;
   padding-left: 1em;
   padding-bottom: 1em;
   padding-right: 1em;
+}
+
+.task-category {
+  font-style: italic;
 }
 
 .task-date-time {
@@ -256,6 +287,10 @@ section {
   cursor: pointer;
 }
 
+.help-out-marker {
+  margin-top: 0.5em;
+}
+
 .exit-help {
   font-size: 30px;
   line-height: 0em;
@@ -264,11 +299,69 @@ section {
   padding-top: 1em;
 }
 
+#tasks-map-wrapper {
+  position: relative;
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.18);
+  display: none;
+}
+
+#tasks-map {
+  height: calc(100vh - 330px);
+  max-height: 70vh;
+}
+
+#confirm-wrapper {
+  display: table;
+  position: absolute;
+  width: 100%;
+  line-height: 1em;
+}
+
+#confirm-map {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+
+#exit-help-map {
+  font-size: 30px;
+  text-align: right;
+  padding-right: 1em;
+  height: calc(50% - 0.5em);
+}
+
+#map-control-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.map-control {
+  background-color: #fff;
+  color: rgb(61, 61, 61);
+  font-size: 14px;
+  padding: 10px 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  -webkit-font-smoothing: antialiased;
+}
+
+#search-area-control {
+  margin-top: 8px;
+}
+
+#load-more-tasks-control {
+  text-align: center;
+  margin-top: -3em;
+  position: absolute;
+  z-index: 3;
+  display: none;
+}
+
 /* Add modal styling */
 .modalWrapper {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
-  z-index: 3; /* Sit on top */
+  z-index: 4; /* Sit on top */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -285,6 +378,9 @@ section {
   border: 1px solid #888;
   width: 50%;
   margin-top: 20vh;
+  margin-bottom: 10vh;
+  max-height: 80%;
+  overflow-y: auto;
 }
 
 .modal textarea {
@@ -295,6 +391,14 @@ section {
   font-size: 16px;
   padding: 10px 20px 10px 20px;
   transition: width 0.5s ease-in-out;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.modal input,
+.modal select {
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .modal textarea:focus {
@@ -417,20 +521,24 @@ td {
   #add-task {
     text-align: right;
     padding-right: 0.5em;
-    margin-top: -1em;
+    margin-top: -1.3em;
+    padding-bottom: 0.2em;
   }
 
   #create-task-button {
     font-size: 2.5em;
   }
 
-  #search-box {
-    padding-top: 0;
-    margin-top: -0.5em;
-  }
-
   #place-input {
     display: block;
+  }
+
+  #search-box {
+    padding-top: 0;
+  }
+
+  #list-map-view {
+    margin: 0.5em 0;
   }
 
   .results-message {
@@ -440,6 +548,10 @@ td {
 
   .fa-3x {
     font-size: 2.5em;
+  }
+
+  h1 {
+    font-size: 1.5em;
   }
 
   h2 {
@@ -462,6 +574,22 @@ td {
     padding-bottom: 0;
     background-color: white;
   }
+
+  #tasks-map {
+    height: calc(100vh - 450px);
+  }
+
+  .modal input {
+    margin-top: 0;
+  }
+
+  .modal label {
+    font-size: 1em;
+  }
+
+  .modal textarea {
+    margin-top: 5px;
+  }
 }
 
 @media only screen and (min-width: 600px) and (max-width: 1203px) {
@@ -481,4 +609,25 @@ td {
   nav {
     background-color: white;
   }
+}
+
+.submit-button {
+  border: 0;
+  outline: none;
+  border-radius: 0;
+  padding: 15px 0;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  background: #1ab188;
+  color: white;
+  transition: all 0.5s ease;
+  -webkit-appearance: none;
+  width: 100%;
+  cursor: pointer;
+}
+
+.submit-button:hover,
+.submit-button:focus {
+  background: #169674;
 }

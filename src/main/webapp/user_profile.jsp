@@ -5,6 +5,7 @@
     <title>My Account</title>
     <link rel="stylesheet" href="user_profile_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type='text/javascript' src='map_styles.js'></script>
     <script type='text/javascript' src='config.js'></script>
     <script src="user_profile_script.js"></script>
   </head>
@@ -170,7 +171,7 @@
                     <label for="edit-address-input">Your address<span class="req">*</span></label>
                 </div>
                 <textarea name="address-input" id="edit-address-input"></textarea>
-                <p id="rest-map">Click to mark your personal address on the map!</p>
+                <p id="rest-map">Click to mark your personal address on the map!<span class="req">*</span></p>
                 <input id="place-input" class="controls" type="text" placeholder="Search Box">
                 <div id="map"></div>
                 <div>
@@ -181,6 +182,8 @@
                     <label for="edit-country-input">Your Country<span class="req">*</span></label>
                 </div>
                 <input type="text" name="country-input" id="edit-country-input">
+                <input type="hidden" name="lat" id="lat-input">
+                <input type="hidden" name="lng" id="lng-input">
                 <br/>
                 <button type="submit" class="submit-button" />SUBMIT</button>
             </form>

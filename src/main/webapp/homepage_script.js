@@ -12,11 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const MAPSKEY = config.MAPS_KEY
+const MAPSKEY = config.MAPS_KEY;
+const MAP_STYLE = styles;
+const GOOGLE_KIRKLAND_LAT = 47.669846;
+const GOOGLE_KIRKLAND_LNG = -122.1996099;
+let map;
+let oms;
 let neighborhood = [null , null];
 let userLocation = null;
 let userActualLocation = null;
 let currentCategory = "all";
+let currentView = "list";
+let markersMap = new Map();
+let markersToHide = new Map();
+let infoWindows = [];
 let taskGroup = null;
 
 /* Changes navbar background upon resize */
@@ -39,7 +48,7 @@ window.onscroll = function() {
 
 /* Adds scroll event listener to load more tasks if the user has reached the bottom of the page */
 document.addEventListener("scroll", function() {
-    if (getDocumentHeight() == getVerticalScroll() + window.innerHeight) {
+    if (getDocumentHeight() == getVerticalScroll() + window.innerHeight && currentView == "list") {
         loadMoreTasks();
     }
 })
@@ -96,8 +105,94 @@ function addUIClickHandlers() {
 
     // adds closeTaskInfoModal click event
     document.getElementById("task-info-close-button").addEventListener("click", closeTaskInfoModal);
+
+    // adds click event to switch to list view
+    document.getElementsByClassName("view-option")[0].addEventListener("click", function(e) {
+        switchView(e.target);
+    });
+
+    // adds click event to switch to map view
+    document.getElementsByClassName("view-option")[1].addEventListener("click", function(e) {
+        switchView(e.target);
+    });
+
+    // adds click event for the map view's load more tasks control button
+    document.getElementById("load-more-tasks-control").addEventListener("click", loadMoreTasks);
 }
 
+/* Function implements switch view (to map or to list) click functionality */
+function switchView(element) {
+    let buttonElement = element;
+
+    // If element clicked was icon inside the parent div, it gets the parent div
+    if (element.classList.contains("fas")) {
+        buttonElement = element.parentNode;
+    }
+
+    document.getElementById("selected-view").removeAttribute("id");
+    buttonElement.setAttribute("id", "selected-view");
+    const loadingElement = document.getElementById("loading");
+
+    // Switch to Map view
+    if (buttonElement.value == "map") {
+        // if loading has finished, it switches views
+        if (loadingElement.style.display == "none") switchToMap();
+        // otherwise it creates a mutation observer that will call switchToMap once loading is complete
+        else {
+            let observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName !== "style") return;
+                    if (loadingElement.style.display == "none") {
+                        switchToMap();
+                    }
+                });
+            });
+            observer.observe(document.getElementById("loading"), {attributes: true});
+        }
+
+    // Switch to List View
+    } else if (buttonElement.value == "list") {
+         // if loading has finished, it switches views
+        if (loadingElement.style.display == "none") switchToList();
+        // otherwise it creates a mutation observer that will call switchToList once loading is complete
+        else {
+            let observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName !== "style") return;
+                    if (loadingElement.style.display == "none") {
+                        switchToList();
+                    }
+                });
+            });
+            observer.observe(document.getElementById("loading"), {attributes: true});
+        }
+    }
+}
+
+/* Helper function that switches to map view */
+function switchToMap() {
+    document.getElementById("tasks-list").style.display = "none";
+    document.getElementById("tasks-map-wrapper").style.display = "block"
+    currentView = "map";
+
+    // centers map on user location
+    map.setCenter(userLocation);
+
+    // displays task markers for each task
+    taskGroup.tasks.forEach(task => displayTaskMarker(task));
+
+    let loadMoreTasksMapControl = document.getElementById("load-more-tasks-control");
+    // hides or shows load more tasks control button if there are more results or not
+    if (taskGroup.endOfQuery) loadMoreTasksMapControl.style.display = "none";
+    else loadMoreTasksMapControl.style.display = "block";
+}
+
+/* Helper function that switches to list view */
+function switchToList() {
+    document.getElementById("tasks-map-wrapper").style.display = "none";
+    document.getElementById("tasks-list").style.display = "block";
+    currentView = "list";
+}
 /* Function loads ten more tasks if there are any more, otherwise it displays a message saying there are no more tasks */
 function loadMoreTasks() {
     if (userNeighborhoodIsKnown()) {
@@ -107,7 +202,7 @@ function loadMoreTasks() {
                         taskGroup = response;
                         displayTasks(true);
                     });
-        } else if (!document.getElementById("no-more-tasks")) {
+        } else if (!document.getElementById("no-more-tasks") && document.getElementById("no-tasks-message").style.display == "none") {
             let noMoreTasksDiv = document.createElement("div");
             noMoreTasksDiv.setAttribute("id", "no-more-tasks");
             noMoreTasksDiv.classList.add("results-message");
@@ -164,9 +259,9 @@ function helpOut(element) {
 /* Function sends a fetch request to the edit task servlet when the user
 offers to help out, edits the task's status and helper properties, and
 then reloads the task list */
-function confirmHelp(element) {
-    const task = element.closest(".task");
-    const url = "/tasks/edit?task-id=" + task.dataset.key + "&action=helpout";
+function confirmHelp(taskKey) {
+    if (!markersMap.has(taskKey) || markersToHide.has(taskKey)) return;
+    const url = "/tasks/edit?task-id=" + taskKey + "&action=helpout";
     const request = new Request(url, {method: "POST"});
     fetch(request).then((response) => {
         // checks if another user has already claimed the task
@@ -175,9 +270,28 @@ function confirmHelp(element) {
                 ("We're sorry, but the task you're trying to help with has already been claimed by another user.");
             window.location.href = '/';
         }
-        // hides task from list if it was succesfully claimed
+        // hides task from list and map if it was succesfully claimed
         else {
-            element.closest(".task").style.display = "none";
+
+            // hides task that was claimed from list
+            document.querySelectorAll("[data-key='" + taskKey +"']")[0].style.display = "none";
+            
+            // keeps tabs on which tasks have been claimed so they are later not displayed in map view
+            markersToHide.set(taskKey, markersMap.get(taskKey));
+
+            // deletes task markers from map
+            // (when switching to map view, displayTaskMarker is called again, 
+            // which will retrieve all task markers again until reload -
+            // this is where markersToHide comes along)
+            oms.forgetMarker(markersMap.get(taskKey));
+            markersMap.get(taskKey).setMap(null);
+            markersMap.delete(taskKey);
+
+            if (markersMap.size == 0) {
+                document.getElementById("tasks-list").style.display = "none";
+                document.getElementById("no-tasks-message").style.display = "block";
+            }
+            
         }
     });
 }
@@ -213,7 +327,7 @@ function validateTaskForm(id) {
         }
     }
     if (!result) {
-        alert("All fields are required. Please fill out all fields with non-empty input.");
+        alert("All fields are required. Please fill out all fields with non-empty input and mark your personal address on the map.");
         return false;
     }
     return true;
@@ -288,9 +402,8 @@ async function getTaskInfo(keyString) {
     return info;
 }
 
-async function showTaskInfo(element) {
-    const task = element.closest(".task");
-    const info = await getTaskInfo(task.dataset.key);
+async function showTaskInfo(taskKey) {
+    const info = await getTaskInfo(taskKey);
     var detailContainer = document.getElementById("task-detail-container");
     detailContainer.innerHTML = "";
     detailContainer.appendChild(document.createTextNode(info.detail));
@@ -314,6 +427,54 @@ function getTasksForUserLocation() {
     document.head.appendChild(script);
 
 	window.initialize = function () {
+    
+        // initialize map
+        map = new google.maps.Map(document.getElementById("tasks-map"), {
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: false,
+            center: {lat: GOOGLE_KIRKLAND_LAT, lng: GOOGLE_KIRKLAND_LNG},
+            zoom: 12,
+            styles: MAP_STYLE,
+        });
+        map.setTilt(45);
+
+        // creates event listener for dragging and releasing map. If map is centered in a new neighborhood,
+        // then the Search this neighborhood control appears.
+        map.addListener('dragend', function() {
+            previousNeighborhood = [...neighborhood];
+            toNeighborhood(map.getCenter().toJSON()).then(() => {
+                if (previousNeighborhood[0] != neighborhood[0] || previousNeighborhood[1] != neighborhood[1]) {
+                    let searchNeighborhoodNode = document.createElement("div");
+                    searchNeighborhoodNode.index = 1;
+                    map.controls[google.maps.ControlPosition.TOP_CENTER].push(searchNeighborhoodNode);
+                    new SearchNeighborhoodMapControl(searchNeighborhoodNode);
+                } 
+            });
+        });
+
+        // closes info windows if user clicks anywhere else on the map
+        map.addListener("click", (event) => {
+            infoWindows.forEach(infoWindow => {
+                    infoWindow.close();
+                });
+        });
+
+        // Helper class that spiderfies markers that are exactly in the same lat/lng coordinates
+        // this is helpful to visualized several tasks from the same user with the same location coordinates
+        oms = new OverlappingMarkerSpiderfier(map, {
+            markersWontMove: true,
+            markersWontHide: false,
+            basicFormatEvents: true,
+            keepSpiderfied: true
+        });
+
+        // gets user location, then calls helper function that calls helper function
+        // that calls toNeighborhood, fetchTasks, and displayTasks
+        getUserLocation().then(callEndOfInitFunctions);
+
+        // initialize autocomplete input text search box
+
         // Once the Maps API script has dynamically loaded it initializes the place autocomplete searchbox
         let placeAutocomplete = new google.maps.places.Autocomplete(document.getElementById("place-input"));
         // 'geometry' field specifies that returned data will include the place's viewport and lat/lng
@@ -327,30 +488,46 @@ function getTasksForUserLocation() {
                 } else {
                     userLocation = userActualLocation;
                 }
-                toNeighborhood(userLocation)
-                        .then(() => fetchTasks(currentCategory, "clear"))
-                        .then(response => {
-                                taskGroup = response;
-                                displayTasks(response);
-                            })
-                        .catch(() => {
-                            document.getElementById("loading").style.display = "none";
-                            document.getElementById("location-missing-message").style.display = "block";
-                        });
+                // calls helper function that calls toNeighborhood, fetchTasks, and displayTasks
+                callEndOfInitFunctions();
               });
-        // Once the Maps API script has dynamically loaded it initializes it gets the user location,
-        // retrieves the neighborhood from the location coordinates, fetches the tasks, and displays them
-         getUserLocation().then(location => toNeighborhood(location))
-        	.then(() => fetchTasks(currentCategory, "clear"))
+
+	}
+}
+
+// Helper function that calls the end of the initialize functions
+function callEndOfInitFunctions() {
+    toNeighborhood(userLocation)
+        .then(() => fetchTasks(currentCategory, "clear"))
+        .then(response => {
+                taskGroup = response;
+                map.setCenter(userLocation);
+                displayTasks();
+            })
+        .catch(() => {
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("location-missing-message").style.display = "block";
+        });
+}
+
+/** Constructs Search Neighborhood Map Control */
+function SearchNeighborhoodMapControl(controlNode) {
+    const controlUI = document.createElement("div");
+    controlUI.setAttribute("id", "search-area-control");
+    controlUI.className = "map-control";
+    controlUI.title = "Click to search current neighborhood";
+    controlUI.textContent = "Search current neighborhood";
+    controlNode.appendChild(controlUI);
+    // adds click event listener to search by the new neighborhood area
+    controlUI.addEventListener("click", function() {
+        fetchTasks(currentCategory, "clear")
             .then(response => {
                     taskGroup = response;
                     displayTasks();
+                    // removes search neighborhood control button
+                    controlNode.remove();
                 })
-            .catch(() => {
-                document.getElementById("loading").style.display = "none";
-                document.getElementById("location-missing-message").style.display = "block";
-            });
-	}
+    });
 }
 
 /* Function that returns a promise to get and return the user's location */
@@ -434,20 +611,204 @@ function fetchTasks(category, cursorAction) {
 
 /* Displays the tasks received from the server response */
 function displayTasks(append) {
+    let taskMap = document.getElementById("tasks-map-wrapper");
+    let taskList = document.getElementById("tasks-list");
+
+    if (!append) {
+        // clears old markers
+        markersMap.forEach((marker) => {
+            oms.forgetMarker(marker);
+            marker.setMap(null);
+        });
+        markersMap.clear();     
+        taskList.innerHTML = "";
+    }
+
     if (taskGroup !== null && taskGroup.currentTaskCount > 0) {
+        
         document.getElementById("no-tasks-message").style.display = "none";
-        document.getElementById("tasks-message").style.display = "block";
-        if (append) document.getElementById("tasks-list").innerHTML += taskGroup.tasks;
-        else document.getElementById("tasks-list").innerHTML = taskGroup.tasks;
-        document.getElementById("tasks-list").style.display = "block";
+
+        // displays new marker tasks
+        taskGroup.tasks.forEach(task => displayTaskMarker(task));
+
+        //displays new listed tasks
+        taskGroup.tasks.map(createTaskListNode).forEach(node => taskList.appendChild(node));
+        
         addTasksClickHandlers();
+
+        let loadMoreTasksMapControl = document.getElementById("load-more-tasks-control");
+        if (currentView === "list") {
+            taskList.style.display = "block";
+            taskMap.style.display = "none";
+            loadMoreTasksMapControl.style.display = "none";
+        } else if (currentView === "map") {
+            taskMap.style.display = "block";
+            taskList.style.display = "none";
+            if (taskGroup.endOfQuery) loadMoreTasksMapControl.style.display = "none";
+            else loadMoreTasksMapControl.style.display = "block";
+        }
     } else {
-        document.getElementById("no-tasks-message").style.display = "block";
-        document.getElementById("tasks-message").style.display = "none";
-        document.getElementById("tasks-list").style.display = "none";
+        if (!append) {
+            taskList.innerHTML = "";
+            document.getElementById("no-tasks-message").style.display = "block";
+            taskList.style.display = "none";
+        }
     }
     document.getElementById("loading").style.display = "none";
-    document.getElementById("search-box").style.visibility = "visible";
+}
+
+function createTaskListNode(task) {
+    let taskDiv = document.createElement("div");
+    taskDiv.className = "task";
+    taskDiv.setAttribute("data-key", task.keyString);
+
+    if (taskGroup.userLoggedIn == true && task.isOwnerCurrentUser == false) {
+        let helpOverlay = document.createElement("div");
+        helpOverlay.className = "help-overlay";
+        let exitHelp = document.createElement("div");
+        exitHelp.className = "exit-help";
+        let exitLink = document.createElement("a");
+        exitLink.innerText = "×";
+        let confirmHelp = document.createElement("a");
+        confirmHelp.className = "confirm-help";
+        confirmHelp.innerText = "CONFIRM";
+
+        exitHelp.appendChild(exitLink);
+        helpOverlay.appendChild(exitHelp);
+        helpOverlay.appendChild(confirmHelp);
+        taskDiv.appendChild(helpOverlay);
+    }
+
+    let taskContainer = document.createElement("div");
+    taskContainer.className = "task-container";
+    let taskHeader = document.createElement("div");
+    taskHeader.className = "task-header";
+    let userNickname = document.createElement("div");
+    userNickname.className = "user-nickname";
+    userNickname.innerText = task.owner;
+    taskHeader.appendChild(userNickname);
+
+    if (taskGroup.userLoggedIn == true && task.isOwnerCurrentUser == false) {
+        let helpOut = document.createElement("div");
+        helpOut.className = "help-out";
+        helpOut.innerText = "HELP OUT";
+        taskHeader.appendChild(helpOut);
+    }
+
+    let taskContent = document.createElement("div");
+    taskContent.className = "task-content";
+    taskContent.innerText = task.overview;
+
+    let taskFooter = document.createElement("div");
+    taskFooter.className = "task-footer";
+    let taskCategory = document.createElement("div");
+    taskCategory.className = "task-category";
+    taskCategory.innerText = "#" + task.category;
+    let taskDateTime = document.createElement("div");
+    taskDateTime.className = "task-date-time";
+    taskDateTime.innerText = task.dateTime;
+    taskFooter.appendChild(taskCategory);
+    taskFooter.appendChild(taskDateTime);
+
+    taskContainer.appendChild(taskHeader);
+    taskContainer.appendChild(taskContent);
+    taskContainer.appendChild(taskFooter);
+
+    taskDiv.appendChild(taskContainer);
+
+    return taskDiv;
+}
+
+// Loads and displays markers for each task fetched that hasn't been added or claimed already
+function displayTaskMarker(task) {
+    // only adds task that aren't already loaded in map and that haven't been claimed in the list-view already
+    if (!markersMap.has(task.keyString) && !markersToHide.has(task.keyString)) {
+        const marker = new google.maps.Marker({
+            position: {lat: task.lat, lng: task.lng},
+            map: map,
+            isCurrentUser: task.isOwnerCurrentUser,
+            detail: task.detail,
+            overview: task.overview,
+            category: task.category,
+            owner: task.owner,
+            dateTime: task.dateTime,
+            key: task.keyString});
+        markersMap.set(marker.get("key"), marker);
+
+        const infoWindow = new google.maps.InfoWindow;
+
+        // adds marker click listener to close all other opened infowindows
+        // and then open the current marker's infowindow
+        marker.addListener("spider_click", () => {
+            infoWindows.forEach(infoWindow => {
+                    infoWindow.close();
+                });
+            openInfoWindow(map, marker, infoWindow);
+        });
+        oms.addMarker(marker);
+    }
+}
+
+/** Builds and Opens Info Window */
+function openInfoWindow(map, marker, infoWindow) {
+    const windowNode = document.createElement("div");
+
+    let owner = document.createElement("div");
+    owner.innerText = marker.owner;
+    owner.className = "user-nickname";
+    windowNode.appendChild(owner);
+
+    let overview = document.createElement("div");
+    overview.innerText = marker.overview;
+    overview.className = "task-content-marker";
+    windowNode.appendChild(overview);
+
+    let category = document.createElement("div");
+    category.innerText = "#" + marker.category;
+    category.className = "task-category";
+    windowNode.appendChild(category);
+
+    let dateTime = document.createElement("div");
+    dateTime.innerText = marker.dateTime;
+    dateTime.className = "task-date-time";
+    windowNode.appendChild(dateTime);
+
+    // adds help out option
+    if (marker.get("isCurrentUser") == false) {
+        const helpOutButton = document.createElement("button");
+        helpOutButton.innerText = "Help Out";
+        helpOutButton.className = "help-out-marker";
+
+        // adds help out button click event
+        helpOutButton.addEventListener("click", function(e) {
+            let helpOverlay = document.getElementById("help-overlay-map");
+            helpOverlay.style.display = "block";
+
+            // adds confirm help click event
+            document.getElementById("confirm-map").addEventListener("click", function(e) {
+                confirmHelp(marker.get("key"));
+                helpOverlay.style.display = "none";
+                e.stopPropagation();
+            });
+
+            // adss exit help click event
+            document.getElementById("exit-help-map").addEventListener("click", function(e) {
+                helpOverlay.style.display = "none";
+                e.stopPropagation();
+            });
+            e.stopPropagation();
+        });
+        windowNode.appendChild(helpOutButton);
+    }
+
+    // adds click even to open up the task details modal
+    windowNode.addEventListener("click", function() {
+        showTaskInfo(marker.get("key"));
+    });
+    
+    infoWindow.setContent(windowNode);
+    infoWindow.open(map, marker);
+    infoWindows.push(infoWindow);
 }
 
 /* Function adds all the necessary tasks 'click' event listeners*/
@@ -456,11 +817,13 @@ function addTasksClickHandlers() {
     // adds confirmHelp click event listener to confirm help buttons
     const confirmHelpButtons = document.getElementsByClassName("confirm-help");
     for (let i = 0; i < confirmHelpButtons.length; i++){
-        confirmHelpButtons[i].addEventListener("click", function(e) {
-            confirmHelp(e.target);
-            e.stopPropagation();
-        });
-
+        if (confirmHelpButtons[i].id != "confirm-map") {
+            confirmHelpButtons[i].addEventListener("click", function(e) {
+                let taskKey = e.target.closest(".task").dataset.key;
+                confirmHelp(taskKey);
+                e.stopPropagation();
+            });
+        } 
     }
     // adds exitHelp click event listener to exit help buttons
     const exitHelpButtons = document.getElementsByClassName("exit-help");
@@ -494,7 +857,13 @@ function addTasksClickHandlers() {
     const tasks = document.getElementsByClassName("task");
     for (let i = 0; i < tasks.length; i++) {
         tasks[i].addEventListener("click", function(e) {
-            showTaskInfo(e.target);
+            let taskElement = e.target;
+
+            // If element clicked was a child element it closest task ancestor instead
+            if (taskElement.className != "task") {
+                taskElement = taskElement.closest(".task");
+            }
+            showTaskInfo(taskElement.dataset.key);
         });
     }
 }
