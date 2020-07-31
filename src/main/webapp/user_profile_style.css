@@ -414,6 +414,27 @@ table button:hover i {
   color: gray;
 }
 
+.more-task-btn-container {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.more-task-button {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.more-task-button:hover {
+  color: #03fca1;
+}
+
 .submit-button {
   border: 0;
   outline: none;

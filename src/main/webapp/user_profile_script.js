@@ -15,6 +15,10 @@
 var markers = [];
 var map;
 var cursorString;
+var needHelpCursor = null;
+var needCompleteCursor = null;
+var offerHelpCursor = null;
+var offerCompleteCursor = null;
 const GOOGLE_KIRKLAND_LAT = 47.669846;
 const GOOGLE_KIRKLAND_LNG = -122.1996099;
 const MAPSKEY = config.MAPS_KEY;
@@ -109,7 +113,7 @@ async function loadMessages(keyString) {
         newMessage.appendChild(document.createTextNode(msg.message)); 
         let moreMessageBtn = document.createElement("button");
         moreMessageBtn.setAttribute("class", "more-msg-button");
-        moreMessageBtn.textContent = "Load 10 more messages";
+        moreMessageBtn.textContent = "Load 10 previous messages";
         moreMessageBtn.addEventListener("click", function() { 
             loadMoreMessages(keyString, newMessage)
         });
@@ -220,7 +224,6 @@ async function editTask(keyString) {
         const id_input = document.getElementById("task-id-input");
         id_input.value = info.keyString;
         document.getElementById("editTaskModalWrapper").style.display = "block";
-        showNeedHelp();
     }
 }
 
@@ -314,8 +317,17 @@ function showNeedHelp() {
     document.getElementById("offer-help").style.display = "none";
     document.getElementById("await-verif").style.display = "table";
     document.getElementById("complete-task").style.display = "none";
+    document.getElementById("need-help-load").style.display = "block";
+    document.getElementById("offer-help-load").style.display = "none";
+    document.getElementById("need-help-complete-load").style.display = "block";
+    document.getElementById("offer-help-complete-load").style.display = "none";
     document.getElementById("need-help-button").style.backgroundColor = "#3e8e41";
     document.getElementById("offer-help-button").style.backgroundColor = "#4CAF50";
+    // Reset the cursor strings to null
+    needHelpCursor = null;
+    needCompleteCursor = null;
+    offerHelpCursor = null;
+    offerCompleteCursor = null;
     displayNeedHelpTasks();
     displayNeedHelpCompleteTasks();
 }
@@ -326,8 +338,17 @@ function showOfferHelp() {
     document.getElementById("offer-help").style.display = "table";
     document.getElementById("await-verif").style.display = "none";
     document.getElementById("complete-task").style.display = "table";
+    document.getElementById("need-help-load").style.display = "none";
+    document.getElementById("offer-help-load").style.display = "block";
+    document.getElementById("need-help-complete-load").style.display = "none";
+    document.getElementById("offer-help-complete-load").style.display = "block";
     document.getElementById("need-help-button").style.backgroundColor = "#4CAF50";
     document.getElementById("offer-help-button").style.backgroundColor = "#3e8e41";
+    // Reset the cursor strings to null
+    needHelpCursor = null;
+    needCompleteCursor = null;
+    offerHelpCursor = null;
+    offerCompleteCursor = null;
     displayOfferHelpTasks();
     displayOfferHelpCompleteTasks();
 }
@@ -374,12 +395,21 @@ window.onclick = function(event) {
 }
 
 async function displayNeedHelpTasks() {
-    const queryURL = "/mytasks?keyword=Owner&complete=False";
+    let queryURL;
+    const needHelpBody = document.getElementById("need-help-body");
+    if (needHelpCursor === null) {
+        queryURL = "/mytasks?keyword=Owner&complete=False";
+        needHelpBody.innerHTML = "";
+    } else {
+        queryURL = "/mytasks?keyword=Owner&complete=False&firstcursor=" + needHelpCursor[0] 
+                    + "&secondcursor=" + needHelpCursor[1];
+    }
+    console.log(queryURL);
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
-    const taskResponse = await response.json();
-    const needHelpBody = document.getElementById("need-help-body");
-    needHelpBody.innerHTML = "";
+    const result = await response.json();
+    const taskResponse = result.tasks;
+    needHelpCursor = result.cursorStrings;
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
@@ -410,15 +440,34 @@ async function displayNeedHelpTasks() {
         tr.appendChild(deleteTd);
         needHelpBody.appendChild(tr);
     }
+    const needHelpLoad = document.getElementById("need-help-load");
+    needHelpLoad.innerHTML = "";
+    if (taskResponse.length === 5) {
+        var moreTaskBtn = document.createElement("button");
+        moreTaskBtn.setAttribute("class", "more-task-button");
+        moreTaskBtn.textContent = "Load more tasks";
+        moreTaskBtn.addEventListener("click", function() { 
+            displayNeedHelpTasks();
+        });
+        needHelpLoad.appendChild(moreTaskBtn);
+    }
 }
 
 async function displayNeedHelpCompleteTasks() {
-    const queryURL = "/mytasks?keyword=Owner&complete=True";
+    let queryURL;
+    const completeTaskBody = document.getElementById("await-verif-body");
+    if (needCompleteCursor === null) {
+        queryURL = "/mytasks?keyword=Owner&complete=True";
+        completeTaskBody.innerHTML = "";
+    } else {
+        queryURL = "/mytasks?keyword=Owner&complete=True&firstcursor=" + needCompleteCursor[0] 
+                    + "&secondcursor=" + needCompleteCursor[1];
+    }
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
-    const taskResponse = await response.json();
-    const completeTaskBody = document.getElementById("await-verif-body");
-    completeTaskBody.innerHTML = "";
+    const result = await response.json();
+    const taskResponse = result.tasks;
+    needCompleteCursor = result.cursorStrings;
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
@@ -449,15 +498,34 @@ async function displayNeedHelpCompleteTasks() {
         tr.appendChild(disapproveTd);
         completeTaskBody.appendChild(tr);
     }
+    const needCompleteLoad = document.getElementById("need-help-complete-load");
+    needCompleteLoad.innerHTML = "";
+    if (taskResponse.length === 5) {
+        var moreTaskBtn = document.createElement("button");
+        moreTaskBtn.setAttribute("class", "more-task-button");
+        moreTaskBtn.textContent = "Load more tasks";
+        moreTaskBtn.addEventListener("click", function() { 
+            displayNeedHelpCompleteTasks();
+        });
+        needCompleteLoad.appendChild(moreTaskBtn);
+    }
 }
 
 async function displayOfferHelpTasks() {
-    const queryURL = "/mytasks?keyword=Helper&complete=False";
+    let queryURL;
+    const offerHelpBody = document.getElementById("offer-help-body");
+    if (offerHelpCursor === null) {
+        queryURL = "/mytasks?keyword=Helper&complete=False";
+        offerHelpBody.innerHTML = "";
+    } else {
+        queryURL = "/mytasks?keyword=Helper&complete=False&firstcursor=" + offerHelpCursor[0] 
+                    + "&secondcursor=" + offerHelpCursor[1];
+    }
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
-    const taskResponse = await response.json();
-    const offerHelpBody = document.getElementById("offer-help-body");
-    offerHelpBody.innerHTML = "";
+    const result = await response.json();
+    const taskResponse = result.tasks;
+    offerHelpCursor = result.cursorStrings;
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
@@ -488,15 +556,34 @@ async function displayOfferHelpTasks() {
         tr.appendChild(abandonTd);
         offerHelpBody.appendChild(tr);
     }
+    const offerHelpLoad = document.getElementById("offer-help-load");
+    offerHelpLoad.innerHTML = "";
+    if (taskResponse.length === 5) {
+        var moreTaskBtn = document.createElement("button");
+        moreTaskBtn.setAttribute("class", "more-task-button");
+        moreTaskBtn.textContent = "Load more tasks";
+        moreTaskBtn.addEventListener("click", function() { 
+            displayOfferHelpTasks();
+        });
+        offerHelpLoad.appendChild(moreTaskBtn);
+    }
 }
 
 async function displayOfferHelpCompleteTasks() {
-    const queryURL = "/mytasks?keyword=Helper&complete=True";
+    let queryURL;
+    const completeTaskBody = document.getElementById("complete-task-body");
+    if (offerCompleteCursor === null) {
+        queryURL = "/mytasks?keyword=Helper&complete=True";
+        completeTaskBody.innerHTML = "";
+    } else {
+        queryURL = "/mytasks?keyword=Helper&complete=True&firstcursor=" + offerCompleteCursor[0] 
+                    + "&secondcursor=" + offerCompleteCursor[1];
+    }
     const request = new Request(queryURL, {method: "GET"});
     const response = await fetch(request);
-    const taskResponse = await response.json();
-    const completeTaskBody = document.getElementById("complete-task-body");
-    completeTaskBody.innerHTML = "";
+    const result = await response.json();
+    const taskResponse = result.tasks;
+    offerCompleteCursor = result.cursorStrings;
     for (var index = 0; index < taskResponse.length; index++) {
         var tr = document.createElement("tr");
         var task = taskResponse[index];
@@ -512,6 +599,17 @@ async function displayOfferHelpCompleteTasks() {
             tr.appendChild(td);
         }
         completeTaskBody.appendChild(tr);
+    }
+    const offerHelpLoad = document.getElementById("offer-help-complete-load");
+    offerHelpLoad.innerHTML = "";
+    if (taskResponse.length === 5) {
+        var moreTaskBtn = document.createElement("button");
+        moreTaskBtn.setAttribute("class", "more-task-button");
+        moreTaskBtn.textContent = "Load more tasks";
+        moreTaskBtn.addEventListener("click", function() { 
+            displayOfferHelpCompleteTasks();
+        });
+        offerHelpLoad.appendChild(moreTaskBtn);
     }
 }
 
