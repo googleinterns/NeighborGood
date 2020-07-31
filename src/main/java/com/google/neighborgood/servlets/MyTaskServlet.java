@@ -28,7 +28,7 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
-import com.google.neighborgood.task.Task;
+import com.google.neighborgood.data.Task;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

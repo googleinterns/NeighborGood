@@ -14,6 +14,8 @@
   <% UserService userService = UserServiceFactory.getUserService();
   if (!userService.isUserLoggedIn()) {
        response.sendRedirect(userService.createLoginURL("/account.jsp"));
+  } else if (!userService.getCurrentUser().getEmail().contains("@google.com")) {
+       response.sendRedirect(userService.createLogoutURL("/401.html"));
   } else if (RetrieveUserInfo.getInfo(userService) == null) { %>
   <body>
     <div id="container">

@@ -353,7 +353,7 @@ section {
   text-align: center;
   margin-top: -3em;
   position: absolute;
-  z-index: 4;
+  z-index: 3;
   display: none;
 }
 
@@ -361,7 +361,7 @@ section {
 .modalWrapper {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
-  z-index: 3; /* Sit on top */
+  z-index: 4; /* Sit on top */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -378,6 +378,9 @@ section {
   border: 1px solid #888;
   width: 50%;
   margin-top: 20vh;
+  margin-bottom: 10vh;
+  max-height: 80%;
+  overflow-y: auto;
 }
 
 .modal textarea {
@@ -388,6 +391,14 @@ section {
   font-size: 16px;
   padding: 10px 20px 10px 20px;
   transition: width 0.5s ease-in-out;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.modal input,
+.modal select {
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .modal textarea:focus {
@@ -539,6 +550,10 @@ td {
     font-size: 2.5em;
   }
 
+  h1 {
+    font-size: 1.5em;
+  }
+
   h2 {
     font-size: 1em;
   }
@@ -563,6 +578,18 @@ td {
   #tasks-map {
     height: calc(100vh - 450px);
   }
+
+  .modal input {
+    margin-top: 0;
+  }
+
+  .modal label {
+    font-size: 1em;
+  }
+
+  .modal textarea {
+    margin-top: 5px;
+  }
 }
 
 @media only screen and (min-width: 600px) and (max-width: 1203px) {
@@ -582,4 +609,25 @@ td {
   nav {
     background-color: white;
   }
+}
+
+.submit-button {
+  border: 0;
+  outline: none;
+  border-radius: 0;
+  padding: 15px 0;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  background: #1ab188;
+  color: white;
+  transition: all 0.5s ease;
+  -webkit-appearance: none;
+  width: 100%;
+  cursor: pointer;
+}
+
+.submit-button:hover,
+.submit-button:focus {
+  background: #169674;
 }

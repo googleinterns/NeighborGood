@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.neighborgood;
+package com.google.neighborgood.data;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.users.UserService;

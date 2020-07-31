@@ -163,21 +163,16 @@
                 <h1>CREATE A NEW TASK: </h1>
                 <div>
                     <label for="task-overview-input">Task Overview<span class="req">*</span></label>
-                    <br/>
                 </div>
-                <br/>
                 <textarea name="task-overview-input" id="task-overview-input" placeholder="Briefly describe your task here:"></textarea>
-                <br/><br/>
                 <div>
                     <label for="task-detail-input">Task Detail<span class="req">*</span></label>
-                    <br/>
                 </div>
-                <br/>
                 <textarea name="task-detail-input" id="task-detail-input" placeholder="Describe your task here:"></textarea>
-                <br/><br/>
+                <br/>
                 <label for="rewarding-point-input">Rewarding Points<span class="req">*</span></label>
                 <input type="number" id="rewarding-point-input" name="reward-input" min="0" max="200" value="50">
-                <br/><br/>
+                <br/>
                 <label for="category-input">Task Category<span class="req">*</span></label>
                 <select name="category-input" id="category-input" form="new-task-form">
                   <option value="garden">Garden</option>
@@ -185,8 +180,8 @@
                   <option value="pets">Pets</option>
                   <option value="misc">Misc</option>
                 </select>
-                <br/><br/>
-                <input type="submit" id="submit-create-task"/>
+                <br/>
+                <button type="submit" class="submit-button" id="submit-create-task"/>SUBMIT</button>
             </form>
         </div>
       </div>
