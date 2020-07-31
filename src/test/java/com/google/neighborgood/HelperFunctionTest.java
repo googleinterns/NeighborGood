@@ -15,7 +15,9 @@
 package com.google.neighborgood.helper;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 import com.google.appengine.api.datastore.DatastoreService;
