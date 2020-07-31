@@ -1,105 +1,41 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee"
-  xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
-    http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-  version="2.5">
 <!--
-     Copyright 2002 Sun Microsystems, Inc. All rights reserved.
+ Copyright 2020 Google LLC
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+      http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
 -->
-<welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
-</welcome-file-list>
 
-<servlet>
-    <servlet-name>Home</servlet-name>
-    <jsp-file>/index.jsp</jsp-file>
-</servlet>
-<servlet-mapping>
-    <servlet-name>Home</servlet-name>
-    <url-pattern>/</url-pattern>
-</servlet-mapping>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
 
-<servlet>
-    <servlet-name>UserInfoServlet</servlet-name>
-    <servlet-class>com.google.neighborgood.servlets.UserInfoServlet</servlet-class>
-</servlet>
-<servlet-mapping>
-    <servlet-name>UserInfoServlet</servlet-name>
-    <url-pattern>/account</url-pattern>
-</servlet-mapping>
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Admin</web-resource-name>
+            <url-pattern>/admin_dashboard.html</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
 
-<servlet>
-    <servlet-name>AdminPage</servlet-name>
-    <servlet-class>com.google.neighborgood.servlets.AdminPage</servlet-class>
-</servlet>
-<servlet-mapping>
-    <servlet-name>AdminPage</servlet-name>
-    <url-pattern>/admin-user-tasks</url-pattern>
-</servlet-mapping>
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>HTTPS</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
 
-<servlet>
-    <servlet-name>TaskServlet</servlet-name>
-    <servlet-class>com.google.neighborgood.servlets.TaskServlet</servlet-class>
-</servlet>
-<servlet-mapping>
-    <servlet-name>TaskServlet</servlet-name>
-    <url-pattern>/tasks</url-pattern>
-</servlet-mapping>
-
-<servlet>
-    <servlet-name>TaskInfoServlet</servlet-name>
-    <servlet-class>com.google.neighborgood.servlets.TaskInfoServlet</servlet-class>
-</servlet>
-<servlet-mapping>
-    <servlet-name>TaskInfoServlet</servlet-name>
-    <url-pattern>/tasks/info</url-pattern>
-</servlet-mapping>
-
-<servlet>
-    <servlet-name>MyTaskServlet</servlet-name>
-    <servlet-class>com.google.neighborgood.servlets.MyTaskServlet</servlet-class>
-</servlet>
-<servlet-mapping>
-    <servlet-name>MyTaskServlet</servlet-name>
-    <url-pattern>/mytasks</url-pattern>
-</servlet-mapping>
-
-<servlet>
-    <servlet-name>MessageServlet</servlet-name>
-    <servlet-class>com.google.neighborgood.servlets.MessageServlet</servlet-class>
-</servlet>
-<servlet-mapping>
-    <servlet-name>MessageServlet</servlet-name>
-    <url-pattern>/messages</url-pattern>
-</servlet-mapping>
-
-<servlet>
-    <servlet-name>EditTaskServlet</servlet-name>
-    <servlet-class>com.google.neighborgood.servlets.EditTaskServlet</servlet-class>
-</servlet>
-<servlet-mapping>
-    <servlet-name>EditTaskServlet</servlet-name>
-    <url-pattern>/tasks/edit</url-pattern>
-</servlet-mapping>
-
-<security-constraint>
-    <web-resource-collection>
-        <web-resource-name>Admin</web-resource-name>
-        <url-pattern>/admin_dashboard.html</url-pattern>
-    </web-resource-collection>
-    <auth-constraint>
-        <role-name>admin</role-name>
-    </auth-constraint>
-</security-constraint>
-
-<security-constraint>
-    <web-resource-collection>
-        <web-resource-name>HTTPS</web-resource-name>
-        <url-pattern>/*</url-pattern>
-    </web-resource-collection>
-    <user-data-constraint>
-        <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-    </user-data-constraint>
-</security-constraint>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/404.jsp</location>
+    </error-page>
 </web-app>
