@@ -49,9 +49,9 @@ public class IntegrationTest {
   private final String USER_NICKNAME = "Mafe";
   private final String USER_NICKNAME_FARAWAY = "Faraway User";
   private final String USER_NICKNAME_HELPER = "Helper";
-  private final String USER_EMAIL = "123456@example.com";
-  private final String USER_EMAIL_HELPER = "helper@example.com";
-  private final String USER_EMAIL_FARAWAY = "faraway@example.com";
+  private final String USER_EMAIL = "123456@google.com";
+  private final String USER_EMAIL_HELPER = "helper@google.com";
+  private final String USER_EMAIL_FARAWAY = "faraway@google.com";
   private final String USER_ADDRESS = "123 Street Name, City, ST";
   private final String USER_ZIPCODE = "90036";
   private final String USER_COUNTRY = "United States";
