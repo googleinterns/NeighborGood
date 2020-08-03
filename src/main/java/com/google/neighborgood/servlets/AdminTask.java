@@ -17,10 +17,16 @@ package com.google.neighborgood.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gson.Gson;
 import com.google.neighborgood.helper.RetrieveUserInfo;
+import com.google.neighborgood.task.adminTask;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -30,6 +36,24 @@ import javax.servlet.http.HttpServletResponse;
 /** Servlet that creates new task entity and fetch saved tasks. */
 @WebServlet("/admin-tasks")
 public class AdminTask extends HttpServlet {
+  @Override
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    Query query = new Query("adminTask").addSort("timestamp", SortDirection.DESCENDING);
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    PreparedQuery results = datastore.prepare(query);
+
+    List<adminTask> myTasks = new ArrayList<>();
+    for (Entity entity : results.asIterable()) {
+      myTasks.add(new adminTask(entity));
+    }
+
+    Gson gson = new Gson();
+    response.setContentType("application/json;");
+    response.getWriter().println(gson.toJson(myTasks));
+  }
+
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // First check whether the admin is logged in
@@ -59,6 +83,7 @@ public class AdminTask extends HttpServlet {
     taskEntity.setProperty("date", date);
     taskEntity.setProperty("time", time);
     taskEntity.setProperty("owner", owner);
+    taskEntity.setProperty("timestamp", creationTime);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(taskEntity);
