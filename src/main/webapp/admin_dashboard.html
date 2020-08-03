@@ -128,9 +128,10 @@
 			<div id="popup">
 				<h2>Admin Task</h2>
 				<form action="/admin-tasks" method="POST">
-					Task: <input type="text" id="admin-task-input" name="admin-task-input">
-                    Owner: <input type="text" id="admin-owner-input" name="admin-owner-input">
-					Due Date: <input type="date" id="admin-date" name="admin-date" min="0" max="200">
+					Detail: <input type="text" id="admin-detail-input" name="admin-detail-input" required>
+                    Owner: <input type="text" id="admin-owner-input" name="admin-owner-input" required>
+					Due Date: <input type="date" id="admin-date" name="admin-date" required>
+                    Time: <input type="time" id="admin-time" name="admin-time" required>
                     <input type="submit" value="Submit">
 				</form>
 				<a href="#" id="popup-close">&times;</a>
