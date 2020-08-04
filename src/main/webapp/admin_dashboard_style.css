@@ -52,6 +52,11 @@ a:focus {
 .fas {
   font-weight: 900;
   padding: 4px;
+  cursor: pointer;
+}
+
+input[type=button], input[type=submit] {
+  cursor: pointer;
 }
 
 a {
@@ -140,6 +145,10 @@ main h1 {
   padding: 15px 15px 15px 20px;
   cursor: pointer;
   margin-bottom: 20px;
+}
+
+#card-div ul li a{
+  color: #eee;
 }
 
 #card-div ul li:hover {
@@ -260,6 +269,11 @@ main h1 {
 #popup form input[type=submit] {
   background: #1d1d1b;
   color: #c7c7c7;
+}
+
+#popup form input[type=button] {
+  background: #ff2222;
+  color: #eee;
 }
 
 /** Media Queries **/

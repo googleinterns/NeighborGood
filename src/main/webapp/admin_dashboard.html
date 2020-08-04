@@ -27,62 +27,12 @@
 	<body>
 		<div class="wrapper">
 			<main>
-				<h1>Admin Prototype</h1>
+				<h1>Admin Dashboard</h1>
 				<div class="flex-grid">
 					<div class="card-container">
-						<h2>Administrator Tasks</h2>
+						<h2>Administrator Tasks<a href="#admin-popup"><span><i class="fas fa-plus fa-2x"></i></span></a></h2>
 						<div id="card-div">
 							<ul id="admin-tasks">
-                                <a href="#admin-popup">
-								<li class="admin-task">
-									<h3>New Homepage Design</h3>
-									<h4>Mafe Ponce</h4>
-									<div class="admin-task-infos">
-										<p class="date"><i class="far fa-calendar"></i> 06/26/2020</p>
-										<p class="time"><i class="far fa-clock"></i> 3:30pm</p>
-									</div>
-								</li>
-                                </a>
-								<li class="admin-task">
-									<h3>User Tasks Design</h3>
-									<h4>Leonard Zhang</h4>
-									<div class="admin-task-infos">
-										<p class="date"><i class="far fa-calendar"></i> 06/26/2020</p>
-										<p class="time"><i class="far fa-clock"></i> 3:30pm</p>
-									</div>
-								</li>
-								<li class="admin-task">
-									<h3>Admin Console Design</h3>
-									<h4>Denzil Ekow Bilson</h4>
-									<div class="admin-task-infos">
-										<p class="date"><i class="far fa-calendar"></i> 06/26/2020</p>
-										<p class="time"><i class="far fa-clock"></i> 3:30pm</p>
-									</div>
-								</li>
-								<li class="admin-task">
-									<h3> User Authentication</h3>
-									<h4>Mafe Ponce</h4>
-									<div class="admin-task-infos">
-										<p class="date"><i class="far fa-calendar"></i> 06/30/2020</p>
-										<p class="time"><i class="far fa-clock"></i> 4:00pm</p>
-									</div>
-								</li>
-								<li class="admin-task">
-									<h3>404 Page Design</h3>
-									<h4>Denzil Bilson</h4>
-									<div class="admin-task-infos">
-										<p class="date"><i class="far fa-calendar"></i> 06/30/2020</p>
-										<p class="time"><i class="far fa-clock"></i> 4:00pm</p>
-									</div>
-								</li>
-								<li class="admin-task">
-									<h3>Upload Tasks</h3>
-									<h4>Leonard Zhang</h4>
-									<div class="admin-task-infos">
-										<p class="date"><i class="far fa-calendar"></i> 06/30/2020</p>
-										<p class="time"><i class="far fa-clock"></i> 4:00pm</p>
-									</div>
-								</li>
 							</ul>
 						</div>
 					</div>
@@ -133,6 +83,8 @@
 					Due Date: <input type="date" id="admin-date" name="admin-date" required>
                     Time: <input type="time" id="admin-time" name="admin-time" required>
                     <input type="submit" value="Submit">
+                    <input type="button" value="Delete">
+                    <input type="hidden" name="admin-task-id" id="admin-task-id">
 				</form>
 				<a href="#" id="popup-close">&times;</a>
 			</div>
