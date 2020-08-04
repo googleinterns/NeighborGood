@@ -190,7 +190,6 @@ function getUserTasks() {
 	fetch("/admin-user-tasks")
 		.then((response) => response.json())
 		.then((tasks) => {
-			console.log(tasks);
 			userTasksArray = tasks;
 			let taskSection = document.getElementById("user-tasks");
 			for (userTask of tasks) {
