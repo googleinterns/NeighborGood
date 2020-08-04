@@ -18,6 +18,8 @@ var map, infoWindow;
 var styledMapType;
 var mapKey = config.MAPS_KEY;
 var userTasksArray;
+var oms;
+var infoWindows = [];
 
 load(`https://maps.googleapis.com/maps/api/js?key=${mapKey}`); // Add maps API to html
 
@@ -25,7 +27,6 @@ google.charts.load("current", { packages: ["line"] });
 
 google.charts.setOnLoadCallback(drawChart);
 window.addEventListener("load", drawMap);
-window.addEventListener("load", getUserTasks());
 window.addEventListener("resize", drawChart);
 
 function drawChart() {
@@ -55,11 +56,33 @@ function drawChart() {
 	chart.draw(data);
 }
 
+function openInfoWindow(map, marker, infoWindow, task) {
+    infoWindow.setContent(task.detail);
+    infoWindow.open(map, marker);
+    infoWindows.push(infoWindow);
+}
+
+function displayTaskMarker(task) {
+    const marker = new google.maps.Marker({
+        position: {lat: task.lat, lng: task.lng},
+        map: map});
+    const infoWindow = new google.maps.InfoWindow;
+    // adds marker click listener to close all other opened infowindows
+    // and then open the current marker's infowindow
+    marker.addListener("spider_click", () => {
+        infoWindows.forEach(infoWindow => {
+            infoWindow.close();
+        });
+        openInfoWindow(map, marker, infoWindow, task);
+        });
+    oms.addMarker(marker);
+}
+
 function drawMap() {
 	// Styles a map in night mode.
 	const LAT = 40.674;
 	const LNG = -73.945;
-	var map = new google.maps.Map(document.getElementById("map-div"), {
+	map = new google.maps.Map(document.getElementById("map-div"), {
 		center: { lat: LAT, lng: LNG },
 		zoom: 12,
 		styles: [
@@ -143,6 +166,12 @@ function drawMap() {
 			},
 		],
 	});
+    oms = new OverlappingMarkerSpiderfier(map, {
+            markersWontMove: true,
+            markersWontHide: false,
+            basicFormatEvents: true,
+            keepSpiderfied: true
+        });
 	//Resize Function
 	google.maps.event.addDomListener(window, "resize", function () {
 		var center = map.getCenter();
@@ -158,8 +187,8 @@ function drawMap() {
 			};
 
 			infoWindow.setPosition(pos);
-			infoWindow.setContent('This is your Neighborhood!');
 			infoWindow.open(map);
+            infoWindow.close();
 			map.setCenter(pos);
 		}, function() {
 			handleLocationError(true, infoWindow, map.getCenter());
@@ -168,6 +197,7 @@ function drawMap() {
 		// Browser doesn't support Geolocation
 		handleLocationError(false, infoWindow, map.getCenter());
 	}
+    getUserTasks();
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
@@ -189,11 +219,11 @@ function getUserTasks() {
 	fetch("/admin-user-tasks")
 		.then((response) => response.json())
 		.then((tasks) => {
-			console.log(tasks);
 			userTasksArray = tasks;
 			let taskSection = document.getElementById("user-tasks");
 			for (userTask of tasks) {
 				taskSection.innerHTML += addTask(userTask);
+                displayTaskMarker(userTask);
 			}
 		});
 }
