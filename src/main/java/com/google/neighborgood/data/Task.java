@@ -53,6 +53,8 @@ public final class Task {
     this.zipcode = (String) entity.getProperty("zipcode");
     this.country = (String) entity.getProperty("country");
     this.category = (String) entity.getProperty("category");
+    this.lat = (Double) entity.getProperty("lat");
+    this.lng = (Double) entity.getProperty("lng");
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     String ownerId = (String) entity.getProperty("Owner");
@@ -67,8 +69,6 @@ public final class Task {
       return;
     }
     this.owner = (String) ownerEntity.getProperty("nickname");
-    this.lat = (Double) ownerEntity.getProperty("lat");
-    this.lng = (Double) ownerEntity.getProperty("lng");
 
     // If the task status is still "OPEN", the input helper should be "N/A".
     // Otherwise, we will show the nickname of the helper.
@@ -91,8 +91,7 @@ public final class Task {
   }
 
   // Constructor with provided ownerId, ownerNickn, ownerLat, and ownerLng
-  public Task(
-      Entity entity, String ownerId, String ownerNickname, Double ownerLat, Double ownerLng) {
+  public Task(Entity entity, String ownerId, String ownerNickname) {
     this.keyString = KeyFactory.keyToString(entity.getKey());
     this.detail = (String) entity.getProperty("detail");
     this.overview = (String) entity.getProperty("overview");
@@ -103,9 +102,9 @@ public final class Task {
     this.zipcode = (String) entity.getProperty("zipcode");
     this.country = (String) entity.getProperty("country");
     this.category = (String) entity.getProperty("category");
+    this.lat = (Double) entity.getProperty("lat");
+    this.lng = (Double) entity.getProperty("lng");
     this.owner = ownerNickname;
-    this.lat = ownerLat;
-    this.lng = ownerLng;
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     String helperId = (String) entity.getProperty("Helper");
