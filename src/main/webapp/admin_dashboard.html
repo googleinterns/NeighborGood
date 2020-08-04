@@ -27,7 +27,7 @@
 	<body>
 		<div class="wrapper">
 			<main>
-				<h1><a href="/"><i class="fas fa-user-circle fa-2x" title="Go to User Page" aria-hidden="true"></i></a> Dashboard</h1>
+				<h1><a href="/"><i class="fas fa-user-circle fa-2x" title="Go to User Page" aria-hidden="true"></i></a> Admin Dashboard</h1>
 				<div class="flex-grid">
 					<div class="card-container">
 						<h2>Administrator Tasks<a href="#admin-popup"><span><i class="fas fa-plus fa-2x"></i></span></a></h2>
@@ -78,12 +78,12 @@
 			<div id="popup">
 				<h2>Admin Task</h2>
 				<form action="/admin-tasks" method="POST">
-					Detail: <input type="text" id="admin-detail-input" name="admin-detail-input" required>
+					Detail: <input type="text" id="admin-detail-input" name="admin-detail-input" maxlength = "20" required>
                     Owner: <input type="text" id="admin-owner-input" name="admin-owner-input" required>
 					Due Date: <input type="date" id="admin-date" name="admin-date" required>
                     Time: <input type="time" id="admin-time" name="admin-time" required>
                     <input type="submit" value="Submit">
-                    <input type="button" value="Delete">
+                    <input type="button" value="Delete" id="delete">
                     <input type="hidden" name="admin-task-id" id="admin-task-id">
 				</form>
 				<a href="#" id="popup-close">&times;</a>

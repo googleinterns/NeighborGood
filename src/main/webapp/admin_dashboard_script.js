@@ -217,10 +217,10 @@ function addTask(task) {
 }
 
 function addAdminTask(task) {
-    let string = `<a href="#admin-popup"><li class="admin-task" onclick="openWithAdminPopup('${task.keyString}')">`;
+    let string = `<li class="admin-task" onclick="openWithAdmin('${task.keyString}')">`;
     string += `<h3>${task.detail}</h3><h4>${task.owner}</h4>`;
     string += `<div class="admin-task-infos"><p class="date"><i class="far fa-calendar"></i> ${task.date}</p>`;
-    string += `<p class="time"><i class="far fa-clock"></i> ${task.time}</p></div></li></a>`;
+    string += `<p class="time"><i class="far fa-clock"></i> ${task.time}</p></div></li>`;
     return string;
 }
 function searchTasks(id){
@@ -247,16 +247,13 @@ async function openWithPopup(id){
 	document.getElementById("edit-category-input").value = task.category;
 }
 
-async function openWithAdminPopup(id){
-	const task = await searchTasks(id);
-	document.getElementById("admin-detail-input").value = task.detail;
-	document.getElementById("admin-owner-input").value = task.owner;
-	document.getElementById("admin-date").value = task.date;
-	document.getElementById("admin-time").value = task.time;
+async function openWithAdmin(id){
+	const task = await searchAdminTasks(id);
+    document.getElementById("delete").onclick = deleteTask(task.keyString);
 }
 
 async function deleteTask(keyString) {
-	if (confirm("Are you sure that you want to delete the task?")) {
+	if (confirm("Do you want to delete this task?")) {
 		const queryURL = "/tasks?key=" + keyString;
 		const request = new Request(queryURL, {method: "DELETE"});
 		await fetch(request);
@@ -264,3 +261,4 @@ async function deleteTask(keyString) {
         return false;
 	}
 }
+
