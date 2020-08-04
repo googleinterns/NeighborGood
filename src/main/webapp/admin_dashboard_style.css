@@ -33,19 +33,24 @@ body {
   color: #222;
 }
 
-a:visited { 
+a {
   text-decoration: none;
-  color:inherit;
+  cursor: pointer;
 }
 
-a:hover { 
+a:visited {
   text-decoration: none;
-  color:inherit;
+  color: inherit;
 }
 
-a:focus { 
+a:hover {
   text-decoration: none;
-  color:inherit;
+  color: inherit;
+}
+
+a:focus {
+  text-decoration: none;
+  color: inherit;
 }
 
 .fa,
@@ -55,11 +60,8 @@ a:focus {
   cursor: pointer;
 }
 
-input[type=button], input[type=submit] {
-  cursor: pointer;
-}
-
-a {
+input[type=button],
+input[type=submit] {
   cursor: pointer;
 }
 
@@ -145,10 +147,6 @@ main h1 {
   padding: 15px 15px 15px 20px;
   cursor: pointer;
   margin-bottom: 20px;
-}
-
-#card-div ul li a{
-  color: #eee;
 }
 
 #card-div ul li:hover {
