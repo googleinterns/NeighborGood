@@ -19,23 +19,22 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.memcache.ErrorHandlers;
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.neighborgood.data.Task;
-import com.google.neighborgood.data.User;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.logging.Level;
 
 /**
- * Helper class that stores the HTML depiction of tasks in groups of 10 or less along with whether
- * or not the end of the query has been reached
+ * Helper class that stores tasks in groups of 10 or less along with whether or not the end of the
+ * query has been reached
  */
 public class TaskGroup {
-  private static Map<String, User>
-      usersInfo; // Stores task owner's user info to prevent querying multiple times in
-  // datastore for the same user's info
+  private static MemcacheService syncCache;
   private static DatastoreService datastore;
   private final boolean userLoggedIn;
   private int currentTaskCount;
@@ -43,7 +42,8 @@ public class TaskGroup {
   private List<Task> tasks;
 
   public TaskGroup() {
-    this.usersInfo = new HashMap<String, User>();
+    this.syncCache = MemcacheServiceFactory.getMemcacheService();
+    syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
     UserService userService = UserServiceFactory.getUserService();
     this.userLoggedIn = userService.isUserLoggedIn();
     this.datastore = DatastoreServiceFactory.getDatastoreService();
@@ -52,20 +52,19 @@ public class TaskGroup {
     this.tasks = new ArrayList<>();
   }
 
-  /** addTask method adds a single task HTML string to the tasks variable */
+  /** addTask method adds a single task to the tasks list */
   public void addTask(Entity entity) {
 
     String taskOwnerId = (String) entity.getProperty("Owner");
-    String taskOwnerNickname = null;
-    if (this.usersInfo.containsKey(taskOwnerId)) {
-      taskOwnerNickname = this.usersInfo.get(taskOwnerId).getUserNickname();
-    } else {
+    String taskOwnerNickname = (String) syncCache.get(taskOwnerId);
+
+    // if cache result returns null, then gets value from entity and puts it in cache
+    if (taskOwnerNickname == null) {
       Key taskOwnerKey = entity.getParent();
       try {
         Entity userEntity = this.datastore.get(taskOwnerKey);
-        User taskUser = new User(userEntity);
-        taskOwnerNickname = taskUser.getUserNickname();
-        this.usersInfo.put(taskOwnerId, taskUser);
+        taskOwnerNickname = (String) userEntity.getProperty("nickname");
+        syncCache.put(taskOwnerId, (String) userEntity.getProperty("nickname"));
       } catch (EntityNotFoundException e) {
         System.err.println(
             "Unable to find the task's owner info to retrieve the owner's nickname. Setting a default nickname.");
