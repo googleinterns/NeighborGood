@@ -218,7 +218,7 @@
     <div class="modalWrapper" id="taskInfoModalWrapper">
         <div class="modal" id="taskInfoModal">
             <span class="close-button" id="task-info-close-button" onclick="closeTaskInfoModal()">&times;</span>
-            <h1>Task Detail: <span class="voice-container"><i class="fa fa-volume-up" onclick="startSpeaking()"></i></span></h1>
+            <h1>Task Detail: <span class="voice-container"><i class="fa fa-volume-up" id="volume-button"></i></span></h1>
             <div id="task-detail-container"></div>
             <div id="audio-container"></div>
         </div>

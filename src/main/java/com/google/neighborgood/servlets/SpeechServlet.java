@@ -38,8 +38,13 @@ public class SpeechServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     try (TextToSpeechClient textToSpeechClient = TextToSpeechClient.create()) {
+      String taskDetail = request.getParameter("detail");
+      if (taskDetail == null) {
+        System.err.println("The task detail is not provided");
+        return;
+      }
       // Set the text input to be synthesized
-      SynthesisInput input = SynthesisInput.newBuilder().setText("Hey bro!").build();
+      SynthesisInput input = SynthesisInput.newBuilder().setText(taskDetail).build();
 
       // Build the voice request, select the language code ("en-US") and the ssml voice gender
       // ("neutral")

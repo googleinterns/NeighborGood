@@ -168,8 +168,10 @@ async function disapproveTask(keyString) {
     }
 }
 
-async function startSpeaking() {
-    const response = await fetch("/speech");
+async function startSpeaking(detail) {
+    const queryURL = "/speech?detail=" + encodeURIComponent(detail);
+    const request = new Request(queryURL, {method: "GET"});
+    const response = await fetch(request);
 }
 
 async function showTaskInfo(keyString) {
@@ -179,6 +181,8 @@ async function showTaskInfo(keyString) {
     detailContainer.appendChild(document.createTextNode(info.detail));
     var modal = document.getElementById("taskInfoModalWrapper");
     modal.style.display = "block";
+    var volume = document.getElementById("volume-button");
+    volume.addEventListener("click", function() { startSpeaking(info.detail) });
 }
 
 function showNeedHelp() {
