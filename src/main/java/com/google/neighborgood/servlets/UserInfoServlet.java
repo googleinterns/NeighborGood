@@ -23,6 +23,9 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.memcache.ErrorHandlers;
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
@@ -30,6 +33,7 @@ import com.google.neighborgood.data.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -149,6 +153,10 @@ public class UserInfoServlet extends HttpServlet {
       entity.setProperty("zipcode", zipcode);
       entity.setProperty("lat", lat);
       entity.setProperty("lng", lng);
+
+      MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+      syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
+      syncCache.put(userId, nickname);
     }
     datastore.put(entity);
 
