@@ -219,6 +219,8 @@ public class TaskServlet extends HttpServlet {
     String formattedAddress = (String) userEntity.getProperty("address");
     String country = (String) userEntity.getProperty("country");
     String zipcode = (String) userEntity.getProperty("zipcode");
+    Double lat = (Double) userEntity.getProperty("lat");
+    Double lng = (Double) userEntity.getProperty("lng");
 
     // Create an Entity that stores the input comment
     Entity taskEntity = new Entity("Task", userEntity.getKey());
@@ -232,6 +234,8 @@ public class TaskServlet extends HttpServlet {
     taskEntity.setProperty("Address", formattedAddress);
     taskEntity.setProperty("zipcode", zipcode);
     taskEntity.setProperty("country", country);
+    taskEntity.setProperty("lat", lat);
+    taskEntity.setProperty("lng", lng);
     taskEntity.setProperty("category", taskCategory);
 
     datastore.put(taskEntity);

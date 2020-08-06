@@ -57,20 +57,14 @@ public class TaskGroup {
 
     String taskOwnerId = (String) entity.getProperty("Owner");
     String taskOwnerNickname = null;
-    Double taskLat = null;
-    Double taskLng = null;
     if (this.usersInfo.containsKey(taskOwnerId)) {
       taskOwnerNickname = this.usersInfo.get(taskOwnerId).getUserNickname();
-      taskLat = this.usersInfo.get(taskOwnerId).getUserLat();
-      taskLng = this.usersInfo.get(taskOwnerId).getUserLng();
     } else {
       Key taskOwnerKey = entity.getParent();
       try {
         Entity userEntity = this.datastore.get(taskOwnerKey);
         User taskUser = new User(userEntity);
         taskOwnerNickname = taskUser.getUserNickname();
-        taskLat = taskUser.getUserLat();
-        taskLng = taskUser.getUserLng();
         this.usersInfo.put(taskOwnerId, taskUser);
       } catch (EntityNotFoundException e) {
         System.err.println(
@@ -78,7 +72,7 @@ public class TaskGroup {
         taskOwnerNickname = "Your Friendly Neighbor";
       }
     }
-    Task task = new Task(entity, taskOwnerId, taskOwnerNickname, taskLat, taskLng);
+    Task task = new Task(entity, taskOwnerId, taskOwnerNickname);
     tasks.add(task);
 
     this.currentTaskCount++;
