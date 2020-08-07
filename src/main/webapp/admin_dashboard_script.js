@@ -18,13 +18,14 @@ var map, infoWindow;
 var styledMapType;
 var mapKey = config.MAPS_KEY;
 var userTasksArray;
+var adminTasksArray;
 
 load(`https://maps.googleapis.com/maps/api/js?key=${mapKey}`); // Add maps API to html
-
 google.charts.load("current", { packages: ["line"] });
 
 google.charts.setOnLoadCallback(drawChart);
 window.addEventListener("load", drawMap);
+window.addEventListener("load", getAdminTasks());
 window.addEventListener("load", getUserTasks());
 window.addEventListener("resize", drawChart);
 
@@ -189,7 +190,6 @@ function getUserTasks() {
 	fetch("/admin-user-tasks")
 		.then((response) => response.json())
 		.then((tasks) => {
-			console.log(tasks);
 			userTasksArray = tasks;
 			let taskSection = document.getElementById("user-tasks");
 			for (userTask of tasks) {
@@ -198,14 +198,41 @@ function getUserTasks() {
 		});
 }
 
+function getAdminTasks() {
+	fetch("/admin-tasks")
+		.then((response) => response.json())
+		.then((tasks) => {
+			adminTasksArray = tasks;
+			let taskSection = document.getElementById("admin-tasks");
+			for (adminTask of tasks) {
+				taskSection.innerHTML += addAdminTask(adminTask);
+            }
+		});
+}
+
 function addTask(task) {
-	let string = `<a href="#popup-overlay"><li class="admin-user-task"  onclick="openWithPopup('${task.keyString}')"><span><h3> ${task.category} </h3>`;
+	let string = `<a href="#user-popup"><li class="admin-user-task"  onclick="openWithPopup('${task.keyString}')"><span><h3> ${task.category} </h3>`;
 	string += `<h4> ${task.owner} </h4></span> <a href="#"><span id="delete-btn" onclick=deleteTask('${task.keyString}')><i class="fas fa-trash fa-2x"></i></span></a></li></a>`;
 	return string;
 }
 
+function addAdminTask(task) {
+    let string = `<li class="admin-task" onclick="openWithAdmin('${task.keyString}')">`;
+    string += `<h3>${task.detail}</h3><h4>${task.owner}</h4>`;
+    string += `<div class="admin-task-infos"><p class="date"><i class="far fa-calendar"></i> ${task.date}</p>`;
+    string += `<p class="time"><i class="far fa-clock"></i> ${task.time}</p></div></li>`;
+    return string;
+}
 function searchTasks(id){
 	for(task of userTasksArray){
+		if(id == task.keyString){
+			return task;
+		}
+	}
+}
+
+function searchAdminTasks(id){
+	for(task of adminTasksArray){
 		if(id == task.keyString){
 			return task;
 		}
@@ -220,8 +247,13 @@ async function openWithPopup(id){
 	document.getElementById("edit-category-input").value = task.category;
 }
 
+async function openWithAdmin(id){
+	const task = await searchAdminTasks(id);
+    document.getElementById("delete").onclick = deleteTask(task.keyString);
+}
+
 async function deleteTask(keyString) {
-	if (confirm("Are you sure that you want to delete the task?")) {
+	if (confirm("Do you want to delete this task?")) {
 		const queryURL = "/tasks?key=" + keyString;
 		const request = new Request(queryURL, {method: "DELETE"});
 		await fetch(request);
@@ -229,3 +261,4 @@ async function deleteTask(keyString) {
         return false;
 	}
 }
+
