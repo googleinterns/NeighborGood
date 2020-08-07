@@ -65,7 +65,7 @@ Task message notification.
 
 ---
 <img src="/demo-images/14.gif?raw=true" width="700">
-Admin Dashboard.
+Admin dashboard view. Editing user's tasks as an admin.
 
 ---
 <img src="/demo-images/15.gif?raw=true" width="700">
