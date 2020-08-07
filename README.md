@@ -13,7 +13,7 @@ Deployed Site: http://neighborgood-step.appspot.com/
 ## Static Demo
 
 <div style="text-align:center"><img src="/demo-images/1.gif?raw=true" width="700">
-<br/>Open tasks displayed in list-view and 'load-more' scroll demo.</div>
+<br/>Open tasks displayed in list-view. Scrolling to bottom of page will load more tasks until there are no more tasks.</div>
 <br/><br/>
 <div style="text-align:center"><img src="/demo-images/2.png?raw=true" width="700">
 <br/>Open tasks displayed in map-view.</div>
