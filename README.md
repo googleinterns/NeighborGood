@@ -74,4 +74,4 @@ Note: the webdriver used in the IntegrationTest can be flaky and occassionally h
 
 ## Running Development Server
 
-Use `mvn package appengine:run` to run the devServer or if you wish to skip tests while doing so run `mvn package appengine:run -DskipTests=true` instead.
+Use `mvn package appengine:run` to run the devServer or if you wish to skip tests add `-DskipTests=true` at the end.
