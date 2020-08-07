@@ -76,7 +76,7 @@ Admin view of user statistics.
 Admin map view of user tasks.
 
 ---
-<img src="/demo-images/17.jpg?raw=true" width="700">
+<img src="/demo-images/17.jpg?raw=true" width="400">
 Admin meta-tasks designed for site upkeep.
 
 
