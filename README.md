@@ -13,43 +13,43 @@ Deployed Site: http://neighborgood-step.appspot.com/
 ## Static Demo
 
 <div style="text-align:center"><img src="/demo-images/1.gif?raw=true" width="700">
-Open tasks displayed in list-view and 'load-more' scroll demo.</div>
+<br/>Open tasks displayed in list-view and 'load-more' scroll demo.</div>
 <br/><br/>
 <div style="text-align:center"><img src="/demo-images/2.png?raw=true" width="700">
-Open tasks displayed in map-view.</div>
+<br/>Open tasks displayed in map-view.</div>
 <br/><br/>
 <div style="text-align:center"><img src="/demo-images/3.gif?raw=true" width="700">
-Tasks being filtered by category.</div>
+<br/>Tasks being filtered by category.</div>
 <br/><br/>
 <div style="text-align:center"><img src="/demo-images/4.gif?raw=true" width="700">
-User offering help with a task.</div>
+<br/>User offering help with a task.</div>
 <br/><br/>
 <div style="text-align:center"><img src="/demo-images/5.gif?raw=true" width="700">
-Searching tasks by a different neighborhood.</div>
+<br/>Searching tasks by a different neighborhood.</div>
 <br/><br/>
 <div style="text-align:center"><img src="/demo-images/6.png?raw=true" width="700">
-Top Scorers Board</div>
+<br/>Top Scorers Board</div>
 <br/><br/>
 <div style="text-align:center"><img src="/demo-images/7.gif?raw=true" width="700">
-Creating a user profile.</div>
+<br/>Creating a user profile.</div>
 <br/><br/>
 <div style="text-align:center"><img src="/demo-images/8.png?raw=true" width="700">
-User profile page - Need help view</div>
+<br/>User profile page - Need help view</div>
 <br/><br/>
 <div style="text-align:center"><img src="/demo-images/9.png?raw=true" width="700">
-User profile page - Offer help view</div>
+<br/>User profile page - Offer help view</div>
 <br/><br/>
 <div style="text-align:center"><img src="/demo-images/10.png?raw=true" width="700">
-Create a new task.</div>
+<br/>Create a new task.</div>
 <br/><br/>
 <div style="text-align:center"><img src="/demo-images/11.png?raw=true" width="700">
-Edit an existing task.</div>
+<br/>Edit an existing task.</div>
 <br/><br/>
 <div style="text-align:center"><img src="/demo-images/12.gif?raw=true" width="700">
-Messaging between task owner and helper.</div>
+<br/>Messaging between task owner and helper.</div>
 <br/><br/>
 <div style="text-align:center"><img src="/demo-images/13.gif?raw=true" width="700">
-Task message notification.</div>
+<br/>Task message notification.</div>
 
 
 ## Configuration
