@@ -63,6 +63,22 @@ Messaging between task owner and helper.
 <img src="/demo-images/13.gif?raw=true" width="700">
 Task message notification.
 
+---
+<img src="/demo-images/14.gif?raw=true" width="700">
+Admin Dashboard.
+
+---
+<img src="/demo-images/15.gif?raw=true" width="700">
+Admin view of user statistics.
+
+---
+<img src="/demo-images/16.gif?raw=true" width="700">
+Admin map view of user tasks.
+
+---
+<img src="/demo-images/17.jpg?raw=true" width="700">
+Admin meta-tasks designed for site upkeep.
+
 
 ## Configuration
 
