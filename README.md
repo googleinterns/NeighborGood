@@ -13,13 +13,18 @@ Deployed Site: http://neighborgood-step.appspot.com/
 ## Static Demo
 
 <img src="/demo-images/1.gif?raw=true" width="max">
-<img src="/demo-images/2.gif?raw=true" width="max">
+<img src="/demo-images/2.png?raw=true" width="max">
 <img src="/demo-images/3.gif?raw=true" width="max">
 <img src="/demo-images/4.gif?raw=true" width="max">
 <img src="/demo-images/5.gif?raw=true" width="max">
-<img src="/demo-images/6.gif?raw=true" width="max">
+<img src="/demo-images/6.png?raw=true" width="max">
 <img src="/demo-images/7.gif?raw=true" width="max">
-<img src="/demo-images/8.gif?raw=true" width="max">
+<img src="/demo-images/8.png?raw=true" width="max">
+<img src="/demo-images/9.png?raw=true" width="max">
+<img src="/demo-images/10.png?raw=true" width="max">
+<img src="/demo-images/11.png?raw=true" width="max">
+<img src="/demo-images/12.gif?raw=true" width="max">
+<img src="/demo-images/13.gif?raw=true" width="max">
 
 ## Configuration
 
