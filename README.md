@@ -13,27 +13,27 @@ Deployed Site: http://neighborgood-step.appspot.com/
 ## Static Demo
 
 <img src="/demo-images/1.gif?raw=true" width="700">
-<br/>Open tasks displayed in list-view. Scrolling to bottom of page will load more tasks until there are no more tasks.
+Open tasks displayed in list-view. Scrolling to bottom of page will load more tasks until there are no more tasks.
 
 ---
 <img src="/demo-images/2.png?raw=true" width="700">
-<br/>Open tasks displayed in map-view.
+Open tasks displayed in map-view.
 
 ---
 <img src="/demo-images/3.gif?raw=true" width="700">
-<br/>Tasks being filtered by category.
+Tasks being filtered by category.
 
 ---
 <img src="/demo-images/4.gif?raw=true" width="700">
-<br/>User offering help with a task.
+User offering help with a task.
 
 ---
 <img src="/demo-images/5.gif?raw=true" width="700">
-<br/>Searching tasks by a different neighborhood.
+Searching tasks by a different neighborhood.
 
 ---
 <img src="/demo-images/6.png?raw=true" width="700">
-<br/>Top Scorers Board
+Top Scorers Board
 
 ---
 <img src="/demo-images/7.gif?raw=true" width="700">
@@ -41,27 +41,27 @@ Deployed Site: http://neighborgood-step.appspot.com/
 
 ---
 <img src="/demo-images/8.png?raw=true" width="700">
-<br/>User profile page - Need help view
+User profile page - Need help view
 
 ---
 <img src="/demo-images/9.png?raw=true" width="700">
-<br/>User profile page - Offer help view
+User profile page - Offer help view
 
 ---
 <img src="/demo-images/10.png?raw=true" width="700">
-<br/>Create a new task.
+Create a new task.
 
 ---
 <img src="/demo-images/11.png?raw=true" width="700">
-<br/>Edit an existing task.
+Edit an existing task.
 
 ---
 <img src="/demo-images/12.gif?raw=true" width="700">
-<br/>Messaging between task owner and helper.
+Messaging between task owner and helper.
 
 ---
 <img src="/demo-images/13.gif?raw=true" width="700">
-<br/>Task message notification.
+Task message notification.
 
 
 ## Configuration
